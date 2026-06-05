@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CashPilot AI | Invoice Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;900&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "primary-fixed": "#e1e0ff",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-surface": "#2d3133",
+                        "surface-tint": "#494bd6",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#07006c",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-background": "#191c1e",
+                        "secondary-fixed": "#dae2fd",
+                        "on-secondary-fixed": "#131b2e",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-secondary-container": "#5c647a",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "tertiary-container": "#68788f",
+                        "on-primary-container": "#fffbff",
+                        "tertiary": "#4f5f76",
+                        "secondary": "#565e74",
+                        "primary-container": "#6063ee",
+                        "error-container": "#ffdad6",
+                        "background": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#4648d4",
+                        "on-tertiary-container": "#000510",
+                        "on-surface": "#191c1e",
+                        "secondary-container": "#dae2fd",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "outline": "#767586",
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-surface-variant": "#464554",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-high": "#e6e8ea",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "inverse-primary": "#c0c1ff",
+                        "surface-container-low": "#f2f4f6",
+                        "outline-variant": "#c7c4d7",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "mono-data": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "headline-xl": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "label-md": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "mono-data": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        .drawer-transition {
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .upload-gradient {
+            background: linear-gradient(135deg, rgba(70, 72, 212, 0.05) 0%, rgba(104, 120, 143, 0.05) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="h-screen w-64 flex flex-col fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant z-40 py-lg px-md space-y-base">
+<div class="px-md mb-xl">
+<h1 class="font-headline-sm text-headline-md font-black text-primary">CashPilot AI</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Small Business Mode</p>
+</div>
+<button class="mx-md mb-lg py-sm px-md bg-primary text-on-primary rounded-lg font-label-md flex items-center justify-center gap-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'wght' 600;">add</span>
+            New Document
+        </button>
+<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+<!-- Dashboard Tab -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<!-- Active Tab: Upload Center -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">upload_file</span>
+<span class="font-label-md">Upload Center</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">receipt_long</span>
+<span class="font-label-md">Invoices</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">timeline</span>
+<span class="font-label-md">Runway</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+<span class="font-label-md">Scenario</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">smart_toy</span>
+<span class="font-label-md">AI CFO</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">bar_chart</span>
+<span class="font-label-md">Analytics</span>
+</a>
+</nav>
+<div class="pt-lg border-t border-outline-variant space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+<span class="font-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">help</span>
+<span class="font-label-md">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-64 h-screen overflow-y-auto custom-scrollbar">
+<!-- Top Bar -->
+<header class="sticky top-0 z-30 bg-surface/80 backdrop-blur-md w-full h-16 border-b border-outline-variant flex items-center justify-between px-xl">
+<div class="flex items-center gap-md">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Upload Center</h2>
+<span class="px-sm py-xs bg-secondary-container text-on-secondary-container font-label-md rounded-lg">v2.4 Ready</span>
+</div>
+<div class="flex items-center gap-lg">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="pl-xl pr-md py-xs bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary font-body-sm w-64 transition-all" placeholder="Search invoices..." type="text"/>
+</div>
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-md">JD</div>
+<span class="font-label-md text-on-surface font-semibold">John Doe</span>
+</div>
+</div>
+</header>
+<div class="p-xl max-w-container-max mx-auto space-y-xl">
+<!-- Upload Area Section -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-lg">
+<div class="lg:col-span-2">
+<div class="upload-gradient border-2 border-dashed border-outline-variant rounded-xl p-xl flex flex-col items-center justify-center text-center cursor-pointer hover:border-primary transition-colors group relative overflow-hidden" id="dropzone">
+<div class="mb-md p-md bg-white shadow-sm rounded-full group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-primary text-[40px]" style="font-variation-settings: 'wght' 300;">cloud_upload</span>
+</div>
+<h3 class="font-headline-md text-on-surface mb-xs">Drag and drop documents</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">Support for PDF, JPG, PNG, receipts, and bank statements.</p>
+<div class="flex gap-md">
+<button class="px-lg py-sm bg-white border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-colors shadow-sm">Browse Files</button>
+<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm active:scale-95 transition-all">Connect Drive</button>
+</div>
+<!-- Progress Overlay (Hidden by default) -->
+<div class="hidden absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-xl" id="upload-progress">
+<span class="material-symbols-outlined text-primary animate-bounce mb-md">auto_awesome</span>
+<p class="font-label-md text-primary font-bold mb-sm">AI Analyzing Invoice Intelligence...</p>
+<div class="w-full max-w-md h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="w-0 h-full bg-primary transition-all duration-500 ease-out" id="progress-bar"></div>
+</div>
+<p class="font-body-sm text-on-surface-variant mt-sm">Processing 'Amazon_Logistics_Inv_442.pdf'</p>
+</div>
+</div>
+</div>
+<!-- Analysis Stats Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between shadow-sm">
+<div>
+<div class="flex justify-between items-center mb-lg">
+<h4 class="font-label-md font-bold uppercase tracking-wider text-on-surface-variant">Queue Status</h4>
+<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-primary"></div>
+<span class="font-body-sm">Pending Verification</span>
+</div>
+<span class="font-mono-data font-bold">12</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="font-body-sm">Auto-reconciled</span>
+</div>
+<span class="font-mono-data font-bold">148</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-error"></div>
+<span class="font-body-sm">Flagged for Review</span>
+</div>
+<span class="font-mono-data font-bold">3</span>
+</div>
+</div>
+</div>
+<div class="mt-xl pt-lg border-t border-outline-variant">
+<p class="font-body-sm text-on-surface-variant mb-md">AI Accuracy Rating</p>
+<div class="flex items-end gap-sm">
+<span class="font-headline-lg text-primary font-bold">99.2%</span>
+<span class="font-label-md text-green-600 mb-base flex items-center">+0.4% <span class="material-symbols-outlined text-[14px]">arrow_upward</span></span>
+</div>
+</div>
+</div>
+</section>
+<!-- Table Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="p-lg border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-md">
+<h3 class="font-headline-md font-bold">Invoice Intelligence</h3>
+<div class="flex items-center gap-sm">
+<button class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                            Filters
+                        </button>
+<button class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                            Export
+                        </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-surface-container-low border-b border-outline-variant">
+<tr>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Vendor Name</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Invoice No.</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Amount</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Due Date</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">AI Priority</th>
+<th class="px-lg py-md"></th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant" id="invoice-table-body">
+<!-- Rows generated by JS -->
+</tbody>
+</table>
+</div>
+<div class="p-md flex items-center justify-between bg-surface-container-low/30">
+<p class="font-body-sm text-on-surface-variant">Showing 8 of 152 invoices</p>
+<div class="flex gap-xs">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-white text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-white text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">chevron_right</span></button>
+</div>
+</div>
+</section>
+</div>
+<footer class="w-full py-xl bg-surface-container-lowest border-t border-outline-variant">
+<div class="max-w-container-max mx-auto px-lg flex flex-col md:flex-row justify-between items-center gap-md">
+<div class="flex flex-col items-center md:items-start">
+<p class="font-headline-sm text-on-surface font-bold mb-xs">CashPilot AI</p>
+<p class="font-body-sm text-on-surface-variant">© 2024 CashPilot AI. All rights reserved.</p>
+</div>
+<div class="flex gap-xl">
+<a class="font-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Security</a>
+<a class="font-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- Side Panel / Detail Drawer -->
+<div class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300" id="drawer-overlay" onclick="closeDrawer()"></div>
+<aside class="fixed top-0 right-0 h-screen w-full max-w-lg bg-surface-container-lowest shadow-2xl z-50 translate-x-full drawer-transition flex flex-col border-l border-outline-variant" id="invoice-drawer">
+<div class="p-lg border-b border-outline-variant flex items-center justify-between bg-white">
+<h3 class="font-headline-md font-bold">Invoice Details</h3>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors" onclick="closeDrawer()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto custom-scrollbar p-lg space-y-xl">
+<!-- Header Info -->
+<div class="flex justify-between items-start">
+<div class="w-16 h-16 rounded-xl bg-primary-container flex items-center justify-center text-on-primary-container text-headline-md font-black" id="drawer-vendor-badge">
+                    A
+                </div>
+<div class="text-right">
+<p class="inline-block px-sm py-xs rounded-lg font-label-md mb-sm" id="drawer-status">Paid</p>
+<h4 class="font-headline-md font-bold" id="drawer-vendor-name">Acme Corp</h4>
+</div>
+</div>
+<!-- Main Data Grid -->
+<div class="grid grid-cols-2 gap-lg p-lg bg-surface-container-low rounded-xl">
+<div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Invoice Number</p>
+<p class="font-body-md font-bold text-on-surface" id="drawer-inv-no">INV-2024-001</p>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Amount Due</p>
+<p class="font-headline-md font-bold text-primary" id="drawer-amount">$12,450.00</p>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Issue Date</p>
+<p class="font-body-md text-on-surface">Oct 12, 2023</p>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Due Date</p>
+<p class="font-body-md text-on-surface" id="drawer-due">Nov 12, 2023</p>
+</div>
+</div>
+<!-- AI Strategy Section -->
+<div class="space-y-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+<h4 class="font-label-md font-bold uppercase tracking-wider text-primary">AI Payment Strategy</h4>
+</div>
+<div class="p-lg bg-primary/5 border border-primary/20 rounded-xl relative overflow-hidden">
+<div class="absolute top-0 right-0 p-md opacity-10">
+<span class="material-symbols-outlined text-[64px]">auto_awesome</span>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-sm mb-sm">
+<span class="px-sm py-xs bg-primary text-on-primary rounded font-mono-data font-bold" id="drawer-priority-score">94</span>
+<span class="font-label-md font-semibold text-primary">High Priority Strategy</span>
+</div>
+<p class="font-body-sm text-on-surface leading-relaxed mb-md">
+                            "Pay this invoice within the next 48 hours to secure a 2% early settlement discount ($249.00). Current cash flow projections show surplus availability for the Q4 cycle. Deferring this payment increases the risk of vendor credit rating impact."
+                        </p>
+<button class="w-full py-md bg-primary text-on-primary rounded-lg font-label-md font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all">
+                            Execute Early Payment
+                        </button>
+</div>
+</div>
+</div>
+<!-- Visual Preview Placeholder -->
+<div class="space-y-md">
+<p class="font-label-md font-bold uppercase tracking-wider text-on-surface-variant">Document Preview</p>
+<div class="aspect-[3/4] bg-surface-container rounded-xl flex items-center justify-center border border-outline-variant overflow-hidden">
+<img alt="Invoice Preview" class="w-full h-full object-cover grayscale opacity-50" data-alt="A sophisticated digital rendering of a financial document with clean typography, tables, and minimalist branding. The image has a professional, light-mode corporate aesthetic with subtle blue and slate grey tones. Soft lighting emphasizes the crisp edges of the paper texture within a high-tech financial software interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5wJ8GDQmqtpIPo0QgJSYywgn1qqQDzbVYot7V30pzayWuf9KINoxURXA_lnG-i26Br3GSiWIzzk54bxMhpfhTRN46kKJJnKJ8waj4WLXGiT51y4ZOxpKOkVHpB_Hl0eZe9g9-yidOPgn58blmDNeAg_H8Xj9dLiTiA4cNvcooq0plJGr2LsgVN2TNrOajrUsKV-ljHCCgHrMdt6M5FmHa3DFHNJEbpP5YrsecU9VdRNBydMoqNZNthWSVRMOqeOXpBh0dVxvaEJfA"/>
+</div>
+</div>
+</div>
+</aside>
+<script>
+        const mockData = [
+            { id: 1, vendor: 'Amazon Web Services', inv: 'AWS-992-K', amount: '$4,210.50', due: 'Oct 24, 2024', status: 'Pending', score: 92, color: 'text-primary' },
+            { id: 2, vendor: 'Google Workspace', inv: 'G-7712-X', amount: '$850.00', due: 'Oct 12, 2024', status: 'Paid', score: 45, color: 'text-on-surface-variant' },
+            { id: 3, vendor: 'Stripe Payments', inv: 'ST-004-P', amount: '$12,940.00', due: 'Oct 05, 2024', status: 'Late', score: 98, color: 'text-error' },
+            { id: 4, vendor: 'Adobe Creative Cloud', inv: 'AD-1123', amount: '$52.99', due: 'Nov 02, 2024', status: 'Pending', score: 12, color: 'text-on-surface-variant' },
+            { id: 5, vendor: 'WeWork Global', inv: 'WW-09-Q', amount: '$3,500.00', due: 'Oct 28, 2024', status: 'Pending', score: 88, color: 'text-primary' },
+            { id: 6, vendor: 'FedEx Shipping', inv: 'FX-778', amount: '$124.20', due: 'Oct 15, 2024', status: 'Paid', score: 32, color: 'text-on-surface-variant' },
+            { id: 7, vendor: 'Slack Technologies', inv: 'SL-8821', amount: '$2,400.00', due: 'Nov 12, 2024', status: 'Pending', score: 74, color: 'text-secondary' },
+            { id: 8, vendor: 'Microsoft Azure', inv: 'AZ-1229', amount: '$6,102.15', due: 'Oct 10, 2024', status: 'Late', score: 95, color: 'text-error' }
+        ];
+
+        const tableBody = document.getElementById('invoice-table-body');
+
+        function renderRows() {
+            tableBody.innerHTML = mockData.map(row => `
+                <tr class="hover:bg-surface-container-low cursor-pointer transition-colors group" onclick="openDrawer(${JSON.stringify(row).replace(/"/g, '&quot;')})">
+                    <td class="px-lg py-md">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center font-bold text-primary">
+                                ${row.vendor.charAt(0)}
+                            </div>
+                            <span class="font-body-md font-semibold text-on-surface">${row.vendor}</span>
+                        </div>
+                    </td>
+                    <td class="px-lg py-md font-mono-data text-on-surface-variant">${row.inv}</td>
+                    <td class="px-lg py-md font-mono-data font-bold">${row.amount}</td>
+                    <td class="px-lg py-md font-body-sm text-on-surface-variant">${row.due}</td>
+                    <td class="px-lg py-md">
+                        <span class="px-sm py-xs rounded-lg font-label-md ${
+                            row.status === 'Paid' ? 'bg-green-100 text-green-700' : 
+                            row.status === 'Late' ? 'bg-red-100 text-red-700' : 
+                            'bg-blue-100 text-blue-700'
+                        }">${row.status}</span>
+                    </td>
+                    <td class="px-lg py-md">
+                        <div class="flex items-center gap-sm">
+                            <div class="w-24 h-1.5 bg-surface-container rounded-full overflow-hidden">
+                                <div class="h-full bg-primary" style="width: ${row.score}%"></div>
+                            </div>
+                            <span class="font-mono-data font-bold ${row.score > 80 ? 'text-primary' : 'text-on-surface-variant'}">${row.score}</span>
+                        </div>
+                    </td>
+                    <td class="px-lg py-md text-right">
+                        <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openDrawer(data) {
+            const drawer = document.getElementById('invoice-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            
+            // Populate drawer
+            document.getElementById('drawer-vendor-name').textContent = data.vendor;
+            document.getElementById('drawer-vendor-badge').textContent = data.vendor.charAt(0);
+            document.getElementById('drawer-inv-no').textContent = data.inv;
+            document.getElementById('drawer-amount').textContent = data.amount;
+            document.getElementById('drawer-due').textContent = data.due;
+            document.getElementById('drawer-priority-score').textContent = data.score;
+            
+            const statusEl = document.getElementById('drawer-status');
+            statusEl.textContent = data.status;
+            statusEl.className = `inline-block px-sm py-xs rounded-lg font-label-md mb-sm ${
+                data.status === 'Paid' ? 'bg-green-100 text-green-700' : 
+                data.status === 'Late' ? 'bg-red-100 text-red-700' : 
+                'bg-blue-100 text-blue-700'
+            }`;
+
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                overlay.classList.add('opacity-100');
+                drawer.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeDrawer() {
+            const drawer = document.getElementById('invoice-drawer');
+            const overlay = document.getElementById('drawer-overlay');
+            
+            drawer.classList.add('translate-x-full');
+            overlay.classList.remove('opacity-100');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 300);
+        }
+
+        // Mock Upload Animation
+        const dropzone = document.getElementById('dropzone');
+        const progressOverlay = document.getElementById('upload-progress');
+        const progressBar = document.getElementById('progress-bar');
+
+        dropzone.addEventListener('click', () => {
+            progressOverlay.classList.remove('hidden');
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 20;
+                if (progress >= 100) {
+                    progress = 100;
+                    progressBar.style.width = '100%';
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progressOverlay.classList.add('hidden');
+                        progressBar.style.width = '0%';
+                        // Trigger a small notification or just reset
+                    }, 1000);
+                } else {
+                    progressBar.style.width = progress + '%';
+                }
+            }, 200);
+        });
+
+        renderRows();
+    </script>
+<div data-page-switcher>
+<div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
+<a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
+</div>
+</div></body></html>

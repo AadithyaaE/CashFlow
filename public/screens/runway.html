@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CashPilot AI | Cash Runway &amp; Scenario Simulator</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800;900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        @keyframes pulse-subtle {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "inverse-on-surface": "#eff1f3",
+                      "primary-fixed-dim": "#c0c1ff",
+                      "primary-fixed": "#e1e0ff",
+                      "on-primary-fixed-variant": "#2f2ebe",
+                      "inverse-surface": "#2d3133",
+                      "surface-tint": "#494bd6",
+                      "on-error": "#ffffff",
+                      "error": "#ba1a1a",
+                      "on-primary-fixed": "#07006c",
+                      "tertiary-fixed": "#d3e4fe",
+                      "on-background": "#191c1e",
+                      "secondary-fixed": "#dae2fd",
+                      "on-secondary-fixed": "#131b2e",
+                      "surface-container-highest": "#e0e3e5",
+                      "secondary-fixed-dim": "#bec6e0",
+                      "on-secondary-container": "#5c647a",
+                      "surface-variant": "#e0e3e5",
+                      "tertiary-fixed-dim": "#b7c8e1",
+                      "tertiary-container": "#68788f",
+                      "on-primary-container": "#fffbff",
+                      "tertiary": "#4f5f76",
+                      "secondary": "#565e74",
+                      "primary-container": "#6063ee",
+                      "error-container": "#ffdad6",
+                      "background": "#f7f9fb",
+                      "surface-bright": "#f7f9fb",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary": "#ffffff",
+                      "primary": "#4648d4",
+                      "on-tertiary-container": "#000510",
+                      "on-surface": "#191c1e",
+                      "secondary-container": "#dae2fd",
+                      "on-error-container": "#93000a",
+                      "on-secondary": "#ffffff",
+                      "outline": "#767586",
+                      "surface-container": "#eceef0",
+                      "surface": "#f7f9fb",
+                      "on-tertiary-fixed": "#0b1c30",
+                      "on-surface-variant": "#464554",
+                      "surface-dim": "#d8dadc",
+                      "surface-container-high": "#e6e8ea",
+                      "on-tertiary-fixed-variant": "#38485d",
+                      "on-secondary-fixed-variant": "#3f465c",
+                      "inverse-primary": "#c0c1ff",
+                      "surface-container-low": "#f2f4f6",
+                      "outline-variant": "#c7c4d7",
+                      "on-primary": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "16px",
+                      "container-max": "1280px",
+                      "xs": "4px",
+                      "sm": "8px",
+                      "md": "16px",
+                      "xl": "40px",
+                      "lg": "24px",
+                      "gutter": "24px",
+                      "base": "4px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "label-md": ["Geist"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "mono-data": ["Geist"],
+                      "body-lg": ["Inter"],
+                      "headline-xl": ["Hanken Grotesk"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                      "label-md": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "mono-data": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                      "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md overflow-x-hidden">
+<!-- Sidebar Navigation Shell -->
+<aside class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant py-lg px-md space-y-base z-30">
+<div class="flex items-center gap-md mb-xl px-sm">
+<div class="w-10 h-10 bg-primary flex items-center justify-center rounded-lg">
+<span class="material-symbols-outlined text-on-primary text-headline-md" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<div>
+<h1 class="font-headline-sm text-headline-sm font-black text-primary leading-tight">CashPilot AI</h1>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70 uppercase tracking-wider">Small Business Mode</p>
+</div>
+</div>
+<button class="flex items-center gap-md px-md py-sm rounded-lg bg-primary text-on-primary font-label-md hover:brightness-110 transition-all mb-lg">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span>New Document</span>
+</button>
+<nav class="flex-1 space-y-1">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="upload_file">upload_file</span>
+<span class="font-label-md">Upload Center</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
+<span class="font-label-md">Invoices</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="timeline">timeline</span>
+<span class="font-label-md">Runway</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-label-md">Scenario</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="font-label-md">AI CFO</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-label-md">Analytics</span>
+</a>
+</nav>
+<div class="pt-lg border-t border-outline-variant space-y-1">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md">Settings</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-label-md">Support</span>
+</a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 p-lg md:p-xl min-h-screen">
+<!-- Header -->
+<header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-xl gap-lg">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Cash Runway Explorer</h2>
+<p class="font-body-md text-on-surface-variant">Real-time depletion analysis and financial forecasting.</p>
+</div>
+<div class="flex gap-md bg-surface-container rounded-xl p-xs border border-outline-variant">
+<button class="px-lg py-sm bg-surface-container-lowest rounded-lg shadow-sm font-label-md text-primary">Daily</button>
+<button class="px-lg py-sm font-label-md text-on-surface-variant hover:text-on-surface">Weekly</button>
+<button class="px-lg py-sm font-label-md text-on-surface-variant hover:text-on-surface">Monthly</button>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Runway Interactive Graph Card -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm flex flex-col relative overflow-hidden">
+<div class="flex justify-between items-center mb-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="trending_down">trending_down</span>
+<h3 class="font-headline-md text-on-surface">Cash Depletion Timeline</h3>
+</div>
+<div class="text-right">
+<span class="font-label-md text-error bg-error-container px-md py-xs rounded-full">High Alert: 18 Days Left</span>
+</div>
+</div>
+<!-- Custom Graph Area -->
+<div class="relative h-64 w-full mt-lg">
+<!-- SVG Graph Line -->
+<svg class="w-full h-full drop-shadow-lg overflow-visible" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="lineGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4648d4" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#4648d4" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Area Fill -->
+<path d="M 0 50 L 100 65 L 200 85 L 300 110 L 400 145 L 500 165 L 600 185 L 650 200 L 0 200 Z" fill="url(#lineGradient)"></path>
+<!-- Main Line -->
+<path d="M 0 50 L 100 65 L 200 85 L 300 110 L 400 145 L 500 165 L 600 185 L 650 200" fill="none" stroke="#4648d4" stroke-linecap="round" stroke-width="3"></path>
+<!-- Active Point -->
+<circle class="animate-pulse-subtle" cx="0" cy="50" fill="#4648d4" r="5"></circle>
+<circle cx="650" cy="200" fill="#ba1a1a" r="5"></circle>
+</svg>
+<!-- Graph Annotations -->
+<div class="absolute top-0 left-0 -translate-y-4">
+<div class="bg-surface-container-high border border-outline-variant px-sm py-xs rounded text-on-surface font-mono-data text-xs">Today: ₹75,000</div>
+</div>
+<div class="absolute bottom-0 left-[81%] translate-y-4">
+<div class="bg-error-container border border-error/20 px-sm py-xs rounded text-error font-mono-data text-xs">Day 18: ₹0</div>
+</div>
+</div>
+<!-- X-Axis Labels -->
+<div class="flex justify-between mt-8 text-on-surface-variant font-label-md border-t border-outline-variant pt-md">
+<span>Now</span>
+<span>Day 5</span>
+<span>Day 10</span>
+<span>Day 15</span>
+<span class="text-error font-bold">Zero Cash</span>
+<span>Day 25</span>
+</div>
+</div>
+<!-- Stats Column -->
+<div class="lg:col-span-4 grid grid-cols-1 gap-lg">
+<!-- KPI Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-on-surface-variant mb-xs">Daily Burn Rate</p>
+<h4 class="font-headline-md text-on-surface font-bold">₹4,166<span class="text-body-sm font-normal text-on-surface-variant ml-xs">/day</span></h4>
+</div>
+<div class="p-sm bg-error-container/30 rounded-lg">
+<span class="material-symbols-outlined text-error" data-icon="local_fire_department">local_fire_department</span>
+</div>
+</div>
+<div class="mt-md flex items-center gap-xs text-error font-label-md">
+<span class="material-symbols-outlined text-sm" data-icon="arrow_upward">arrow_upward</span>
+<span>12% from last week</span>
+</div>
+</div>
+<!-- KPI Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-md text-on-surface-variant mb-xs">Available Capital</p>
+<h4 class="font-headline-md text-on-surface font-bold">₹75,000</h4>
+</div>
+<div class="p-sm bg-primary-fixed/30 rounded-lg">
+<span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
+</div>
+</div>
+<div class="mt-md w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full w-[18%]"></div>
+</div>
+<p class="mt-xs text-on-surface-variant font-label-md text-xs text-right">18% of monthly goal</p>
+</div>
+</div>
+<!-- Scenario Simulator Section -->
+<div class="lg:col-span-7 bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<div class="flex justify-between items-center mb-lg">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary" data-icon="science">science</span>
+<h3 class="font-headline-md text-on-surface">Scenario Simulator</h3>
+</div>
+<button class="text-primary font-label-md hover:underline flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm" data-icon="history">history</span>
+                        View History
+                    </button>
+</div>
+<div class="space-y-md">
+<!-- Scenario Input 1 -->
+<div class="flex flex-col md:flex-row gap-md items-end bg-surface-container-low p-md rounded-xl border border-outline-variant/50">
+<div class="flex-1 space-y-xs">
+<label class="font-label-md text-on-surface-variant px-xs">Scenario Description</label>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-md" data-icon="shopping_cart">shopping_cart</span>
+<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-body-md focus:ring-primary focus:border-primary" type="text" value="New equipment purchase"/>
+</div>
+</div>
+<div class="w-full md:w-32 space-y-xs">
+<label class="font-label-md text-on-surface-variant px-xs">Amount</label>
+<div class="relative">
+<span class="absolute left-sm top-1/2 -translate-y-1/2 font-mono-data text-on-surface-variant">₹</span>
+<input class="w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-mono-data focus:ring-primary focus:border-primary" type="text" value="50,000"/>
+</div>
+</div>
+<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm active:scale-95 transition-transform h-[46px]">Apply</button>
+</div>
+<!-- Scenario Input 2 -->
+<div class="flex flex-col md:flex-row gap-md items-end bg-surface-container-low p-md rounded-xl border border-outline-variant/50">
+<div class="flex-1 space-y-xs">
+<label class="font-label-md text-on-surface-variant px-xs">Scenario Description</label>
+<div class="relative">
+<span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-md" data-icon="person_add">person_add</span>
+<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-body-md focus:ring-primary focus:border-primary" placeholder="e.g. New Hire, Office Rent..." type="text"/>
+</div>
+</div>
+<div class="w-full md:w-32 space-y-xs">
+<label class="font-label-md text-on-surface-variant px-xs">Amount</label>
+<div class="relative">
+<span class="absolute left-sm top-1/2 -translate-y-1/2 font-mono-data text-on-surface-variant">₹</span>
+<input class="w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-mono-data focus:ring-primary focus:border-primary" placeholder="0" type="text"/>
+</div>
+</div>
+<button class="px-lg py-sm bg-surface-container-highest text-on-surface-variant rounded-lg font-label-md active:scale-95 transition-transform h-[46px]">Add New</button>
+</div>
+</div>
+<div class="mt-lg p-md border-l-4 border-error bg-error-container/10 rounded-r-lg">
+<p class="font-label-md text-on-surface"><span class="font-bold text-error">Warning:</span> If you proceed with the 'New equipment purchase', your runway will collapse to <span class="font-bold">6 days</span>. Immediate external funding required.</p>
+</div>
+</div>
+<!-- Payment Prioritization Engine Panel -->
+<div class="lg:col-span-5 bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-tertiary" data-icon="auto_awesome">auto_awesome</span>
+<h3 class="font-headline-md text-on-surface">Payment Prioritization</h3>
+</div>
+<div class="space-y-md">
+<!-- Recommendation 1 -->
+<div class="p-md rounded-xl border border-outline-variant hover:border-primary transition-colors">
+<div class="flex justify-between items-start mb-sm">
+<div>
+<h5 class="font-label-md text-on-surface font-bold">Utilities (BESCOM)</h5>
+<p class="text-xs font-mono-data text-on-surface-variant">₹12,450 • Due: Today</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-sm py-xs bg-primary-fixed text-on-primary-fixed-variant rounded-md text-[10px] font-bold uppercase tracking-tight">Pay Immediately</span>
+<div class="flex items-center gap-xs mt-xs">
+<span class="text-xs font-label-md text-on-surface-variant">Conf:</span>
+<span class="text-xs font-bold text-primary">98%</span>
+</div>
+</div>
+</div>
+<p class="text-body-sm text-on-surface-variant">Reasoning: Essential service. Late payment leads to immediate disruption of operations and credit score impact.</p>
+</div>
+<!-- Recommendation 2 -->
+<div class="p-md rounded-xl border border-outline-variant hover:border-outline transition-colors opacity-80 grayscale-[0.3]">
+<div class="flex justify-between items-start mb-sm">
+<div>
+<h5 class="font-label-md text-on-surface font-bold">Vendor ABC (Inventory)</h5>
+<p class="text-xs font-mono-data text-on-surface-variant">₹35,000 • Due: 2 Days</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-sm py-xs bg-surface-container-highest text-on-surface-variant rounded-md text-[10px] font-bold uppercase tracking-tight">Delay Priority</span>
+<div class="flex items-center gap-xs mt-xs">
+<span class="text-xs font-label-md text-on-surface-variant">Conf:</span>
+<span class="text-xs font-bold text-on-surface">82%</span>
+</div>
+</div>
+</div>
+<p class="text-body-sm text-on-surface-variant">Reasoning: Negotiated grace period of 7 days available. Cash preservation recommended for payroll cycle.</p>
+</div>
+<!-- Recommendation 3 -->
+<div class="p-md rounded-xl border border-outline-variant bg-surface-container-low/50">
+<div class="flex justify-between items-start mb-sm">
+<div>
+<h5 class="font-label-md text-on-surface font-bold">Cloud Infrastructure</h5>
+<p class="text-xs font-mono-data text-on-surface-variant">₹8,900 • Due: 5 Days</p>
+</div>
+<div class="flex flex-col items-end">
+<span class="px-sm py-xs bg-primary-fixed text-on-primary-fixed-variant rounded-md text-[10px] font-bold uppercase tracking-tight">Pay Immediately</span>
+<div class="flex items-center gap-xs mt-xs">
+<span class="text-xs font-label-md text-on-surface-variant">Conf:</span>
+<span class="text-xs font-bold text-primary">94%</span>
+</div>
+</div>
+</div>
+<p class="text-body-sm text-on-surface-variant">Reasoning: Critical infrastructure. Auto-renewals typically incur no grace period before service suspension.</p>
+</div>
+</div>
+<button class="w-full mt-lg py-sm border border-outline text-on-surface font-label-md rounded-lg hover:bg-surface-container transition-all">
+                    Generate Optimized Payment Plan
+                </button>
+</div>
+</div>
+<!-- Atmospheric Image Footer Section -->
+<section class="mt-xl grid grid-cols-1 md:grid-cols-2 gap-lg items-center bg-surface-container-high/30 rounded-2xl p-lg border border-outline-variant">
+<div class="space-y-md">
+<h4 class="font-headline-md text-on-surface">Secure Financial Data Pipelines</h4>
+<p class="font-body-md text-on-surface-variant">Your data is encrypted using military-grade AES-256 and synchronized via secure banking protocols. CashPilot AI never stores your actual credentials.</p>
+<div class="flex gap-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+<span class="font-label-md">SOC2 Type II</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="lock">lock</span>
+<span class="font-label-md">PCI Compliant</span>
+</div>
+</div>
+</div>
+<div class="relative h-48 md:h-64 rounded-xl overflow-hidden shadow-lg border border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="A macro close-up of a high-tech financial server rack with glowing blue and indigo fiber optic cables. The lighting is dramatic and futuristic, creating a professional enterprise fintech atmosphere. The background is a sleek, dark data center with sharp lines and a minimalist corporate aesthetic. The overall mood is one of extreme security, reliability, and advanced technological precision." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1RiFAzuuj5z8iJduBnwmf5g1IRhijVJ2mWgUcTs7O2QdtgYR_nQmKBObl_xauDdAR1qzhB7FmJ4HI3J3LCx1PeJtHJhJwaeQsbm49TiM_E-wVqRc1z99e8fXa9H4e8PLIQvVC19ePYo7_vTLjMmJE76CmB-f72FDh7nGRK9R0iqX8Oad_SJD-tkyeEJg_LETdygnKXA6zWAKMz1OF9J_Q5nzKNMCcmT_LPXyMnE6NfGIkPm-MbXTIdToZwbbYghtcEohStpmG5MDs"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="md:ml-64 bg-surface-container-lowest border-t border-outline-variant py-xl mt-xl">
+<div class="max-w-container-max mx-auto px-lg flex flex-col md:flex-row justify-between items-center gap-lg">
+<div class="flex items-center gap-md">
+<span class="font-headline-sm text-headline-sm font-bold text-on-surface">CashPilot AI</span>
+<span class="text-on-surface-variant opacity-50">|</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 CashPilot AI. All rights reserved.</p>
+</div>
+<div class="flex gap-lg">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Security</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary underline transition-all" href="#">Contact</a>
+</div>
+</div>
+</footer>
+<!-- Mobile Navigation (Visible only on mobile) -->
+<div class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-outline-variant z-50 px-md py-sm flex justify-around">
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="text-[10px] font-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-primary font-bold" href="#">
+<span class="material-symbols-outlined" data-icon="timeline">timeline</span>
+<span class="text-[10px] font-label-md">Runway</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="text-[10px] font-label-md">CFO</span>
+</a>
+<a class="flex flex-col items-center gap-xs text-on-surface-variant" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="text-[10px] font-label-md">Settings</span>
+</a>
+</div>
+<script>
+        // Micro-interactions for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                let ripple = document.createElement('span');
+                ripple.classList.add('ripple');
+                this.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Simple Scenario simulation logic
+        const applyBtn = document.querySelector('button.bg-primary');
+        const warningDiv = document.querySelector('.border-error.bg-error-container\\/10');
+        
+        applyBtn.addEventListener('click', () => {
+            applyBtn.innerHTML = 'Recalculating...';
+            applyBtn.disabled = true;
+            
+            setTimeout(() => {
+                applyBtn.innerHTML = 'Applied';
+                applyBtn.classList.replace('bg-primary', 'bg-tertiary');
+                warningDiv.classList.remove('hidden');
+                warningDiv.classList.add('animate-pulse');
+                setTimeout(() => warningDiv.classList.remove('animate-pulse'), 2000);
+            }, 800);
+        });
+    </script>
+<div data-page-switcher>
+<div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
+<a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
+</div>
+</div></body></html>

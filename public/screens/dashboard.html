@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CashPilot AI | Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800;900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "primary-fixed": "#e1e0ff",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-surface": "#2d3133",
+                        "surface-tint": "#494bd6",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#07006c",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-background": "#191c1e",
+                        "secondary-fixed": "#dae2fd",
+                        "on-secondary-fixed": "#131b2e",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-secondary-container": "#5c647a",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "tertiary-container": "#68788f",
+                        "on-primary-container": "#fffbff",
+                        "tertiary": "#4f5f76",
+                        "secondary": "#565e74",
+                        "primary-container": "#6063ee",
+                        "error-container": "#ffdad6",
+                        "background": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#4648d4",
+                        "on-tertiary-container": "#000510",
+                        "on-surface": "#191c1e",
+                        "secondary-container": "#dae2fd",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "outline": "#767586",
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-surface-variant": "#464554",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-high": "#e6e8ea",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "inverse-primary": "#c0c1ff",
+                        "surface-container-low": "#f2f4f6",
+                        "outline-variant": "#c7c4d7",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "mono-data": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "headline-xl": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "label-md": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "mono-data": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .gauge-ring {
+            transition: stroke-dashoffset 0.5s ease-out;
+        }
+        .bento-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 24px;
+        }
+        /* Custom scrollbar for premium look */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e0e3e5; border-radius: 10px; }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+<!-- Sidebar Navigation Shell -->
+<aside class="h-screen w-64 flex-col fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant z-40 hidden md:flex py-lg px-md space-y-base">
+<div class="mb-xl px-sm">
+<h1 class="font-headline-sm text-headline-sm font-black text-primary">CashPilot AI</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Small Business Mode</p>
+</div>
+<button class="w-full mb-lg flex items-center justify-center gap-sm bg-primary text-on-primary py-md rounded-xl font-label-md shadow-md hover:bg-primary-container transition-all active:scale-95">
+<span class="material-symbols-outlined">add</span>
+            New Document
+        </button>
+<nav class="flex-1 space-y-xs overflow-y-auto">
+<!-- Active State Dashboard -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">upload_file</span>
+                Upload Center
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">receipt_long</span>
+                Invoices
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">timeline</span>
+                Runway
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+                Scenario
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+                AI CFO
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined">bar_chart</span>
+                Analytics
+            </a>
+</nav>
+<div class="pt-lg border-t border-outline-variant space-y-xs">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200" href="#">
+<span class="material-symbols-outlined">settings</span>
+                Settings
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200" href="#">
+<span class="material-symbols-outlined">help</span>
+                Support
+            </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 p-lg md:p-xl bg-background min-h-screen">
+<!-- Header -->
+<header class="flex justify-between items-center mb-xl">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Financial Overview</h2>
+<p class="text-on-surface-variant font-body-md">Last synchronized: 12 minutes ago</p>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-sm text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
+                    JS
+                </div>
+</div>
+</header>
+<!-- Bento Grid Layout -->
+<div class="bento-grid">
+<!-- Key Metrics Bar (Row 1) -->
+<div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-3 gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-on-surface-variant font-label-md">Current Balance</span>
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface">₹75,000</div>
+<div class="mt-base flex items-center text-success text-sm font-medium text-primary">
+<span class="material-symbols-outlined text-sm">trending_up</span>
+                        +12.5% from last month
+                    </div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-on-surface-variant font-label-md">Total Payables</span>
+<span class="material-symbols-outlined text-error">payments</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface">₹52,000</div>
+<div class="mt-base text-on-surface-variant text-sm">Due in 15 days</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow">
+<div class="flex justify-between items-start mb-sm">
+<span class="text-on-surface-variant font-label-md">Total Receivables</span>
+<span class="material-symbols-outlined text-tertiary">request_quote</span>
+</div>
+<div class="font-headline-md text-headline-md text-on-surface">₹40,000</div>
+<div class="mt-base text-on-surface-variant text-sm">₹12,000 overdue</div>
+</div>
+</div>
+<!-- Health Score Circular Gauge (Row 1 Right) -->
+<div class="col-span-12 lg:col-span-4 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col items-center justify-center relative overflow-hidden">
+<div class="absolute top-4 left-4 font-label-md text-on-surface-variant uppercase tracking-wider">Health Score</div>
+<div class="relative flex items-center justify-center">
+<svg class="w-40 h-40 transform -rotate-90">
+<circle class="text-surface-container" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary gauge-ring" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="79.2" stroke-linecap="round" stroke-width="12"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="font-headline-xl text-headline-xl text-primary leading-none">82</span>
+<span class="font-label-md text-on-surface-variant">Optimal</span>
+</div>
+</div>
+<div class="mt-md text-center text-on-surface-variant text-body-sm px-md">
+                    Your financial health is strong. Improving your A/R turnover could boost this to 90+.
+                </div>
+</div>
+<!-- Main Liquidity Chart (Row 2 Left) -->
+<div class="col-span-12 lg:col-span-8 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex justify-between items-center mb-xl">
+<h3 class="font-headline-md text-headline-md text-on-surface">Liquidity Trend</h3>
+<div class="flex bg-surface-container-low p-xs rounded-lg">
+<button class="px-md py-xs rounded-md bg-white shadow-sm text-label-md font-bold">Cash Flow</button>
+<button class="px-md py-xs rounded-md text-on-surface-variant text-label-md">Projection</button>
+</div>
+</div>
+<!-- Simulated Chart -->
+<div class="relative h-64 w-full flex items-end justify-between px-md">
+<div class="absolute inset-0 flex flex-col justify-between py-4 pointer-events-none">
+<div class="border-t border-dashed border-outline-variant w-full"></div>
+<div class="border-t border-dashed border-outline-variant w-full"></div>
+<div class="border-t border-dashed border-outline-variant w-full"></div>
+<div class="border-t border-dashed border-outline-variant w-full"></div>
+</div>
+<!-- Chart Bars -->
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:bg-primary" style="height: 60%;"></div>
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:bg-primary" style="height: 45%;"></div>
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:bg-primary" style="height: 80%;"></div>
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:bg-primary" style="height: 65%;"></div>
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:bg-primary" style="height: 90%;"></div>
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:bg-primary" style="height: 70%;"></div>
+<div class="w-12 bg-primary-container rounded-t-lg transition-all hover:bg-primary" style="height: 85%;"></div>
+<div class="w-12 bg-primary-fixed-dim rounded-t-lg border-2 border-dashed border-primary" style="height: 55%;"></div>
+</div>
+<div class="flex justify-between mt-md px-md text-label-md text-on-surface-variant">
+<span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span><span class="font-bold text-primary">AUG (EST)</span>
+</div>
+</div>
+<!-- AI CFO Chat (Row 2 & 3 Right - Floating Sidebar style) -->
+<div class="col-span-12 lg:col-span-4 row-span-2 flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl shadow-lg overflow-hidden h-[600px] lg:h-auto">
+<div class="bg-primary p-lg flex items-center gap-md">
+<div class="bg-white/20 p-sm rounded-lg">
+<span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div>
+<h3 class="text-white font-headline-md leading-tight">AI CFO</h3>
+<p class="text-white/80 text-body-sm">Active &amp; Analyzing Data</p>
+</div>
+</div>
+<div class="flex-1 overflow-y-auto p-lg space-y-lg bg-surface-container-low/30">
+<div class="flex flex-col items-start max-w-[85%]">
+<div class="bg-white border border-outline-variant p-md rounded-xl rounded-tl-none shadow-sm text-body-md">
+                            Good morning! I've analyzed your upcoming vendor payments. Your **cash runway** is currently **18 days**.
+                        </div>
+<span class="text-xs text-on-surface-variant mt-xs">CFO • 09:41 AM</span>
+</div>
+<div class="flex flex-col items-end max-w-[85%] ml-auto">
+<div class="bg-primary text-on-primary p-md rounded-xl rounded-tr-none shadow-sm text-body-md">
+                            What can I do to extend the runway by 10 days?
+                        </div>
+<span class="text-xs text-on-surface-variant mt-xs">You • 09:42 AM</span>
+</div>
+<div class="flex flex-col items-start max-w-[85%]">
+<div class="bg-white border border-outline-variant p-md rounded-xl rounded-tl-none shadow-sm text-body-md">
+                            By deferring the Amazon Web Services payment (₹12,000) by 5 days and accelerating the invoice for "Digital Corp" (₹8,500), you can reach 29 days.
+                        </div>
+<span class="text-xs text-on-surface-variant mt-xs">CFO • 09:43 AM</span>
+</div>
+</div>
+<div class="p-md border-t border-outline-variant bg-white">
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-xl pr-12 focus:ring-2 focus:ring-primary" placeholder="Ask about runway, taxes, or P&amp;L..." type="text"/>
+<button class="absolute right-2 top-1/2 -translate-y-1/2 text-primary p-sm">
+<span class="material-symbols-outlined">send</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Smart Alerts & Secondary Metrics (Row 3 Left) -->
+<div class="col-span-12 lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Smart Alerts -->
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+<div class="flex items-center gap-sm mb-lg">
+<span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Smart Alerts</h3>
+</div>
+<div class="space-y-md">
+<div class="flex items-start gap-md p-md bg-error-container/30 rounded-lg border-l-4 border-error">
+<span class="material-symbols-outlined text-error mt-xs">priority_high</span>
+<div>
+<p class="font-bold text-on-error-container">Cash Warning</p>
+<p class="text-body-sm text-on-surface-variant">Cash balance may reach zero in 6 days if receivables are delayed.</p>
+</div>
+</div>
+<div class="flex items-start gap-md p-md bg-secondary-container/30 rounded-lg border-l-4 border-secondary">
+<span class="material-symbols-outlined text-secondary mt-xs">schedule</span>
+<div>
+<p class="font-bold text-on-secondary-container">Tax Deadline</p>
+<p class="text-body-sm text-on-surface-variant">GST filing due in 4 days. Estimated liability: ₹14,200.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Runway & Risk Score -->
+<div class="grid grid-rows-2 gap-lg">
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex items-center justify-between">
+<div>
+<span class="text-on-surface-variant font-label-md">Cash Runway</span>
+<div class="font-headline-md text-headline-md text-error">18 Days</div>
+</div>
+<div class="w-12 h-12 bg-error-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-error">history</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex items-center justify-between">
+<div>
+<span class="text-on-surface-variant font-label-md">Risk Score</span>
+<div class="font-headline-md text-headline-md text-secondary">Medium</div>
+</div>
+<div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary">security</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Upcoming Obligations (Row 4 Full) -->
+<div class="col-span-12 bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+<div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
+<h3 class="font-headline-md text-headline-md text-on-surface">Upcoming Obligations</h3>
+<button class="text-primary font-label-md hover:underline">View Calendar</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-surface-container-low text-on-surface-variant font-label-md uppercase tracking-wider">
+<tr>
+<th class="px-lg py-md font-medium">Recipient</th>
+<th class="px-lg py-md font-medium">Type</th>
+<th class="px-lg py-md font-medium">Due Date</th>
+<th class="px-lg py-md font-medium text-right">Amount</th>
+<th class="px-lg py-md font-medium text-center">Status</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant">
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-lg py-md flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs">A</div>
+<span class="font-medium">AWS Cloud Services</span>
+</td>
+<td class="px-lg py-md text-on-surface-variant">SaaS Subscription</td>
+<td class="px-lg py-md">Aug 24, 2024</td>
+<td class="px-lg py-md text-right font-mono-data">₹12,400.00</td>
+<td class="px-lg py-md text-center">
+<span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full text-xs font-bold">Scheduled</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-lg py-md flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs">R</div>
+<span class="font-medium">Reliance Property Group</span>
+</td>
+<td class="px-lg py-md text-on-surface-variant">Office Rent</td>
+<td class="px-lg py-md">Aug 28, 2024</td>
+<td class="px-lg py-md text-right font-mono-data">₹25,000.00</td>
+<td class="px-lg py-md text-center">
+<span class="bg-tertiary-container text-on-tertiary-container px-sm py-xs rounded-full text-xs font-bold">Pending</span>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/50 transition-colors">
+<td class="px-lg py-md flex items-center gap-md">
+<div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs">T</div>
+<span class="font-medium">Tax Authority</span>
+</td>
+<td class="px-lg py-md text-on-surface-variant">GST Payment</td>
+<td class="px-lg py-md">Aug 20, 2024</td>
+<td class="px-lg py-md text-right font-mono-data">₹14,200.00</td>
+<td class="px-lg py-md text-center">
+<span class="bg-error-container text-on-error-container px-sm py-xs rounded-full text-xs font-bold">Overdue</span>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-xl py-lg border-t border-outline-variant flex flex-col md:flex-row justify-between items-center text-on-surface-variant font-body-sm">
+<p>© 2024 CashPilot AI. All rights reserved.</p>
+<div class="flex gap-lg mt-md md:mt-0">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Security</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+</footer>
+</main>
+<!-- Contextual FAB (Only for Dashboard/Home) -->
+<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 md:hidden">
+<span class="material-symbols-outlined">add</span>
+</button>
+<script>
+        // Simple Interaction: Animate the Gauge on load
+        window.addEventListener('load', () => {
+            const circle = document.querySelector('.gauge-ring');
+            const score = 82;
+            const radius = 70;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (score / 100) * circumference;
+            circle.style.strokeDasharray = `${circumference}`;
+            circle.style.strokeDashoffset = `${offset}`;
+        });
+
+        // Toggle Sidebar on mobile (Simulation)
+        // In a real app, this would be a full hamburger menu logic
+    </script>
+<div data-page-switcher>
+<div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
+<a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
+</div>
+</div></body></html>

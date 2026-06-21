@@ -140,36 +140,125 @@
             New Document
         </button>
 <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
-<!-- Dashboard Tab -->
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
-<span class="font-label-md">Dashboard</span>
-</a>
-<!-- Active Tab: Upload Center -->
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="#">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">upload_file</span>
-<span class="font-label-md">Upload Center</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">receipt_long</span>
-<span class="font-label-md">Invoices</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">timeline</span>
-<span class="font-label-md">Runway</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
-<span class="font-label-md">Scenario</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">smart_toy</span>
-<span class="font-label-md">AI CFO</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">bar_chart</span>
-<span class="font-label-md">Analytics</span>
-</a>
+
+    <!-- Dashboard -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/dashboard.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            dashboard
+        </span>
+
+        <span class="font-label-md">
+            Dashboard
+        </span>
+
+    </a>
+
+    <!-- Invoice Hub -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all"
+       href="/screens/invoices.html">
+
+        <span class="material-symbols-outlined"
+              style="font-variation-settings:'FILL' 1;">
+            upload_file
+        </span>
+
+        <span class="font-label-md">
+            Invoice Hub
+        </span>
+
+    </a>
+
+    <!-- Cash Runway -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/runway.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            timeline
+        </span>
+
+        <span class="font-label-md">
+            Cash Runway
+        </span>
+
+    </a>
+
+    <!-- Analytics -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/analytics.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            analytics
+        </span>
+
+        <span class="font-label-md">
+            Analytics
+        </span>
+
+    </a>
+
+    <!-- AI Recommendations -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            psychology
+        </span>
+
+        <span class="font-label-md">
+            AI Recommendations
+        </span>
+
+    </a>
+
+    <!-- Payment Priorities -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            priority_high
+        </span>
+
+        <span class="font-label-md">
+            Payment Priorities
+        </span>
+
+    </a>
+
+    <!-- Vendor Negotiator -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            forum
+        </span>
+
+        <span class="font-label-md">
+            Vendor Negotiator
+        </span>
+
+    </a>
+
+    <!-- Sidebar KPI Card -->
+    <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
+
+        <p class="text-xs text-on-surface-variant">
+            Current Cash Position
+        </p>
+
+        <h4 id="sidebarBalance"
+            class="font-headline-md text-primary font-bold mt-xs">
+            ₹75,000
+        </h4>
+
+        <p id="sidebarRunway"
+           class="text-xs text-on-surface-variant mt-xs">
+           18 days runway
+        </p>
+
+    </div>
+
 </nav>
 <div class="pt-lg border-t border-outline-variant space-y-xs">
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
@@ -396,55 +485,143 @@
 </div>
 </aside>
 <script>
-        const mockData = [
-            { id: 1, vendor: 'Amazon Web Services', inv: 'AWS-992-K', amount: '$4,210.50', due: 'Oct 24, 2024', status: 'Pending', score: 92, color: 'text-primary' },
-            { id: 2, vendor: 'Google Workspace', inv: 'G-7712-X', amount: '$850.00', due: 'Oct 12, 2024', status: 'Paid', score: 45, color: 'text-on-surface-variant' },
-            { id: 3, vendor: 'Stripe Payments', inv: 'ST-004-P', amount: '$12,940.00', due: 'Oct 05, 2024', status: 'Late', score: 98, color: 'text-error' },
-            { id: 4, vendor: 'Adobe Creative Cloud', inv: 'AD-1123', amount: '$52.99', due: 'Nov 02, 2024', status: 'Pending', score: 12, color: 'text-on-surface-variant' },
-            { id: 5, vendor: 'WeWork Global', inv: 'WW-09-Q', amount: '$3,500.00', due: 'Oct 28, 2024', status: 'Pending', score: 88, color: 'text-primary' },
-            { id: 6, vendor: 'FedEx Shipping', inv: 'FX-778', amount: '$124.20', due: 'Oct 15, 2024', status: 'Paid', score: 32, color: 'text-on-surface-variant' },
-            { id: 7, vendor: 'Slack Technologies', inv: 'SL-8821', amount: '$2,400.00', due: 'Nov 12, 2024', status: 'Pending', score: 74, color: 'text-secondary' },
-            { id: 8, vendor: 'Microsoft Azure', inv: 'AZ-1229', amount: '$6,102.15', due: 'Oct 10, 2024', status: 'Late', score: 95, color: 'text-error' }
-        ];
+        const tableBody = document.getElementById(
+    "invoice-table-body"
+);
 
-        const tableBody = document.getElementById('invoice-table-body');
+async function loadInvoices() {
 
-        function renderRows() {
-            tableBody.innerHTML = mockData.map(row => `
-                <tr class="hover:bg-surface-container-low cursor-pointer transition-colors group" onclick="openDrawer(${JSON.stringify(row).replace(/"/g, '&quot;')})">
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/invoices"
+        );
+
+        const invoices =
+            await response.json();
+
+        tableBody.innerHTML = "";
+
+        invoices.forEach(invoice => {
+
+            tableBody.innerHTML += `
+                <tr class="hover:bg-surface-container-low transition-colors">
+
                     <td class="px-lg py-md">
                         <div class="flex items-center gap-md">
+
                             <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center font-bold text-primary">
-                                ${row.vendor.charAt(0)}
+                                ${invoice.vendor.charAt(0)}
                             </div>
-                            <span class="font-body-md font-semibold text-on-surface">${row.vendor}</span>
+
+                            <span class="font-body-md font-semibold text-on-surface">
+                                ${invoice.vendor}
+                            </span>
+
                         </div>
                     </td>
-                    <td class="px-lg py-md font-mono-data text-on-surface-variant">${row.inv}</td>
-                    <td class="px-lg py-md font-mono-data font-bold">${row.amount}</td>
-                    <td class="px-lg py-md font-body-sm text-on-surface-variant">${row.due}</td>
-                    <td class="px-lg py-md">
-                        <span class="px-sm py-xs rounded-lg font-label-md ${
-                            row.status === 'Paid' ? 'bg-green-100 text-green-700' : 
-                            row.status === 'Late' ? 'bg-red-100 text-red-700' : 
-                            'bg-blue-100 text-blue-700'
-                        }">${row.status}</span>
+
+                    <td class="px-lg py-md font-mono-data text-on-surface-variant">
+                        INV-${invoice.id}
                     </td>
+
+                    <td class="px-lg py-md font-mono-data font-bold">
+                        ₹${invoice.amount.toLocaleString()}
+                    </td>
+
+                    <td class="px-lg py-md font-body-sm text-on-surface-variant">
+                        ${invoice.due_date}
+                    </td>
+
+                    <td class="px-lg py-md">
+                        <span class="px-sm py-xs rounded-lg font-label-md bg-blue-100 text-blue-700">
+                            Pending
+                        </span>
+                    </td>
+
                     <td class="px-lg py-md">
                         <div class="flex items-center gap-sm">
+
                             <div class="w-24 h-1.5 bg-surface-container rounded-full overflow-hidden">
-                                <div class="h-full bg-primary" style="width: ${row.score}%"></div>
+
+                                <div
+                                    class="h-full bg-primary"
+                                    style="width:90%">
+                                </div>
+
                             </div>
-                            <span class="font-mono-data font-bold ${row.score > 80 ? 'text-primary' : 'text-on-surface-variant'}">${row.score}</span>
+
+                            <span class="font-mono-data font-bold text-primary">
+                                90
+                            </span>
+
                         </div>
                     </td>
-                    <td class="px-lg py-md text-right">
-                        <span class="material-symbols-outlined text-on-surface-variant opacity-0 group-hover:opacity-100 transition-opacity">chevron_right</span>
-                    </td>
-                </tr>
-            `).join('');
-        }
 
+                    <td class="px-lg py-md text-right">
+
+    <button
+        onclick="deleteInvoice(${invoice.id})"
+        class="text-red-500 hover:text-red-700">
+
+        <span class="material-symbols-outlined">
+            delete
+        </span>
+
+    </button>
+
+</td>
+
+                </tr>
+            `;
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+}
+
+loadInvoices();
+
+setInterval(
+    loadInvoices,
+    5000
+);
+
+
+async function deleteInvoice(id) {
+
+    const confirmed =
+        confirm("Delete this invoice?");
+
+    if (!confirmed) return;
+
+    try {
+
+        const response = await fetch(
+            `http://127.0.0.1:8000/invoice/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        const result =
+            await response.json();
+
+        console.log(result);
+
+        loadInvoices();
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Delete failed");
+
+    }
+}
         function openDrawer(data) {
             const drawer = document.getElementById('invoice-drawer');
             const overlay = document.getElementById('drawer-overlay');
@@ -484,31 +661,98 @@
         }
 
         // Mock Upload Animation
-        const dropzone = document.getElementById('dropzone');
-        const progressOverlay = document.getElementById('upload-progress');
-        const progressBar = document.getElementById('progress-bar');
+        const dropzone = document.getElementById("dropzone");
+const progressOverlay = document.getElementById("upload-progress");
+const progressBar = document.getElementById("progress-bar");
 
-        dropzone.addEventListener('click', () => {
-            progressOverlay.classList.remove('hidden');
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 20;
-                if (progress >= 100) {
-                    progress = 100;
-                    progressBar.style.width = '100%';
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        progressOverlay.classList.add('hidden');
-                        progressBar.style.width = '0%';
-                        // Trigger a small notification or just reset
-                    }, 1000);
-                } else {
-                    progressBar.style.width = progress + '%';
-                }
-            }, 200);
-        });
+const fileInput = document.createElement("input");
 
-        renderRows();
+fileInput.type = "file";
+fileInput.accept = ".pdf";
+
+dropzone.addEventListener("click", () => {
+    fileInput.click();
+});
+
+fileInput.addEventListener("change", async () => {
+
+    const file = fileInput.files[0];
+
+    if (!file) return;
+
+    progressOverlay.classList.remove("hidden");
+    progressBar.style.width = "20%";
+
+    const formData = new FormData();
+
+    formData.append("file", file);
+
+    try {
+
+        progressBar.style.width = "60%";
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/upload-invoice",
+            {
+                method: "POST",
+                body: formData
+            }
+        );
+
+        const result = await response.json();
+
+        progressBar.style.width = "100%";
+
+        setTimeout(() => {
+
+            progressOverlay.classList.add("hidden");
+            progressBar.style.width = "0%";
+
+            alert(
+                `Invoice Uploaded\n\nVendor: ${result.vendor}\nAmount: ₹${result.amount}`
+            );
+
+            loadInvoices();
+
+        }, 1000);
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Upload failed");
+
+        progressOverlay.classList.add("hidden");
+        progressBar.style.width = "0%";
+    }
+});
+
+
+
+async function deleteInvoice(id) {
+
+    const confirmed =
+        confirm("Delete this invoice?");
+
+    if (!confirmed) return;
+
+    try {
+
+        await fetch(
+            `http://127.0.0.1:8000/invoice/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        loadInvoices();
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+}
     </script>
 <div data-page-switcher>
 <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">

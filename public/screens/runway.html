@@ -139,35 +139,140 @@
 <span class="material-symbols-outlined" data-icon="add">add</span>
 <span>New Document</span>
 </button>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-label-md">Dashboard</span>
+<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+
+    <!-- Dashboard -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/dashboard.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            dashboard
+        </span>
+
+        <span class="font-label-md">
+            Dashboard
+        </span>
+
+    </a>
+
+    <!-- Invoice Hub -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all"
+       href="/screens/invoices.html">
+
+        <span class="material-symbols-outlined"
+              style="font-variation-settings:'FILL' 1;">
+            upload_file
+        </span>
+
+        <span class="font-label-md">
+            Invoice Hub
+        </span>
+
+    </a>
+
+<!-- Cash Runway -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+   href="/screens/runway.html">
+
+    <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+        timeline
+    </span>
+
+    <span class="font-label-md">
+        Cash Runway
+    </span>
+
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="upload_file">upload_file</span>
-<span class="font-label-md">Upload Center</span>
+
+<!-- Analytics -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+   href="/screens/analytics.html">
+
+    <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+        analytics
+    </span>
+
+    <span class="font-label-md">
+        Analytics
+    </span>
+
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
-<span class="font-label-md">Invoices</span>
+
+<!-- Scenario Simulator -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+   href="/screens/runway.html#scenario">
+
+    <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+        science
+    </span>
+
+    <span class="font-label-md">
+        Scenario Simulator
+    </span>
+
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="timeline">timeline</span>
-<span class="font-label-md">Runway</span>
+
+<!-- Payment Priorities -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+   href="/screens/analytics.html#priorities">
+
+    <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+        priority_high
+    </span>
+
+    <span class="font-label-md">
+        Payment Priorities
+    </span>
+
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="font-label-md">Scenario</span>
+
+<!-- Vendor Negotiator -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+   href="/screens/analytics.html#negotiator">
+
+    <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+        forum
+    </span>
+
+    <span class="font-label-md">
+        Vendor Negotiator
+    </span>
+
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
-<span class="font-label-md">AI CFO</span>
+
+<!-- AI CFO Insights -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+   href="/screens/dashboard.html">
+
+    <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+        psychology
+    </span>
+
+    <span class="font-label-md">
+        AI CFO Insights
+    </span>
+
 </a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
-<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
-<span class="font-label-md">Analytics</span>
-</a>
+
+    <!-- Sidebar KPI Card -->
+    <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
+
+        <p class="text-xs text-on-surface-variant">
+            Current Cash Position
+        </p>
+
+        <h4 id="sidebarBalance"
+            class="font-headline-md text-primary font-bold mt-xs">
+            ₹75,000
+        </h4>
+
+        <p id="sidebarRunway"
+           class="text-xs text-on-surface-variant mt-xs">
+           18 days runway
+        </p>
+
+    </div>
+
 </nav>
 <div class="pt-lg border-t border-outline-variant space-y-1">
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all" href="#">
@@ -204,43 +309,47 @@
 <h3 class="font-headline-md text-on-surface">Cash Depletion Timeline</h3>
 </div>
 <div class="text-right">
-<span class="font-label-md text-error bg-error-container px-md py-xs rounded-full">High Alert: 18 Days Left</span>
+<span
+    id="runwayAlert"
+    class="font-label-md text-error bg-error-container px-md py-xs rounded-full">
+    High Alert: 18 Days Left
+</span>
 </div>
 </div>
-<!-- Custom Graph Area -->
-<div class="relative h-64 w-full mt-lg">
-<!-- SVG Graph Line -->
-<svg class="w-full h-full drop-shadow-lg overflow-visible" viewbox="0 0 800 200">
-<defs>
-<lineargradient id="lineGradient" x1="0" x2="0" y1="0" y2="1">
-<stop offset="0%" stop-color="#4648d4" stop-opacity="0.2"></stop>
-<stop offset="100%" stop-color="#4648d4" stop-opacity="0"></stop>
-</lineargradient>
-</defs>
-<!-- Area Fill -->
-<path d="M 0 50 L 100 65 L 200 85 L 300 110 L 400 145 L 500 165 L 600 185 L 650 200 L 0 200 Z" fill="url(#lineGradient)"></path>
-<!-- Main Line -->
-<path d="M 0 50 L 100 65 L 200 85 L 300 110 L 400 145 L 500 165 L 600 185 L 650 200" fill="none" stroke="#4648d4" stroke-linecap="round" stroke-width="3"></path>
-<!-- Active Point -->
-<circle class="animate-pulse-subtle" cx="0" cy="50" fill="#4648d4" r="5"></circle>
-<circle cx="650" cy="200" fill="#ba1a1a" r="5"></circle>
-</svg>
-<!-- Graph Annotations -->
-<div class="absolute top-0 left-0 -translate-y-4">
-<div class="bg-surface-container-high border border-outline-variant px-sm py-xs rounded text-on-surface font-mono-data text-xs">Today: ₹75,000</div>
+<!-- Dynamic Runway Graph -->
+
+<div class="mt-lg">
+
+    <div
+        class="bg-surface-container-high border border-outline-variant px-sm py-xs rounded text-on-surface font-mono-data text-xs inline-block mb-md">
+
+        Current Balance:
+        <span id="currentBalanceLabel">
+            ₹75,000
+        </span>
+
+    </div>
+
+    <div style="height:220px">
+
+        <canvas id="runwayChart"></canvas>
+
+    </div>
+
 </div>
-<div class="absolute bottom-0 left-[81%] translate-y-4">
-<div class="bg-error-container border border-error/20 px-sm py-xs rounded text-error font-mono-data text-xs">Day 18: ₹0</div>
-</div>
-</div>
-<!-- X-Axis Labels -->
-<div class="flex justify-between mt-8 text-on-surface-variant font-label-md border-t border-outline-variant pt-md">
-<span>Now</span>
-<span>Day 5</span>
-<span>Day 10</span>
-<span>Day 15</span>
-<span class="text-error font-bold">Zero Cash</span>
-<span>Day 25</span>
+
+<!-- X Axis Labels -->
+<div
+    class="flex justify-between mt-8 text-on-surface-variant font-label-md border-t border-outline-variant pt-md">
+
+    <span>Today</span>
+    <span>25%</span>
+    <span>50%</span>
+    <span>75%</span>
+    <span class="text-error font-bold">
+        Zero Cash
+    </span>
+
 </div>
 </div>
 <!-- Stats Column -->
@@ -250,7 +359,11 @@
 <div class="flex justify-between items-start">
 <div>
 <p class="font-label-md text-on-surface-variant mb-xs">Daily Burn Rate</p>
-<h4 class="font-headline-md text-on-surface font-bold">₹4,166<span class="text-body-sm font-normal text-on-surface-variant ml-xs">/day</span></h4>
+<h4
+    id="burnRate"
+    class="font-headline-md text-on-surface font-bold">
+    ₹4,166/day
+</h4>
 </div>
 <div class="p-sm bg-error-container/30 rounded-lg">
 <span class="material-symbols-outlined text-error" data-icon="local_fire_department">local_fire_department</span>
@@ -266,7 +379,11 @@
 <div class="flex justify-between items-start">
 <div>
 <p class="font-label-md text-on-surface-variant mb-xs">Available Capital</p>
-<h4 class="font-headline-md text-on-surface font-bold">₹75,000</h4>
+<h4
+    id="currentBalance"
+    class="font-headline-md text-on-surface font-bold">
+    ₹75,000
+</h4>
 </div>
 <div class="p-sm bg-primary-fixed/30 rounded-lg">
 <span class="material-symbols-outlined text-primary" data-icon="account_balance_wallet">account_balance_wallet</span>
@@ -293,44 +410,85 @@
 <div class="space-y-md">
 <!-- Scenario Input 1 -->
 <div class="flex flex-col md:flex-row gap-md items-end bg-surface-container-low p-md rounded-xl border border-outline-variant/50">
-<div class="flex-1 space-y-xs">
-<label class="font-label-md text-on-surface-variant px-xs">Scenario Description</label>
-<div class="relative">
-<span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-md" data-icon="shopping_cart">shopping_cart</span>
-<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-body-md focus:ring-primary focus:border-primary" type="text" value="New equipment purchase"/>
+
+    <div class="flex-1 space-y-xs">
+
+        <label class="font-label-md text-on-surface-variant px-xs">
+            Scenario Description
+        </label>
+
+        <div class="relative">
+
+            <span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-md">
+                shopping_cart
+            </span>
+
+            <input
+                id="scenarioDescription"
+                class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-body-md focus:ring-primary focus:border-primary"
+                type="text"
+                value="New Equipment Purchase"/>
+
+        </div>
+
+    </div>
+
+    <div class="w-full md:w-32 space-y-xs">
+
+        <label class="font-label-md text-on-surface-variant px-xs">
+            Amount
+        </label>
+
+        <div class="relative">
+
+            <span class="absolute left-sm top-1/2 -translate-y-1/2 font-mono-data text-on-surface-variant">
+                ₹
+            </span>
+
+            <input
+                id="scenarioAmount"
+                class="w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-mono-data focus:ring-primary focus:border-primary"
+                type="text"
+                value="50000"/>
+
+        </div>
+
+    </div>
+
+    <button
+        id="applyScenario"
+        class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm active:scale-95 transition-transform h-[46px]">
+
+        Apply
+
+    </button>
+
 </div>
-</div>
-<div class="w-full md:w-32 space-y-xs">
-<label class="font-label-md text-on-surface-variant px-xs">Amount</label>
-<div class="relative">
-<span class="absolute left-sm top-1/2 -translate-y-1/2 font-mono-data text-on-surface-variant">₹</span>
-<input class="w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-mono-data focus:ring-primary focus:border-primary" type="text" value="50,000"/>
-</div>
-</div>
-<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm active:scale-95 transition-transform h-[46px]">Apply</button>
-</div>
-<!-- Scenario Input 2 -->
-<div class="flex flex-col md:flex-row gap-md items-end bg-surface-container-low p-md rounded-xl border border-outline-variant/50">
-<div class="flex-1 space-y-xs">
-<label class="font-label-md text-on-surface-variant px-xs">Scenario Description</label>
-<div class="relative">
-<span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-md" data-icon="person_add">person_add</span>
-<input class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-body-md focus:ring-primary focus:border-primary" placeholder="e.g. New Hire, Office Rent..." type="text"/>
-</div>
-</div>
-<div class="w-full md:w-32 space-y-xs">
-<label class="font-label-md text-on-surface-variant px-xs">Amount</label>
-<div class="relative">
-<span class="absolute left-sm top-1/2 -translate-y-1/2 font-mono-data text-on-surface-variant">₹</span>
-<input class="w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-mono-data focus:ring-primary focus:border-primary" placeholder="0" type="text"/>
-</div>
-</div>
-<button class="px-lg py-sm bg-surface-container-highest text-on-surface-variant rounded-lg font-label-md active:scale-95 transition-transform h-[46px]">Add New</button>
-</div>
-</div>
-<div class="mt-lg p-md border-l-4 border-error bg-error-container/10 rounded-r-lg">
-<p class="font-label-md text-on-surface"><span class="font-bold text-error">Warning:</span> If you proceed with the 'New equipment purchase', your runway will collapse to <span class="font-bold">6 days</span>. Immediate external funding required.</p>
-</div>
+
+<div
+    id="scenarioResult"
+    class="mt-lg p-md border-l-4 border-error bg-error-container/10 rounded-r-lg hidden">
+
+    <p class="font-label-md text-on-surface">
+
+        <span class="font-bold text-error">
+            Scenario Impact:
+        </span>
+
+        New Balance:
+        <span id="newBalance">
+            ₹0
+        </span>
+
+        |
+
+        Runway:
+        <span id="newRunway">
+            0 days
+        </span>
+
+    </p>
+
 </div>
 <!-- Payment Prioritization Engine Panel -->
 <div class="lg:col-span-5 bg-surface-container-lowest rounded-xl border border-outline-variant p-lg shadow-sm">
@@ -338,62 +496,17 @@
 <span class="material-symbols-outlined text-tertiary" data-icon="auto_awesome">auto_awesome</span>
 <h3 class="font-headline-md text-on-surface">Payment Prioritization</h3>
 </div>
-<div class="space-y-md">
-<!-- Recommendation 1 -->
-<div class="p-md rounded-xl border border-outline-variant hover:border-primary transition-colors">
-<div class="flex justify-between items-start mb-sm">
-<div>
-<h5 class="font-label-md text-on-surface font-bold">Utilities (BESCOM)</h5>
-<p class="text-xs font-mono-data text-on-surface-variant">₹12,450 • Due: Today</p>
+<div
+    id="priorityContainer"
+    class="space-y-md">
 </div>
-<div class="flex flex-col items-end">
-<span class="px-sm py-xs bg-primary-fixed text-on-primary-fixed-variant rounded-md text-[10px] font-bold uppercase tracking-tight">Pay Immediately</span>
-<div class="flex items-center gap-xs mt-xs">
-<span class="text-xs font-label-md text-on-surface-variant">Conf:</span>
-<span class="text-xs font-bold text-primary">98%</span>
-</div>
-</div>
-</div>
-<p class="text-body-sm text-on-surface-variant">Reasoning: Essential service. Late payment leads to immediate disruption of operations and credit score impact.</p>
-</div>
-<!-- Recommendation 2 -->
-<div class="p-md rounded-xl border border-outline-variant hover:border-outline transition-colors opacity-80 grayscale-[0.3]">
-<div class="flex justify-between items-start mb-sm">
-<div>
-<h5 class="font-label-md text-on-surface font-bold">Vendor ABC (Inventory)</h5>
-<p class="text-xs font-mono-data text-on-surface-variant">₹35,000 • Due: 2 Days</p>
-</div>
-<div class="flex flex-col items-end">
-<span class="px-sm py-xs bg-surface-container-highest text-on-surface-variant rounded-md text-[10px] font-bold uppercase tracking-tight">Delay Priority</span>
-<div class="flex items-center gap-xs mt-xs">
-<span class="text-xs font-label-md text-on-surface-variant">Conf:</span>
-<span class="text-xs font-bold text-on-surface">82%</span>
-</div>
-</div>
-</div>
-<p class="text-body-sm text-on-surface-variant">Reasoning: Negotiated grace period of 7 days available. Cash preservation recommended for payroll cycle.</p>
-</div>
-<!-- Recommendation 3 -->
-<div class="p-md rounded-xl border border-outline-variant bg-surface-container-low/50">
-<div class="flex justify-between items-start mb-sm">
-<div>
-<h5 class="font-label-md text-on-surface font-bold">Cloud Infrastructure</h5>
-<p class="text-xs font-mono-data text-on-surface-variant">₹8,900 • Due: 5 Days</p>
-</div>
-<div class="flex flex-col items-end">
-<span class="px-sm py-xs bg-primary-fixed text-on-primary-fixed-variant rounded-md text-[10px] font-bold uppercase tracking-tight">Pay Immediately</span>
-<div class="flex items-center gap-xs mt-xs">
-<span class="text-xs font-label-md text-on-surface-variant">Conf:</span>
-<span class="text-xs font-bold text-primary">94%</span>
-</div>
-</div>
-</div>
-<p class="text-body-sm text-on-surface-variant">Reasoning: Critical infrastructure. Auto-renewals typically incur no grace period before service suspension.</p>
-</div>
-</div>
-<button class="w-full mt-lg py-sm border border-outline text-on-surface font-label-md rounded-lg hover:bg-surface-container transition-all">
-                    Generate Optimized Payment Plan
-                </button>
+
+<button
+    class="w-full mt-lg py-sm border border-outline text-on-surface font-label-md rounded-lg">
+
+    Generate Optimized Payment Plan
+
+</button>
 </div>
 </div>
 <!-- Atmospheric Image Footer Section -->
@@ -454,35 +567,549 @@
 </a>
 </div>
 <script>
-        // Micro-interactions for buttons
-        document.querySelectorAll('button').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                let ripple = document.createElement('span');
-                ripple.classList.add('ripple');
-                this.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 600);
-            });
-        });
 
-        // Simple Scenario simulation logic
-        const applyBtn = document.querySelector('button.bg-primary');
-        const warningDiv = document.querySelector('.border-error.bg-error-container\\/10');
-        
-        applyBtn.addEventListener('click', () => {
-            applyBtn.innerHTML = 'Recalculating...';
-            applyBtn.disabled = true;
-            
-            setTimeout(() => {
-                applyBtn.innerHTML = 'Applied';
-                applyBtn.classList.replace('bg-primary', 'bg-tertiary');
-                warningDiv.classList.remove('hidden');
-                warningDiv.classList.add('animate-pulse');
-                setTimeout(() => warningDiv.classList.remove('animate-pulse'), 2000);
-            }, 800);
-        });
-    </script>
+// Ripple effect
+document.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', function() {
+        let ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        this.appendChild(ripple);
+
+        setTimeout(() => ripple.remove(), 600);
+    });
+});
+
+async function loadRunway() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/dashboard"
+        );
+
+        const data = await response.json();
+
+        console.log("Runway Data:", data);
+
+        // Current Balance
+        const balanceEl =
+            document.getElementById("currentBalance");
+
+        if (balanceEl) {
+            balanceEl.innerText =
+                `₹${data.current_balance.toLocaleString()}`;
+        }
+
+        // Runway Days
+        const runwayEl =
+            document.getElementById("runwayDays");
+
+        if (runwayEl) {
+            runwayEl.innerText =
+                `${data.cash_runway} Days`;
+        }
+
+        // Alert Badge
+        const alertEl =
+            document.getElementById("runwayAlert");
+
+        if (alertEl) {
+            alertEl.innerText =
+                `High Alert: ${data.cash_runway} Days Left`;
+        }
+
+        // Daily Burn Rate
+        const burnRateEl =
+            document.getElementById("burnRate");
+
+        if (burnRateEl) {
+
+            const burnRate =
+                data.cash_runway > 0
+                ? Math.round(
+                    data.total_payables /
+                    data.cash_runway
+                )
+                : 0;
+
+            burnRateEl.innerText =
+                `₹${burnRate.toLocaleString()}/day`;
+        }
+
+    } catch (err) {
+
+        console.error(
+            "Runway load failed:",
+            err
+        );
+
+    }
+}
+
+// Initial Load
+loadRunway();
+
+// Auto Refresh
+setInterval(
+    loadRunway,
+    5000
+);
+
+</script>
+
+<script>
+
+async function loadRunwayGraph() {
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/dashboard"
+        );
+
+    const dashboard =
+        await response.json();
+
+    const currentBalance =
+        dashboard.current_balance;
+
+    const runwayDays =
+        Math.max(
+            Math.ceil(
+                dashboard.cash_runway
+            ),
+            1
+        );
+
+    const burnRate =
+        Math.round(
+            dashboard.total_payables / 30
+        );
+
+    document.getElementById("runwayAlert").innerText =
+        `High Alert: ${runwayDays} Days Left`;
+
+    document.getElementById("burnRate").innerText =
+        `₹${burnRate.toLocaleString()}/day`;
+
+    const labels = [];
+    const values = [];
+
+    for (let day = 0; day <= runwayDays; day++) {
+
+        labels.push(`Day ${day}`);
+
+        values.push(
+            Math.max(
+                currentBalance - (burnRate * day),
+                0
+            )
+        );
+    }
+
+    const ctx =
+        document.getElementById("runwayChart");
+
+    if (
+    window.runwayChart &&
+    typeof window.runwayChart.destroy === "function"
+) {
+    window.runwayChart.destroy();
+}
+
+    window.runwayChart = new Chart(ctx, {
+
+        type: "line",
+
+        data: {
+            labels: labels,
+            datasets: [{
+                label: "Available Cash",
+                data: values,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+loadRunwayGraph();
+
+setInterval(
+    loadRunwayGraph,
+    5000
+);
+
+
+</script>
 <div data-page-switcher>
 <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
 <a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
 </div>
-</div></body></html>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+async function loadRunwayGraph() {
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/dashboard"
+        );
+
+    const dashboard =
+        await response.json();
+
+    const currentBalance =
+        dashboard.current_balance;
+
+    const runwayDays =
+        Math.max(
+            Math.ceil(
+                dashboard.cash_runway
+            ),
+            1
+        );
+
+    const burnRate =
+        Math.round(
+            dashboard.total_payables / 30
+        );
+
+    document.getElementById(
+        "runwayAlert"
+    ).innerText =
+        `High Alert: ${runwayDays} Days Left`;
+
+    document.getElementById(
+        "burnRate"
+    ).innerText =
+        `₹${burnRate.toLocaleString()}/day`;
+
+    document.getElementById(
+        "currentBalanceLabel"
+    ).innerText =
+        `₹${currentBalance.toLocaleString()}`;
+
+    const labels = [];
+    const values = [];
+
+    for (
+        let day = 0;
+        day <= runwayDays;
+        day++
+    ) {
+
+        labels.push(
+            `Day ${day}`
+        );
+
+        values.push(
+
+            Math.max(
+
+                currentBalance -
+                (burnRate * day),
+
+                0
+
+            )
+
+        );
+    }
+
+    const ctx =
+        document.getElementById(
+            "runwayChart"
+        );
+
+    if (
+        window.runwayChart
+    ) {
+
+        window.runwayChart.destroy();
+
+    }
+
+    window.runwayChart =
+        new Chart(ctx, {
+
+            type: "line",
+
+            data: {
+
+                labels,
+
+                datasets: [
+
+                    {
+
+                        label:
+                            "Available Cash",
+
+                        data:
+                            values,
+
+                        borderColor:
+                            "#4648d4",
+
+                        backgroundColor:
+                            "rgba(70,72,212,0.15)",
+
+                        fill: true,
+
+                        tension: 0.4,
+
+                        pointRadius: 3,
+
+                        pointHoverRadius: 6
+                    }
+
+                ]
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+                },
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            callback:
+                                value =>
+                                    "₹" +
+                                    value.toLocaleString()
+                        }
+                    }
+                }
+            }
+        });
+}
+
+loadRunwayGraph();
+
+setInterval(
+    loadRunwayGraph,
+    5000
+);
+
+</script>
+
+<script>
+
+document
+.getElementById(
+    "applyScenario"
+)
+.addEventListener(
+    "click",
+    simulateScenario
+);
+
+async function simulateScenario() {
+
+    const amount =
+        parseFloat(
+            document
+            .getElementById(
+                "scenarioAmount"
+            )
+            .value
+            .replace(/,/g, "")
+        );
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/simulate-scenario",
+            {
+                method: "POST",
+
+                headers: {
+                    "Content-Type":
+                        "application/json"
+                },
+
+                body: JSON.stringify({
+                    amount
+                })
+            }
+        );
+
+    const result =
+        await response.json();
+
+    document
+        .getElementById(
+            "scenarioResult"
+        )
+        .classList
+        .remove(
+            "hidden"
+        );
+
+    document
+        .getElementById(
+            "newBalance"
+        )
+        .innerText =
+            `₹${result.new_balance.toLocaleString()}`;
+
+    document
+        .getElementById(
+            "newRunway"
+        )
+        .innerText =
+            `${result.new_runway} days`;
+
+}
+
+</script>
+
+
+<script>
+
+async function loadPriorities() {
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/payment-priority"
+        );
+
+    const priorities =
+        await response.json();
+
+    const container =
+        document.getElementById(
+            "priorityContainer"
+        );
+
+    container.innerHTML = "";
+
+    priorities.forEach(item => {
+
+        container.innerHTML += `
+
+        <div class="p-md rounded-xl border border-outline-variant">
+
+            <div class="flex justify-between items-start mb-sm">
+
+                <div>
+
+                    <h5 class="font-label-md text-on-surface font-bold">
+                        ${item.vendor}
+                    </h5>
+
+                    <p class="text-xs font-mono-data text-on-surface-variant">
+                        ₹${item.amount.toLocaleString()}
+                    </p>
+
+                </div>
+
+                <div class="flex flex-col items-end">
+
+                    <span
+                        class="px-sm py-xs rounded-md text-[10px] font-bold uppercase tracking-tight
+                        ${
+                            item.action === "Pay Immediately"
+                            ? "bg-primary-fixed text-on-primary-fixed-variant"
+                            : "bg-surface-container-highest text-on-surface-variant"
+                        }">
+
+                        ${item.action}
+
+                    </span>
+
+                    <div class="flex items-center gap-xs mt-xs">
+
+                        <span class="text-xs font-label-md">
+                            Score:
+                        </span>
+
+                        <span class="text-xs font-bold text-primary">
+                            ${item.score}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <p class="text-body-sm text-on-surface-variant">
+
+                ${item.reason}
+
+            </p>
+
+        </div>
+
+        `;
+    });
+}
+
+loadPriorities();
+
+setInterval(
+    loadPriorities,
+    5000
+);
+
+
+async function loadSidebarStats() {
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/dashboard"
+        );
+
+    const data =
+        await response.json();
+
+    const balance =
+        document.getElementById(
+            "sidebarBalance"
+        );
+
+    const runway =
+        document.getElementById(
+            "sidebarRunway"
+        );
+
+    if (balance) {
+        balance.innerText =
+            `₹${data.current_balance.toLocaleString()}`;
+    }
+
+    if (runway) {
+        runway.innerText =
+            `${Math.ceil(data.cash_runway)} days runway`;
+    }
+}
+
+loadSidebarStats();
+
+</script>
+</body></html>

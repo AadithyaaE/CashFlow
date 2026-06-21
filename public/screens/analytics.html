@@ -127,35 +127,126 @@
 <h1 class="font-headline-sm text-headline-md font-black text-primary tracking-tighter">CashPilot AI</h1>
 <p class="font-label-md text-label-md text-on-surface-variant">Small Business Mode</p>
 </div>
-<nav class="flex-1 space-y-1">
-<a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-<span class="font-label-md">Dashboard</span>
-</a>
-<a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="upload_file">upload_file</span>
-<span class="font-label-md">Upload Center</span>
-</a>
-<a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="receipt_long">receipt_long</span>
-<span class="font-label-md">Invoices</span>
-</a>
-<a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="timeline">timeline</span>
-<span class="font-label-md">Runway</span>
-</a>
-<a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
-<span class="font-label-md">Scenario</span>
-</a>
-<a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all duration-200" href="#">
-<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
-<span class="font-label-md">AI CFO</span>
-</a>
-<a class="flex items-center gap-3 px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold" href="#">
-<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
-<span class="font-label-md">Analytics</span>
-</a>
+<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+
+    <!-- Dashboard -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/dashboard.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            dashboard
+        </span>
+
+        <span class="font-label-md">
+            Dashboard
+        </span>
+
+    </a>
+
+    <!-- Invoice Hub -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all"
+       href="/screens/invoices.html">
+
+        <span class="material-symbols-outlined"
+              style="font-variation-settings:'FILL' 1;">
+            upload_file
+        </span>
+
+        <span class="font-label-md">
+            Invoice Hub
+        </span>
+
+    </a>
+
+    <!-- Cash Runway -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/runway.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            timeline
+        </span>
+
+        <span class="font-label-md">
+            Cash Runway
+        </span>
+
+    </a>
+
+    <!-- Analytics -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/analytics.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            analytics
+        </span>
+
+        <span class="font-label-md">
+            Analytics
+        </span>
+
+    </a>
+
+    <!-- AI Recommendations -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            psychology
+        </span>
+
+        <span class="font-label-md">
+            AI Recommendations
+        </span>
+
+    </a>
+
+    <!-- Payment Priorities -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            priority_high
+        </span>
+
+        <span class="font-label-md">
+            Payment Priorities
+        </span>
+
+    </a>
+
+    <!-- Vendor Negotiator -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            forum
+        </span>
+
+        <span class="font-label-md">
+            Vendor Negotiator
+        </span>
+
+    </a>
+
+    <!-- Sidebar KPI Card -->
+    <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
+
+        <p class="text-xs text-on-surface-variant">
+            Current Cash Position
+        </p>
+
+        <h4 id="sidebarBalance"
+            class="font-headline-md text-primary font-bold mt-xs">
+            ₹75,000
+        </h4>
+
+        <p id="sidebarRunway"
+           class="text-xs text-on-surface-variant mt-xs">
+           18 days runway
+        </p>
+
+    </div>
+
 </nav>
 <div class="pt-lg border-t border-outline-variant space-y-1">
 <a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high" href="#">
@@ -554,6 +645,40 @@
                 this.querySelector('span:not(.material-symbols-outlined)').innerText = originalText;
             }, 2000);
         });
+
+
+        async function loadSidebarStats() {
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/dashboard"
+        );
+
+    const data =
+        await response.json();
+
+    const balance =
+        document.getElementById(
+            "sidebarBalance"
+        );
+
+    const runway =
+        document.getElementById(
+            "sidebarRunway"
+        );
+
+    if (balance) {
+        balance.innerText =
+            `₹${data.current_balance.toLocaleString()}`;
+    }
+
+    if (runway) {
+        runway.innerText =
+            `${Math.ceil(data.cash_runway)} days runway`;
+    }
+}
+
+loadSidebarStats();
     </script>
 <div data-page-switcher>
 <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">

@@ -132,36 +132,145 @@
         <span class="material-symbols-outlined">add</span>
         New Document
     </button>
-    <nav class="flex-1 space-y-xs overflow-y-auto">
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold duration-200 ease-in-out" href="#">
-            <span class="material-symbols-outlined">dashboard</span>
+<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+
+    <!-- Dashboard -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/dashboard.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            dashboard
+        </span>
+
+        <span class="font-label-md">
             Dashboard
-        </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
-            <span class="material-symbols-outlined">upload_file</span>
-            Upload Center
-        </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
-            <span class="material-symbols-outlined">receipt_long</span>
-            Invoices
-        </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
-            <span class="material-symbols-outlined">timeline</span>
-            Runway
-        </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
-            <span class="material-symbols-outlined">analytics</span>
-            Scenario
-        </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
-            <span class="material-symbols-outlined">smart_toy</span>
-            AI CFO
-        </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 ease-in-out" href="#">
-            <span class="material-symbols-outlined">bar_chart</span>
+        </span>
+
+    </a>
+
+    <!-- Invoice Hub -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all"
+       href="/screens/invoices.html">
+
+        <span class="material-symbols-outlined"
+              style="font-variation-settings:'FILL' 1;">
+            upload_file
+        </span>
+
+        <span class="font-label-md">
+            Invoice Hub
+        </span>
+
+    </a>
+
+    <!-- Cash Runway -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/runway.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            timeline
+        </span>
+
+        <span class="font-label-md">
+            Cash Runway
+        </span>
+
+    </a>
+
+    <!-- Analytics -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="/screens/analytics.html">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            analytics
+        </span>
+
+        <span class="font-label-md">
             Analytics
-        </a>
-    </nav>
+        </span>
+
+    </a>
+
+    <!-- AI Recommendations -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            psychology
+        </span>
+
+        <span class="font-label-md">
+            AI Recommendations
+        </span>
+
+    </a>
+
+    <!-- Payment Priorities -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            priority_high
+        </span>
+
+        <span class="font-label-md">
+            Payment Priorities
+        </span>
+
+    </a>
+
+    <!-- Vendor Negotiator -->
+    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
+       href="#">
+
+        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
+            forum
+        </span>
+
+        <span class="font-label-md">
+            Vendor Negotiator
+        </span>
+
+    </a>
+
+    <!-- Sidebar KPI Card -->
+    <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
+
+        <p class="text-xs text-on-surface-variant">
+            Current Cash Position
+        </p>
+
+        <div class="mt-sm flex flex-col gap-sm">
+
+    <h4 id="sidebarBalance"
+        class="font-headline-md text-primary font-bold">
+        ₹75,000
+    </h4>
+
+    <input
+        id="sidebarBalanceInput"
+        type="number"
+        placeholder="Enter balance"
+        class="px-sm py-xs border border-outline-variant rounded-lg text-sm bg-surface-container-lowest">
+
+    <button
+        onclick="updateBalance()"
+        class="px-sm py-xs bg-primary text-on-primary rounded-lg text-sm font-semibold">
+
+        Update Balance
+
+    </button>
+
+</div>
+
+        <p id="sidebarRunway"
+           class="text-xs text-on-surface-variant mt-xs">
+           18 days runway
+        </p>
+
+    </div>
+
+</nav>
     <div class="pt-lg border-t border-outline-variant space-y-xs">
         <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200" href="#">
             <span class="material-symbols-outlined">settings</span>
@@ -200,7 +309,7 @@
                         <span class="text-on-surface-variant font-label-md">Current Balance</span>
                         <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
                     </div>
-                    <div class="font-headline-md text-headline-md text-on-surface">₹75,000</div>
+                    <div id="currentBalance" class="font-headline-md text-headline-md text-on-surface">₹75,000</div>
                 </div>
                 <div class="mt-base flex items-center text-sm font-medium text-primary">
                     <span class="material-symbols-outlined text-sm">trending_up</span>
@@ -213,7 +322,7 @@
                         <span class="text-on-surface-variant font-label-md">Total Payables</span>
                         <span class="material-symbols-outlined text-error">payments</span>
                     </div>
-                    <div class="font-headline-md text-headline-md text-on-surface">₹52,000</div>
+                    <div id="totalPayables" class="font-headline-md text-headline-md text-on-surface">₹52,000</div>
                 </div>
                 <div class="mt-base text-on-surface-variant text-sm">Due in 15 days</div>
             </div>
@@ -247,11 +356,11 @@
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Current Balance</p>
-                            <p class="text-xl font-bold text-on-surface mt-1">₹75,000</p>
+                            <p id="overviewBalance" class="text-xl font-bold text-on-surface mt-1">₹75,000</p>
                         </div>
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Cash Runway</p>
-                            <p class="text-xl font-bold text-on-surface mt-1">18 Days</p>
+                            <p id="cashRunway" class="text-xl font-bold text-on-surface mt-1">18 Days</p>
                         </div>
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Upcoming Bills</p>
@@ -352,7 +461,7 @@
                     <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex items-center justify-between">
                         <div>
                             <span class="text-on-surface-variant font-label-md">Cash Runway</span>
-                            <div class="font-headline-md text-headline-md text-error tracking-tight">18 Days</div>
+                            <div id="cashRunwayWidget" class="font-headline-md text-headline-md text-error tracking-tight">18 Days</div>
                         </div>
                         <div class="w-12 h-12 bg-error-container rounded-full flex items-center justify-center">
                             <span class="material-symbols-outlined text-error">history</span>
@@ -428,44 +537,8 @@
                             <th class="px-lg py-md font-medium text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-outline-variant text-sm">
-                        <tr class="hover:bg-surface-container-low/50 transition-colors">
-                            <td class="px-lg py-md flex items-center gap-md">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">A</div>
-                                <span class="font-medium text-on-surface">AWS Cloud Services</span>
-                            </td>
-                            <td class="px-lg py-md text-on-surface-variant">SaaS Subscription</td>
-                            <td class="px-lg py-md text-on-surface-variant">Aug 24, 2024</td>
-                            <td class="px-lg py-md text-right font-mono-data text-on-surface">₹12,400.00</td>
-                            <td class="px-lg py-md text-center">
-                                <span class="bg-secondary-container text-on-secondary-container px-sm py-xs rounded-full text-xs font-bold">Scheduled</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-surface-container-low/50 transition-colors">
-                            <td class="px-lg py-md flex items-center gap-md">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">R</div>
-                                <span class="font-medium text-on-surface">Reliance Property Group</span>
-                            </td>
-                            <td class="px-lg py-md text-on-surface-variant">Office Rent</td>
-                            <td class="px-lg py-md text-on-surface-variant">Aug 28, 2024</td>
-                            <td class="px-lg py-md text-right font-mono-data text-on-surface">₹25,000.00</td>
-                            <td class="px-lg py-md text-center">
-                                <span class="bg-tertiary-container text-on-tertiary-container px-sm py-xs rounded-full text-xs font-bold">Pending</span>
-                            </td>
-                        </tr>
-                        <tr class="hover:bg-surface-container-low/50 transition-colors">
-                            <td class="px-lg py-md flex items-center gap-md">
-                                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">T</div>
-                                <span class="font-medium text-on-surface">Tax Authority</span>
-                            </td>
-                            <td class="px-lg py-md text-on-surface-variant">GST Payment</td>
-                            <td class="px-lg py-md text-on-surface-variant">Aug 20, 2024</td>
-                            <td class="px-lg py-md text-right font-mono-data text-on-surface">₹14,200.00</td>
-                            <td class="px-lg py-md text-center">
-                                <span class="bg-error-container text-on-error-container px-sm py-xs rounded-full text-xs font-bold">Overdue</span>
-                            </td>
-                        </tr>
-                    </tbody>
+                    <tbody id="invoiceTable" class="divide-y divide-outline-variant text-sm">
+</tbody>
                 </table>
             </div>
         </div>
@@ -500,105 +573,544 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // Animate the Radial Gauge on Load
+    // Animate Health Score Gauge
     window.addEventListener('load', () => {
         const circle = document.querySelector('.gauge-ring');
-        const score = 82;
-        const radius = 70;
-        const circumference = 2 * Math.PI * radius;
-        const offset = circumference - (score / 100) * circumference;
-        circle.style.strokeDasharray = `${circumference}`;
-        circle.style.strokeDashoffset = `${offset}`;
+
+        if (circle) {
+            const score = 82;
+            const radius = 70;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (score / 100) * circumference;
+
+            circle.style.strokeDasharray = `${circumference}`;
+            circle.style.strokeDashoffset = `${offset}`;
+        }
+
+        loadDashboard();
+        loadLiquidityChart();
+        loadExpenseChart();
     });
 
-    // Liquidity Line Chart Configuration
-    const ctx = document.getElementById('liquidityChart');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug'],
-            datasets: [
-                {
-                    label: 'Income',
-                    data: [45, 72, 65, 70, 68, 69, 70, 80],
-                    borderColor: '#22C55E',
-                    backgroundColor: '#22C55E',
-                    tension: 0.4,
-                    fill: false
+    // ==========================
+    // DASHBOARD DATA
+    // ==========================
+
+    async function loadDashboard() {
+
+        try {
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/dashboard"
+            );
+
+            const data = await response.json();
+
+            const balanceCards =
+                document.querySelectorAll(
+                    ".cashflow-overview .text-2xl, .cashflow-overview .text-xl"
+                );
+
+            console.log("Dashboard:", data);
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // ==========================
+    // CASHFLOW LINE CHART
+    // ==========================
+
+    async function loadLiquidityChart() {
+
+        try {
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/dashboard"
+            );
+
+            const dashboard =
+                await response.json();
+
+            const payables =
+                dashboard.total_payables;
+
+            const balance =
+                dashboard.current_balance;
+
+            const income = [
+                balance * 0.60,
+                balance * 0.70,
+                balance * 0.75,
+                balance * 0.80
+            ];
+
+            const expenses = [
+                payables * 0.25,
+                payables * 0.50,
+                payables * 0.75,
+                payables
+            ];
+
+            const netCashflow =
+                income.map(
+                    (value, index) =>
+                        value - expenses[index]
+                );
+
+            const ctx =
+                document.getElementById(
+                    "liquidityChart"
+                );
+
+            new Chart(ctx, {
+                type: "line",
+
+                data: {
+                    labels: [
+                        "Q1",
+                        "Q2",
+                        "Q3",
+                        "Q4"
+                    ],
+
+                    datasets: [
+                        {
+                            label: "Income",
+                            data: income,
+                            borderColor: "#22C55E",
+                            backgroundColor: "#22C55E",
+                            tension: 0.4
+                        },
+
+                        {
+                            label: "Expenses",
+                            data: expenses,
+                            borderColor: "#EF4444",
+                            backgroundColor: "#EF4444",
+                            tension: 0.4
+                        },
+
+                        {
+                            label: "Net Cashflow",
+                            data: netCashflow,
+                            borderColor: "#3B82F6",
+                            backgroundColor: "#3B82F6",
+                            tension: 0.4
+                        }
+                    ]
                 },
-                {
-                    label: 'Expenses',
-                    data: [25, 50, 43, 52, 40, 39, 42, 48],
-                    borderColor: '#EF4444',
-                    backgroundColor: '#EF4444',
-                    tension: 0.4,
-                    fill: false
-                },
-                {
-                    label: 'Net Cashflow',
-                    data: [15, 35, 28, 34, 22, 24, 27, 32],
-                    borderColor: '#3B82F6',
-                    backgroundColor: '#3B82F6',
-                    tension: 0.4,
-                    fill: false
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    align: 'start',
-                    labels: {
-                        boxWidth: 12,
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        padding: 16,
-                        font: { family: 'Inter', size: 12 }
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            align: 'start'
+                        }
                     }
                 }
-            },
-            scales: {
-                y: { grid: { color: '#F3F4F6' }, ticks: { font: { family: 'Geist' } } },
-                x: { grid: { display: false }, ticks: { font: { family: 'Geist' } } }
-            }
-        }
-    });
+            });
 
-    // Spending Breakdown Doughnut Chart Configuration
-    const expenseCtx = document.getElementById('expenseChart');
-    new Chart(expenseCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Rent', 'Utilities', 'Internet', 'Vendor Payments', 'Salaries', 'Other'],
-            datasets: [{
-                data: [15000, 4200, 2500, 12000, 18000, 5000],
-                backgroundColor: [
-                    '#22C55E',
-                    '#A3E635',
-                    '#FBBF24',
-                    '#FB923C',
-                    '#EF4444',
-                    '#9CA3AF'
-                ],
-                borderWidth: 4,
-                borderColor: '#ffffff',
-                hoverOffset: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '78%',
-            plugins: {
-                legend: {
-                    display: false // Turned off built-in legends to use custom premium HTML legend data grid
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    // ==========================
+    // SPENDING BREAKDOWN
+    // ==========================
+
+    async function loadExpenseChart() {
+
+        try {
+
+            const response = await fetch(
+                "http://127.0.0.1:8000/analytics"
+            );
+
+            const analytics =
+                await response.json();
+
+            const labels =
+                Object.keys(
+                    analytics.categories
+                );
+
+            const values =
+                Object.values(
+                    analytics.categories
+                );
+
+            const expenseCtx =
+                document.getElementById(
+                    "expenseChart"
+                );
+
+            new Chart(expenseCtx, {
+
+                type: "doughnut",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [{
+                        data: values,
+
+                        backgroundColor: [
+                            '#22C55E',
+                            '#A3E635',
+                            '#FBBF24',
+                            '#FB923C',
+                            '#EF4444',
+                            '#9CA3AF',
+                            '#3B82F6',
+                            '#8B5CF6'
+                        ],
+
+                        borderWidth: 4,
+                        borderColor: '#ffffff'
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '78%',
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
                 }
+            });
+
+            console.log(
+                "Analytics:",
+                analytics
+            );
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+</script>
+<script>
+async function loadDashboard() {
+  try {
+    const response = await fetch(
+      "http://127.0.0.1:8000/dashboard"
+    );
+
+    const data = await response.json();
+
+    const currentBalance =
+      document.getElementById("currentBalance");
+
+    const totalPayables =
+      document.getElementById("totalPayables");
+
+    const overviewBalance =
+      document.getElementById("overviewBalance");
+
+    const cashRunway =
+      document.getElementById("cashRunway");
+
+    const cashRunwayWidget =
+      document.getElementById("cashRunwayWidget");
+
+    if (currentBalance)
+      currentBalance.innerText =
+        `₹${data.current_balance.toLocaleString()}`;
+
+    if (overviewBalance)
+      overviewBalance.innerText =
+        `₹${data.current_balance.toLocaleString()}`;
+
+    if (totalPayables)
+      totalPayables.innerText =
+        `₹${data.total_payables.toLocaleString()}`;
+
+    if (cashRunway)
+      cashRunway.innerText =
+        `${data.cash_runway} Days`;
+
+    if (cashRunwayWidget)
+      cashRunwayWidget.innerText =
+        `${data.cash_runway} Days`;
+
+    console.log("Dashboard Updated", data);
+
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+loadDashboard();
+
+setInterval(loadDashboard, 5000);
+</script>
+
+<script>
+async function loadInvoices() {
+
+    try {
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/invoices"
+        );
+
+        const invoices =
+            await response.json();
+
+        tableBody.innerHTML = "";
+
+        invoices.forEach(invoice => {
+
+            // table row code
+
+        });
+
+    } catch (err) {
+
+        console.error(err);
+
+    }
+}
+
+
+// ADD THIS DIRECTLY BELOW loadInvoices()
+
+async function deleteInvoice(id) {
+
+    const confirmed =
+        confirm("Delete this invoice?");
+
+    if (!confirmed) return;
+
+    try {
+
+        await fetch(
+            `http://127.0.0.1:8000/invoice/${id}`,
+            {
+                method: "DELETE"
+            }
+        );
+
+        loadInvoices();
+
+    } catch (err) {
+
+        console.error(err);
+
+        alert("Delete failed");
+    }
+}
+
+
+loadInvoices();
+
+setInterval(
+    loadInvoices,
+    5000
+);
+
+loadInvoices();
+setInterval(loadInvoices, 5000);
+
+
+
+</script>
+
+<script>
+    async function loadSidebarStats() {
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/dashboard"
+        );
+
+    const data =
+        await response.json();
+
+    const balance =
+        document.getElementById(
+            "sidebarBalance"
+        );
+
+    const runway =
+        document.getElementById(
+            "sidebarRunway"
+        );
+
+    if (balance) {
+        balance.innerText =
+            `₹${data.current_balance.toLocaleString()}`;
+    }
+
+    if (runway) {
+        runway.innerText =
+            `${Math.ceil(data.cash_runway)} days runway`;
+    }
+}
+
+loadSidebarStats();
+
+async function loadUpcomingObligations() {
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/invoices"
+        );
+
+    const invoices =
+        await response.json();
+
+    const table =
+        document.getElementById(
+            "invoiceTable"
+        );
+
+    table.innerHTML = "";
+
+    invoices.forEach(invoice => {
+
+        const today = new Date();
+
+        const dueDate =
+            new Date(invoice.due_date);
+
+        let status = "Pending";
+
+        let statusClass =
+            "bg-tertiary-container text-on-tertiary-container";
+
+        if (!isNaN(dueDate)) {
+
+            const diffDays =
+                Math.ceil(
+                    (dueDate - today) /
+                    (1000 * 60 * 60 * 24)
+                );
+
+            if (diffDays < 0) {
+
+                status = "Overdue";
+
+                statusClass =
+                    "bg-error-container text-on-error-container";
+
+            } else if (diffDays <= 3) {
+
+                status = "Due Soon";
+
+                statusClass =
+                    "bg-secondary-container text-on-secondary-container";
             }
         }
+
+        table.innerHTML += `
+
+        <tr class="hover:bg-surface-container-low/50 transition-colors">
+
+            <td class="px-lg py-md flex items-center gap-md">
+
+                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">
+
+                    ${invoice.vendor.charAt(0)}
+
+                </div>
+
+                <span class="font-medium text-on-surface">
+
+                    ${invoice.vendor}
+
+                </span>
+
+            </td>
+
+            <td class="px-lg py-md text-on-surface-variant">
+
+                ${invoice.category}
+
+            </td>
+
+            <td class="px-lg py-md text-on-surface-variant">
+
+                ${invoice.due_date}
+
+            </td>
+
+            <td class="px-lg py-md text-right font-mono-data text-on-surface">
+
+                ₹${Number(invoice.amount).toLocaleString()}
+
+            </td>
+
+            <td class="px-lg py-md text-center">
+
+                <span class="${statusClass} px-sm py-xs rounded-full text-xs font-bold">
+
+                    ${status}
+
+                </span>
+
+            </td>
+
+        </tr>
+
+        `;
     });
+}
+
+loadUpcomingObligations();
+
+setInterval(
+    loadUpcomingObligations,
+    5000
+);
+
+
+
+async function updateBalance() {
+
+    const balance =
+        Number(
+            document.getElementById(
+                "sidebarBalanceInput"
+            ).value
+        );
+
+    if (!balance) return;
+
+    await fetch(
+        "http://127.0.0.1:8000/update-balance",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+                balance: balance
+            })
+        }
+    );
+
+    document.getElementById(
+        "sidebarBalance"
+    ).innerText =
+        `₹${balance.toLocaleString()}`;
+
+    location.reload();
+}
 </script>
 </body>
 </html>

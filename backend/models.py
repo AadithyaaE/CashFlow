@@ -47,3 +47,7 @@ class ScenarioRequest(BaseModel):
     projected_runway: int
 
     total_payables: float
+
+
+class ChatRequest(BaseModel):
+    question: str

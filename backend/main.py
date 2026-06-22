@@ -9,7 +9,7 @@ from database import SessionLocal, engine
 from models import Base, Invoice,ManualExpenseRequest
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
-from models import ScenarioRequest
+from models import ScenarioRequest,ChatRequest
 
 
 
@@ -1115,3 +1115,148 @@ Return only HTML.
             "recommendation":
                 response.content
         }
+
+
+@app.post("/cfo-chat")
+def cfo_chat(data: ChatRequest):
+
+    from datetime import datetime, timedelta
+
+    db = SessionLocal()
+
+    invoices = db.query(
+        Invoice
+    ).all()
+
+    upcoming_bills = 0
+
+    for invoice in invoices:
+
+        try:
+
+            due = datetime.strptime(
+                invoice.due_date,
+                "%d-%m-%Y"
+            )
+
+            if (
+                due <=
+                datetime.today()
+                + timedelta(days=30)
+            ):
+
+                upcoming_bills += (
+                    invoice.amount
+                )
+
+        except:
+
+            pass
+
+    global CURRENT_BALANCE
+
+    current_balance = (
+        CURRENT_BALANCE
+    )
+
+    total_payables = sum(
+
+        invoice.amount
+
+        for invoice in invoices
+
+        if invoice.transaction_type
+        == "payable"
+
+    )
+
+    total_receivables = sum(
+
+        invoice.amount
+
+        for invoice in invoices
+
+        if invoice.transaction_type
+        == "receivable"
+
+    )
+
+    monthly_burn = (
+        total_payables
+    )
+
+    if monthly_burn > 0:
+
+        runway_days = round(
+
+            (
+                current_balance
+                /
+                monthly_burn
+            )
+            * 30
+
+        )
+
+    else:
+
+        runway_days = 365
+
+    prompt = f"""
+You are CashPilot AI.
+
+You are an AI CFO assistant.
+
+You ONLY answer questions about:
+
+- Cash flow
+- Runway
+- Payables
+- Receivables
+- Vendor payments
+- Expenses
+- Business finance
+
+If the user asks anything outside business finance, reply exactly:
+
+I can only answer questions about your business finances.
+
+Business Data:
+
+Current Balance: ₹{current_balance}
+
+Cash Runway: {runway_days} days
+
+Total Payables: ₹{total_payables}
+
+Total Receivables: ₹{total_receivables}
+
+Upcoming Bills (30 Days): ₹{upcoming_bills}
+
+Invoice Count: {len(invoices)}
+
+User Question:
+
+{data.question}
+
+Rules:
+
+1. Use the business data above.
+2. Mention actual numbers.
+3. Give practical CFO recommendations.
+4. Be concise.
+5. Keep answer under 120 words.
+"""
+
+    response = llm.invoke(
+        prompt
+    )
+
+    db.close()
+
+    return {
+
+        "answer":
+            response.content
+
+    }

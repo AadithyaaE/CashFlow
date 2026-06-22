@@ -418,16 +418,33 @@
                         <span class="text-[10px] text-on-surface-variant mt-xs px-1">CFO • 09:43 AM</span>
                     </div>
                 </div>
-                <div class="p-sm border-t border-outline-variant bg-white">
-                    <div class="relative">
-                        <input class="w-full bg-surface-container-low border-none rounded-xl pr-10 text-xs focus:ring-1 focus:ring-primary py-2.5" placeholder="Ask about runway..." type="text"/>
-                        <button class="absolute right-1 top-1/2 -translate-y-1/2 text-primary p-xs hover:scale-105 transition-transform">
-                            <span class="material-symbols-outlined text-md">send</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+              <div class="p-sm border-t border-outline-variant bg-white">
+
+    <div id="chatMessages" class="mb-md space-y-sm">
+    </div>
+
+    <div class="relative">
+
+        <input
+            id="chatInput"
+            class="w-full bg-surface-container-low border-none rounded-xl pr-10 text-xs focus:ring-1 focus:ring-primary py-2.5"
+            placeholder="Ask about runway..."
+            type="text"
+        />
+
+        <button
+            id="sendChatBtn"
+            class="absolute right-1 top-1/2 -translate-y-1/2 text-primary p-xs hover:scale-105 transition-transform">
+
+            <span class="material-symbols-outlined text-md">
+                send
+            </span>
+
+        </button>
+
+    </div>
+
+</div>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
             <div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
@@ -736,5 +753,144 @@ const netCashflow =
         }
     }
 </script>
+
+<script>
+
+document
+.getElementById(
+    "sendChatBtn"
+)
+.addEventListener(
+    "click",
+    sendMessage
+);
+
+document
+.getElementById(
+    "chatInput"
+)
+.addEventListener(
+    "keypress",
+    function(e){
+
+        if(e.key === "Enter"){
+
+            sendMessage();
+
+        }
+
+    }
+);
+
+async function sendMessage(){
+
+    const question =
+        document
+        .getElementById(
+            "chatInput"
+        )
+        .value;
+
+    if(!question.trim()){
+
+        return;
+
+    }
+
+    addUserMessage(
+        question
+    );
+
+    document
+    .getElementById(
+        "chatInput"
+    )
+    .value = "";
+
+    const response =
+    await fetch(
+        "http://127.0.0.1:8000/cfo-chat",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+
+            body: JSON.stringify({
+
+                question:
+                    question
+
+            })
+
+        }
+    );
+
+    const data =
+        await response.json();
+
+    addBotMessage(
+        data.answer
+    );
+
+}
+
+function addUserMessage(text){
+
+    const chat =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    chat.innerHTML += `
+
+        <div class="flex justify-end">
+
+            <div class="bg-primary text-white px-md py-sm rounded-xl max-w-xs">
+
+                ${text}
+
+            </div>
+
+        </div>
+
+    `;
+
+}
+
+function addBotMessage(text){
+
+    const chat =
+        document.getElementById(
+            "chatMessages"
+        );
+
+    chat.innerHTML += `
+
+        <div class="flex justify-start">
+
+            <div class="bg-surface-container-low px-md py-sm rounded-xl max-w-md">
+
+                ${text}
+
+            </div>
+
+        </div>
+
+    `;
+
+    chat.scrollTop =
+        chat.scrollHeight;
+
+}
+
+</script>
+
+
+
+
+
 </body>
 </html>

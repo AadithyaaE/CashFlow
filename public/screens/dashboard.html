@@ -132,145 +132,52 @@
         <span class="material-symbols-outlined">add</span>
         New Document
     </button>
-<nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+    <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/dashboard.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+            <span class="font-label-md">Dashboard</span>
+        </a>
 
-    <!-- Dashboard -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="/screens/dashboard.html">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="/screens/invoices.html">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">upload_file</span>
+            <span class="font-label-md">Invoice Hub</span>
+        </a>
 
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            dashboard
-        </span>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">timeline</span>
+            <span class="font-label-md">Cash Runway</span>
+        </a>
 
-        <span class="font-label-md">
-            Dashboard
-        </span>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+            <span class="font-label-md">Analytics</span>
+        </a>
 
-    </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">psychology</span>
+            <span class="font-label-md">AI Recommendations</span>
+        </a>
 
-    <!-- Invoice Hub -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all"
-       href="/screens/invoices.html">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">priority_high</span>
+            <span class="font-label-md">Payment Priorities</span>
+        </a>
 
-        <span class="material-symbols-outlined"
-              style="font-variation-settings:'FILL' 1;">
-            upload_file
-        </span>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">forum</span>
+            <span class="font-label-md">Vendor Negotiator</span>
+        </a>
 
-        <span class="font-label-md">
-            Invoice Hub
-        </span>
-
-    </a>
-
-    <!-- Cash Runway -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="/screens/runway.html">
-
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            timeline
-        </span>
-
-        <span class="font-label-md">
-            Cash Runway
-        </span>
-
-    </a>
-
-    <!-- Analytics -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="/screens/analytics.html">
-
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            analytics
-        </span>
-
-        <span class="font-label-md">
-            Analytics
-        </span>
-
-    </a>
-
-    <!-- AI Recommendations -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="#">
-
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            psychology
-        </span>
-
-        <span class="font-label-md">
-            AI Recommendations
-        </span>
-
-    </a>
-
-    <!-- Payment Priorities -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="#">
-
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            priority_high
-        </span>
-
-        <span class="font-label-md">
-            Payment Priorities
-        </span>
-
-    </a>
-
-    <!-- Vendor Negotiator -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="#">
-
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            forum
-        </span>
-
-        <span class="font-label-md">
-            Vendor Negotiator
-        </span>
-
-    </a>
-
-    <!-- Sidebar KPI Card -->
-    <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
-
-        <p class="text-xs text-on-surface-variant">
-            Current Cash Position
-        </p>
-
-        <div class="mt-sm flex flex-col gap-sm">
-
-    <h4 id="sidebarBalance"
-        class="font-headline-md text-primary font-bold">
-        ₹75,000
-    </h4>
-
-    <input
-        id="sidebarBalanceInput"
-        type="number"
-        placeholder="Enter balance"
-        class="px-sm py-xs border border-outline-variant rounded-lg text-sm bg-surface-container-lowest">
-
-    <button
-        onclick="updateBalance()"
-        class="px-sm py-xs bg-primary text-on-primary rounded-lg text-sm font-semibold">
-
-        Update Balance
-
-    </button>
-
-</div>
-
-        <p id="sidebarRunway"
-           class="text-xs text-on-surface-variant mt-xs">
-           18 days runway
-        </p>
-
-    </div>
-
-</nav>
+        <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
+            <p class="text-xs text-on-surface-variant">Current Cash Position</p>
+            <div class="mt-sm flex flex-col gap-sm">
+                <h4 id="sidebarBalance" class="font-headline-md text-primary font-bold">₹75,000</h4>
+                <input id="sidebarBalanceInput" type="number" placeholder="Enter balance" class="px-sm py-xs border border-outline-variant rounded-lg text-sm bg-surface-container-lowest">
+                <button onclick="updateBalance()" class="px-sm py-xs bg-primary text-on-primary rounded-lg text-sm font-semibold">Update Balance</button>
+            </div>
+            <p id="sidebarRunway" class="text-xs text-on-surface-variant mt-xs">18 days runway</p>
+        </div>
+    </nav>
     <div class="pt-lg border-t border-outline-variant space-y-xs">
         <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200" href="#">
             <span class="material-symbols-outlined">settings</span>
@@ -284,7 +191,6 @@
 </aside>
 
 <main class="md:ml-64 p-lg md:p-xl bg-background min-h-screen">
-    
     <header class="flex justify-between items-center mb-xl">
         <div>
             <h2 class="font-headline-lg text-headline-lg text-on-surface">Financial Overview</h2>
@@ -301,7 +207,6 @@
     </header>
 
     <div class="space-y-lg">
-        
         <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                 <div>
@@ -316,30 +221,31 @@
                     <span class="ml-1">+12.5% from last month</span>
                 </div>
             </div>
+
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                 <div>
                     <div class="flex justify-between items-start mb-sm">
                         <span class="text-on-surface-variant font-label-md">Total Payables</span>
                         <span class="material-symbols-outlined text-error">payments</span>
                     </div>
-                    <div id="totalPayables" class="font-headline-md text-headline-md text-on-surface">₹52,000</div>
+                    <div id="totalPayables" class="font-headline-md text-headline-md text-on-surface">₹0</div>
                 </div>
                 <div class="mt-base text-on-surface-variant text-sm">Due in 15 days</div>
             </div>
+
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                 <div>
                     <div class="flex justify-between items-start mb-sm">
                         <span class="text-on-surface-variant font-label-md">Total Receivables</span>
                         <span class="material-symbols-outlined text-tertiary">request_quote</span>
                     </div>
-                    <div class="font-headline-md text-headline-md text-on-surface">₹40,000</div>
+                    <div id="totalReceivables" class="font-headline-md text-headline-md text-on-surface">₹0</div>
                 </div>
                 <div class="mt-base text-on-surface-variant text-sm">₹12,000 overdue</div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-stretch">
-            
             <div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between">
                 <div>
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-md mb-6">
@@ -364,7 +270,13 @@
                         </div>
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Upcoming Bills</p>
-                            <p class="text-xl font-bold text-on-surface mt-1">₹28,000</p>
+                            <p
+    id="upcomingBills"
+    class="text-xl font-bold text-on-surface mt-1">
+
+    ₹0
+
+</p>
                         </div>
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Safety Threshold</p>
@@ -379,7 +291,6 @@
             </div>
 
             <div class="lg:col-span-4 flex flex-col gap-lg justify-between">
-                
                 <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between flex-1">
                     <div class="flex justify-between items-center mb-2">
                         <h4 class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Health Score</h4>
@@ -427,12 +338,10 @@
                         <div class="flex items-center justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant truncate"><span class="w-2 h-2 rounded-full flex-shrink-0 bg-[#9CA3AF]"></span>Other</span><span class="font-mono-data text-on-surface font-semibold">₹5k</span></div>
                     </div>
                 </div>
-
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-stretch">
-            
             <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-lg">
                 <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between">
                     <div class="flex items-center gap-sm mb-lg">
@@ -518,7 +427,6 @@
                     </div>
                 </div>
             </div>
-
         </div>
 
         <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
@@ -538,11 +446,10 @@
                         </tr>
                     </thead>
                     <tbody id="invoiceTable" class="divide-y divide-outline-variant text-sm">
-</tbody>
+                        </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 
     <footer class="mt-xl py-lg border-t border-outline-variant flex flex-col md:flex-row justify-between items-center text-on-surface-variant font-body-sm">
@@ -576,7 +483,6 @@
     // Animate Health Score Gauge
     window.addEventListener('load', () => {
         const circle = document.querySelector('.gauge-ring');
-
         if (circle) {
             const score = 82;
             const radius = 70;
@@ -590,527 +496,245 @@
         loadDashboard();
         loadLiquidityChart();
         loadExpenseChart();
+        loadSidebarStats();
+        loadUpcomingObligations();
     });
 
-    // ==========================
-    // DASHBOARD DATA
-    // ==========================
-
+    // ==========================================
+    // CORE ASYNC DASHBOARD LOAD & POLLING ENGINE
+    // ==========================================
     async function loadDashboard() {
-
         try {
-
-            const response = await fetch(
-                "http://127.0.0.1:8000/dashboard"
-            );
-
+            const response = await fetch("http://127.0.0.1:8000/dashboard");
             const data = await response.json();
 
-            const balanceCards =
-                document.querySelectorAll(
-                    ".cashflow-overview .text-2xl, .cashflow-overview .text-xl"
-                );
+            document.getElementById(
+    "upcomingBills"
+).innerText =
+    `₹${data.total_payables.toLocaleString()}`;
 
-            console.log("Dashboard:", data);
+            const currentBalance = document.getElementById("currentBalance");
+            const totalPayables = document.getElementById("totalPayables");
+            const totalReceivables = document.getElementById("totalReceivables");
+            const overviewBalance = document.getElementById("overviewBalance");
+            const cashRunway = document.getElementById("cashRunway");
+            const cashRunwayWidget = document.getElementById("cashRunwayWidget");
+            
 
+            if (currentBalance) currentBalance.innerText = `₹${data.current_balance.toLocaleString()}`;
+            if (overviewBalance) overviewBalance.innerText = `₹${data.current_balance.toLocaleString()}`;
+            if (totalPayables) totalPayables.innerText = `₹${data.total_payables.toLocaleString()}`;
+            if (totalReceivables) totalReceivables.innerText = `₹${(data.total_receivables || 0).toLocaleString()}`;
+            if (cashRunway) cashRunway.innerText = `${data.cash_runway} Days`;
+            if (cashRunwayWidget) cashRunwayWidget.innerText = `${data.cash_runway} Days`;
+
+            console.log("Dashboard Updated Successfully", data);
         } catch (err) {
-            console.error(err);
+            console.error("Dashboard metric sync error:", err);
+        }
+    }
+
+    // Set polling intervals
+    setInterval(loadDashboard, 5000);
+    setInterval(loadSidebarStats, 5000);
+    setInterval(loadUpcomingObligations, 5000);
+
+    // ==========================
+    // SIDEBAR METRIC UPDATER
+    // ==========================
+    async function loadSidebarStats() {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/dashboard");
+            const data = await response.json();
+
+            const balance = document.getElementById("sidebarBalance");
+            const runway = document.getElementById("sidebarRunway");
+
+            if (balance) balance.innerText = `₹${data.current_balance.toLocaleString()}`;
+            if (runway) runway.innerText = `${Math.ceil(data.cash_runway)} days runway`;
+        } catch (err) {
+            console.error("Sidebar runtime error:", err);
         }
     }
 
     // ==========================
-    // CASHFLOW LINE CHART
+    // CASHFLOW LINE CHART ENGINE
     // ==========================
-
     async function loadLiquidityChart() {
-
         try {
-
-            const response = await fetch(
-                "http://127.0.0.1:8000/dashboard"
-            );
-
-            const dashboard =
-                await response.json();
-
-            const payables =
-                dashboard.total_payables;
-
+            const response = await fetch("http://127.0.0.1:8000/dashboard");
+            const dashboard = await response.json();
             const balance =
-                dashboard.current_balance;
+    dashboard.current_balance;
 
-            const income = [
-                balance * 0.60,
-                balance * 0.70,
-                balance * 0.75,
-                balance * 0.80
-            ];
+const payables =
+    dashboard.total_payables;
 
-            const expenses = [
-                payables * 0.25,
-                payables * 0.50,
-                payables * 0.75,
-                payables
-            ];
+const income = [
+    balance * 0.60,
+    balance * 0.70,
+    balance * 0.75,
+    balance * 0.80
+];
 
-            const netCashflow =
-                income.map(
-                    (value, index) =>
-                        value - expenses[index]
-                );
+const expenses = [
+    payables * 0.25,
+    payables * 0.50,
+    payables * 0.75,
+    payables
+];
 
-            const ctx =
-                document.getElementById(
-                    "liquidityChart"
-                );
+const netCashflow =
+    income.map(
+        (value, index) =>
+            value - expenses[index]
+    );
+
+            const ctx = document.getElementById("liquidityChart");
+            if (!ctx) return;
+
+            console.log("Canvas:", ctx);
+            console.log("Chart:", typeof Chart);
 
             new Chart(ctx, {
                 type: "line",
-
                 data: {
-                    labels: [
-                        "Q1",
-                        "Q2",
-                        "Q3",
-                        "Q4"
-                    ],
-
+                    labels: ["Q1", "Q2", "Q3", "Q4"],
                     datasets: [
-                        {
-                            label: "Income",
-                            data: income,
-                            borderColor: "#22C55E",
-                            backgroundColor: "#22C55E",
-                            tension: 0.4
-                        },
-
-                        {
-                            label: "Expenses",
-                            data: expenses,
-                            borderColor: "#EF4444",
-                            backgroundColor: "#EF4444",
-                            tension: 0.4
-                        },
-
-                        {
-                            label: "Net Cashflow",
-                            data: netCashflow,
-                            borderColor: "#3B82F6",
-                            backgroundColor: "#3B82F6",
-                            tension: 0.4
-                        }
+                        { label: "Income", data: income, borderColor: "#22C55E", backgroundColor: "#22C55E", tension: 0.4 },
+                        { label: "Expenses", data: expenses, borderColor: "#EF4444", backgroundColor: "#EF4444", tension: 0.4 },
+                        { label: "Net Cashflow", data: netCashflow, borderColor: "#3B82F6", backgroundColor: "#3B82F6", tension: 0.4 }
                     ]
                 },
-
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-
                     plugins: {
-                        legend: {
-                            position: 'top',
-                            align: 'start'
-                        }
+                        legend: { position: 'top', align: 'start' }
                     }
                 }
             });
-
         } catch (err) {
-            console.error(err);
+            console.error("Liquidity rendering matrix error:", err);
         }
     }
 
-    // ==========================
-    // SPENDING BREAKDOWN
-    // ==========================
-
+    // ============================
+    // SPENDING BREAKDOWN DONUT
+    // ============================
     async function loadExpenseChart() {
-
         try {
+            const response = await fetch("http://127.0.0.1:8000/analytics");
+            const analytics = await response.json();
 
-            const response = await fetch(
-                "http://127.0.0.1:8000/analytics"
-            );
+            const labels = Object.keys(analytics.categories);
+            const values = Object.values(analytics.categories);
 
-            const analytics =
-                await response.json();
-
-            const labels =
-                Object.keys(
-                    analytics.categories
-                );
-
-            const values =
-                Object.values(
-                    analytics.categories
-                );
-
-            const expenseCtx =
-                document.getElementById(
-                    "expenseChart"
-                );
+            const expenseCtx = document.getElementById("expenseChart");
+            if (!expenseCtx) return;
 
             new Chart(expenseCtx, {
-
                 type: "doughnut",
-
                 data: {
-
                     labels: labels,
-
                     datasets: [{
                         data: values,
-
-                        backgroundColor: [
-                            '#22C55E',
-                            '#A3E635',
-                            '#FBBF24',
-                            '#FB923C',
-                            '#EF4444',
-                            '#9CA3AF',
-                            '#3B82F6',
-                            '#8B5CF6'
-                        ],
-
+                        backgroundColor: ['#22C55E', '#A3E635', '#FBBF24', '#FB923C', '#EF4444', '#9CA3AF', '#3B82F6', '#8B5CF6'],
                         borderWidth: 4,
                         borderColor: '#ffffff'
                     }]
                 },
-
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
                     cutout: '78%',
-
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    }
+                    plugins: { legend: { display: false } }
                 }
             });
-
-            console.log(
-                "Analytics:",
-                analytics
-            );
-
         } catch (err) {
-            console.error(err);
+            console.error("Expense mapping rendering error:", err);
         }
     }
-</script>
-<script>
-async function loadDashboard() {
-  try {
-    const response = await fetch(
-      "http://127.0.0.1:8000/dashboard"
-    );
 
-    const data = await response.json();
-
-    const currentBalance =
-      document.getElementById("currentBalance");
-
-    const totalPayables =
-      document.getElementById("totalPayables");
-
-    const overviewBalance =
-      document.getElementById("overviewBalance");
-
-    const cashRunway =
-      document.getElementById("cashRunway");
-
-    const cashRunwayWidget =
-      document.getElementById("cashRunwayWidget");
-
-    if (currentBalance)
-      currentBalance.innerText =
-        `₹${data.current_balance.toLocaleString()}`;
-
-    if (overviewBalance)
-      overviewBalance.innerText =
-        `₹${data.current_balance.toLocaleString()}`;
-
-    if (totalPayables)
-      totalPayables.innerText =
-        `₹${data.total_payables.toLocaleString()}`;
-
-    if (cashRunway)
-      cashRunway.innerText =
-        `${data.cash_runway} Days`;
-
-    if (cashRunwayWidget)
-      cashRunwayWidget.innerText =
-        `${data.cash_runway} Days`;
-
-    console.log("Dashboard Updated", data);
-
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-loadDashboard();
-
-setInterval(loadDashboard, 5000);
-</script>
-
-<script>
-async function loadInvoices() {
-
-    try {
-
-        const response = await fetch(
-            "http://127.0.0.1:8000/invoices"
-        );
-
-        const invoices =
-            await response.json();
-
-        tableBody.innerHTML = "";
-
-        invoices.forEach(invoice => {
-
-            // table row code
-
-        });
-
-    } catch (err) {
-
-        console.error(err);
-
-    }
-}
-
-
-// ADD THIS DIRECTLY BELOW loadInvoices()
-
-async function deleteInvoice(id) {
-
-    const confirmed =
-        confirm("Delete this invoice?");
-
-    if (!confirmed) return;
-
-    try {
-
-        await fetch(
-            `http://127.0.0.1:8000/invoice/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
-
-        loadInvoices();
-
-    } catch (err) {
-
-        console.error(err);
-
-        alert("Delete failed");
-    }
-}
-
-
-loadInvoices();
-
-setInterval(
-    loadInvoices,
-    5000
-);
-
-loadInvoices();
-setInterval(loadInvoices, 5000);
-
-
-
-</script>
-
-<script>
-    async function loadSidebarStats() {
-
-    const response =
-        await fetch(
-            "http://127.0.0.1:8000/dashboard"
-        );
-
-    const data =
-        await response.json();
-
-    const balance =
-        document.getElementById(
-            "sidebarBalance"
-        );
-
-    const runway =
-        document.getElementById(
-            "sidebarRunway"
-        );
-
-    if (balance) {
-        balance.innerText =
-            `₹${data.current_balance.toLocaleString()}`;
-    }
-
-    if (runway) {
-        runway.innerText =
-            `${Math.ceil(data.cash_runway)} days runway`;
-    }
-}
-
-loadSidebarStats();
-
-async function loadUpcomingObligations() {
-
-    const response =
-        await fetch(
-            "http://127.0.0.1:8000/invoices"
-        );
-
-    const invoices =
-        await response.json();
-
-    const table =
-        document.getElementById(
-            "invoiceTable"
-        );
-
-    table.innerHTML = "";
-
-    invoices.forEach(invoice => {
-
-        const today = new Date();
-
-        const dueDate =
-            new Date(invoice.due_date);
-
-        let status = "Pending";
-
-        let statusClass =
-            "bg-tertiary-container text-on-tertiary-container";
-
-        if (!isNaN(dueDate)) {
-
-            const diffDays =
-                Math.ceil(
-                    (dueDate - today) /
-                    (1000 * 60 * 60 * 24)
-                );
-
-            if (diffDays < 0) {
-
-                status = "Overdue";
-
-                statusClass =
-                    "bg-error-container text-on-error-container";
-
-            } else if (diffDays <= 3) {
-
-                status = "Due Soon";
-
-                statusClass =
-                    "bg-secondary-container text-on-secondary-container";
-            }
+    // ==================================
+    // UPCOMING OBLIGATIONS TABLE RENDERING
+    // ==================================
+    async function loadUpcomingObligations() {
+        try {
+            const response = await fetch("http://127.0.0.1:8000/invoices");
+            const invoices = await response.json();
+
+            const table = document.getElementById("invoiceTable");
+            if (!table) return;
+            table.innerHTML = "";
+
+            invoices.forEach(invoice => {
+                const today = new Date();
+                const dueDate = new Date(invoice.due_date);
+                let status = "Pending";
+                let statusClass = "bg-tertiary-container text-on-tertiary-container";
+
+                if (!isNaN(dueDate)) {
+                    const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                    if (diffDays < 0) {
+                        status = "Overdue";
+                        statusClass = "bg-error-container text-on-error-container";
+                    } else if (diffDays <= 3) {
+                        status = "Due Soon";
+                        statusClass = "bg-secondary-container text-on-secondary-container";
+                    }
+                }
+
+                table.innerHTML += `
+                <tr class="hover:bg-surface-container-low/50 transition-colors">
+                    <td class="px-lg py-md flex items-center gap-md">
+                        <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">
+                            ${invoice.vendor ? invoice.vendor.charAt(0) : 'V'}
+                        </div>
+                        <span class="font-medium text-on-surface">${invoice.vendor || ''}</span>
+                    </td>
+                    <td class="px-lg py-md text-on-surface-variant">${invoice.category || ''}</td>
+                    <td class="px-lg py-md text-on-surface-variant">${invoice.due_date || ''}</td>
+                    <td class="px-lg py-md text-right font-mono-data text-on-surface">
+                        ₹${Number(invoice.amount).toLocaleString()}
+                    </td>
+                    <td class="px-lg py-md text-center">
+                        <span class="${statusClass} px-sm py-xs rounded-full text-xs font-bold">
+                            ${status}
+                        </span>
+                    </td>
+                </tr>
+                `;
+            });
+        } catch (err) {
+            console.error("Obligations table populate exception:", err);
         }
+    }
 
-        table.innerHTML += `
+    // ===============================
+    // UPDATE BALANCE MUTATION TRIGGER
+    // ===============================
+    async function updateBalance() {
+        const inputEl = document.getElementById("sidebarBalanceInput");
+        if (!inputEl) return;
+        
+        const balance = Number(inputEl.value);
+        if (!balance) return;
 
-        <tr class="hover:bg-surface-container-low/50 transition-colors">
+        try {
+            await fetch("http://127.0.0.1:8000/update-balance", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ balance: balance })
+            });
 
-            <td class="px-lg py-md flex items-center gap-md">
-
-                <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">
-
-                    ${invoice.vendor.charAt(0)}
-
-                </div>
-
-                <span class="font-medium text-on-surface">
-
-                    ${invoice.vendor}
-
-                </span>
-
-            </td>
-
-            <td class="px-lg py-md text-on-surface-variant">
-
-                ${invoice.category}
-
-            </td>
-
-            <td class="px-lg py-md text-on-surface-variant">
-
-                ${invoice.due_date}
-
-            </td>
-
-            <td class="px-lg py-md text-right font-mono-data text-on-surface">
-
-                ₹${Number(invoice.amount).toLocaleString()}
-
-            </td>
-
-            <td class="px-lg py-md text-center">
-
-                <span class="${statusClass} px-sm py-xs rounded-full text-xs font-bold">
-
-                    ${status}
-
-                </span>
-
-            </td>
-
-        </tr>
-
-        `;
-    });
-}
-
-loadUpcomingObligations();
-
-setInterval(
-    loadUpcomingObligations,
-    5000
-);
-
-
-
-async function updateBalance() {
-
-    const balance =
-        Number(
-            document.getElementById(
-                "sidebarBalanceInput"
-            ).value
-        );
-
-    if (!balance) return;
-
-    await fetch(
-        "http://127.0.0.1:8000/update-balance",
-        {
-            method: "POST",
-
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
-
-            body: JSON.stringify({
-                balance: balance
-            })
+            const sidebarBal = document.getElementById("sidebarBalance");
+            if (sidebarBal) sidebarBal.innerText = `₹${balance.toLocaleString()}`;
+            location.reload();
+        } catch (err) {
+            console.error("Balance synchronization failed:", err);
         }
-    );
-
-    document.getElementById(
-        "sidebarBalance"
-    ).innerText =
-        `₹${balance.toLocaleString()}`;
-
-    location.reload();
-}
+    }
 </script>
 </body>
 </html>

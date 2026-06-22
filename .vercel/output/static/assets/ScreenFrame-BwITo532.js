@@ -1,0 +1,1 @@
+import{r as t,j as s}from"./index-B23JpKRp.js";function i({src:r,title:e}){return t.useEffect(()=>{window.VITE_OCR_API_KEY="K82301801788957"},[]),s.jsx("iframe",{src:r,title:e,style:{width:"100vw",height:"100vh",border:0,display:"block"}})}export{i as S};

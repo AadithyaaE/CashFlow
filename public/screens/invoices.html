@@ -358,6 +358,74 @@
 <!-- Table Section -->
 <section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
 <div class="p-lg border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-md">
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-lg">
+
+    <h3 class="font-headline-md mb-md">
+        Add Manual Expense
+    </h3>
+
+    <div class="grid md:grid-cols-5 gap-md">
+
+    <input
+        id="vendorInput"
+        placeholder="Vendor Name"
+        class="border rounded-lg p-sm">
+
+    <select
+        id="transactionType"
+        class="border rounded-lg p-sm">
+
+        <option value="payable">
+            Payable
+        </option>
+
+        <option value="receivable">
+            Receivable
+        </option>
+
+    </select>
+
+    <select
+        id="categoryInput"
+        class="border rounded-lg p-sm">
+
+        <option>Utilities</option>
+        <option>Rent</option>
+        <option>Payroll</option>
+        <option>Software</option>
+        <option>Vendor Payment</option>
+        <option>Other</option>
+
+    </select>
+
+    <input
+        id="amountInput"
+        type="number"
+        placeholder="Amount"
+        class="border rounded-lg p-sm">
+
+    <input
+        id="dueDateInput"
+        type="date"
+        class="border rounded-lg p-sm">
+
+</div>
+
+
+
+
+
+
+
+    <button
+        onclick="addExpense()"
+        class="mt-md px-lg py-sm bg-primary text-white rounded-lg">
+
+        Add Expense
+
+    </button>
+
+</div>
 <h3 class="font-headline-md font-bold">Invoice Intelligence</h3>
 <div class="flex items-center gap-sm">
 <button class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors">
@@ -378,6 +446,9 @@
 <th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Invoice No.</th>
 <th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Amount</th>
 <th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Due Date</th>
+<th class="px-lg py-md text-left">
+    TYPE
+</th>
 <th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
 <th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">AI Priority</th>
 <th class="px-lg py-md"></th>
@@ -530,10 +601,28 @@ async function loadInvoices() {
                     </td>
 
                     <td class="px-lg py-md font-body-sm text-on-surface-variant">
-                        ${invoice.due_date}
-                    </td>
+    ${invoice.due_date}
+</td>
 
-                    <td class="px-lg py-md">
+<td class="px-lg py-md">
+
+    <span
+        class="
+            px-sm py-xs rounded-lg font-label-md
+            ${
+                invoice.transaction_type === "receivable"
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            }
+        ">
+
+        ${invoice.transaction_type}
+
+    </span>
+
+</td>
+
+<td class="px-lg py-md">
                         <span class="px-sm py-xs rounded-lg font-label-md bg-blue-100 text-blue-700">
                             Pending
                         </span>
@@ -545,15 +634,34 @@ async function loadInvoices() {
                             <div class="w-24 h-1.5 bg-surface-container rounded-full overflow-hidden">
 
                                 <div
-                                    class="h-full bg-primary"
-                                    style="width:90%">
-                                </div>
+    class="h-full bg-primary"
+    style="width:${Math.min(invoice.ai_score,100)}%">
+</div>
 
                             </div>
 
-                            <span class="font-mono-data font-bold text-primary">
-                                90
-                            </span>
+                            <span class="
+font-mono-data font-bold
+${
+    invoice.ai_score >= 80
+    ? 'text-red-600'
+    : invoice.ai_score >= 60
+    ? 'text-orange-600'
+    : invoice.ai_score >= 40
+    ? 'text-yellow-600'
+    : 'text-green-600'
+}
+">
+
+    ${invoice.ai_score}
+
+    <span class="text-xs ml-1">
+
+        ${invoice.risk_level}
+
+    </span>
+
+</span>
 
                         </div>
                     </td>
@@ -752,6 +860,79 @@ async function deleteInvoice(id) {
         console.error(err);
 
     }
+}
+
+async function addExpense() {
+
+    const vendor =
+        document.getElementById(
+            "vendorInput"
+        ).value;
+
+    const category =
+        document.getElementById(
+            "categoryInput"
+        ).value;
+
+    const transactionType =
+    document.getElementById(
+        "transactionType"
+    ).value;
+
+    const amount =
+        Number(
+            document.getElementById(
+                "amountInput"
+            ).value
+        );
+
+    const dueDate =
+        document.getElementById(
+            "dueDateInput"
+        ).value;
+
+    const formattedDate =
+        dueDate
+            .split("-")
+            .reverse()
+            .join("-");
+
+    await fetch(
+
+        "http://127.0.0.1:8000/manual-expense",
+
+        {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type":
+                    "application/json"
+            },
+            body: JSON.stringify({
+
+    vendor,
+
+    amount,
+
+    category,
+
+    due_date: formattedDate,
+
+    transaction_type:
+        transactionType
+
+})
+
+        }
+
+    );
+
+    alert(
+        "Expense Added"
+    );
+
+    location.reload();
 }
     </script>
 <div data-page-switcher>

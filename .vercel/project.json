@@ -1,0 +1,16 @@
+{
+  "projectId": "prj_zGezR49RRVam0Wa4E7jsF5GrT1BQ",
+  "orgId": "team_Y3VHpW8NgYZA0MguHwDggmnj",
+  "projectName": "cash-flow",
+  "settings": {
+    "createdAt": 1781548764951,
+    "framework": "tanstack-start",
+    "devCommand": null,
+    "installCommand": null,
+    "buildCommand": null,
+    "outputDirectory": null,
+    "rootDirectory": null,
+    "directoryListing": false,
+    "nodeVersion": "24.x"
+  }
+}

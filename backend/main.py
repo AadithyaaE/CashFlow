@@ -6,12 +6,110 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, UploadFile, File
 
 from database import SessionLocal, engine
-from models import Base, Invoice
+from models import Base, Invoice,ManualExpenseRequest
 from pydantic import BaseModel
+from langchain_google_genai import ChatGoogleGenerativeAI
+from models import ScenarioRequest
+
+
 
 Base.metadata.create_all(bind=engine)
+CURRENT_BALANCE = 75000
 
 app = FastAPI()
+
+def priority_score(invoice):
+
+        try:
+
+            transaction_bonus = 0
+
+            if invoice.transaction_type == "receivable":
+
+                transaction_bonus = 15
+
+            due_date = datetime.strptime(
+                invoice.due_date,
+                "%d-%m-%Y"
+            )
+
+            days_left = (
+                due_date -
+                datetime.today()
+            ).days
+
+            if days_left <= 0:
+
+                due_score = 50
+
+            elif days_left <= 3:
+
+                due_score = 45
+
+            elif days_left <= 7:
+
+                due_score = 35
+
+            elif days_left <= 15:
+
+                due_score = 20
+
+            else:
+
+                due_score = 10
+
+        except:
+
+            due_score = 10
+
+        amount_score = min(
+            invoice.amount / 1000,
+            30
+        )
+
+        category = (
+            invoice.category or ""
+        ).lower()
+
+        if "rent" in category:
+
+            category_score = 20
+
+        elif "salary" in category:
+
+            category_score = 20
+
+        elif (
+            "utility" in category or
+            "utilities" in category
+        ):
+
+            category_score = 15
+
+        else:
+
+            category_score = 5
+
+        score = (
+
+    (due_score / 50) * 0.50 +
+
+    (amount_score / 30) * 0.30 +
+
+    (category_score / 20) * 0.20
+
+) * 100
+
+        score += transaction_bonus
+
+        return min(
+            round(score),
+            100
+        )
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.5-flash"
+)
 
 app.add_middleware(
     CORSMiddleware,
@@ -285,119 +383,213 @@ async def upload_invoice(
     return data
 
 
+
+
+
 from datetime import datetime
 
 
 @app.get("/dashboard")
 def dashboard():
 
+    from datetime import datetime, timedelta
+
+    upcoming_bills = 0
     db = SessionLocal()
 
     invoices = db.query(Invoice).all()
+
+    for invoice in invoices:
+
+        try:
+
+            due = datetime.strptime(
+                invoice.due_date,
+                "%d-%m-%Y"
+            )
+
+            if due <= datetime.today() + timedelta(days=30):
+
+                upcoming_bills += invoice.amount
+
+        except:
+            pass
+
+    
+
+    
 
     global CURRENT_BALANCE
 
     current_balance = CURRENT_BALANCE
 
     total_payables = sum(
+    invoice.amount
+    for invoice in invoices
+    if invoice.transaction_type == "payable"
+)
+
+    total_receivables = sum(
         invoice.amount
         for invoice in invoices
+        if invoice.transaction_type == "receivable"
     )
 
-    today = datetime.today().date()
+    monthly_burn = total_payables
 
-    future_invoices = []
+    if monthly_burn > 0:
 
-    for invoice in invoices:
+        runway_days = round(
+            (current_balance / monthly_burn) * 30
+        )
 
-        due_date = None
+    else:
 
-        try:
-
-            due_date = datetime.strptime(
-                invoice.due_date,
-                "%d-%m-%Y"
-            )
-
-        except:
-
-            try:
-
-                due_date = datetime.strptime(
-                    invoice.due_date,
-                    "%B %d, %Y"
-                )
-
-            except:
-
-                continue
-
-        if due_date.date() >= today:
-
-            future_invoices.append(
-                (
-                    due_date,
-                    invoice.amount
-                )
-            )
-
-    future_invoices.sort(
-        key=lambda x: x[0]
-    )
-
-    remaining_balance = current_balance
-
-    runway_days = 365
-
-    for due_date, amount in future_invoices:
-
-        remaining_balance -= amount
-
-        if remaining_balance <= 0:
-
-            runway_days = max(
-                (
-                    due_date.date() - today
-                ).days,
-                0
-            )
-
-            break
-
-    print("TODAY:", today)
-    print("FUTURE INVOICES:", future_invoices)
-    print("RUNWAY DAYS:", runway_days)
+        runway_days = 365
 
     db.close()
 
     return {
         "current_balance": current_balance,
         "total_payables": total_payables,
+        "upcoming_bills":upcoming_bills,
+        "total_receivables": total_receivables,
         "cash_runway": runway_days,
-        "invoice_count": len(invoices)
-    }
+        "invoice_count": len(invoices),
+
+ }
+
+from datetime import datetime
+
+def calculate_ai_score(invoice):
+
+    score = 0
+
+    try:
+
+        due_date = datetime.strptime(
+            invoice.due_date,
+            "%d-%m-%Y"
+        )
+
+        days_left = (
+            due_date -
+            datetime.today()
+        ).days
+
+        if days_left < 0:
+
+            score += 60
+
+        elif days_left <= 3:
+
+            score += 50
+
+        elif days_left <= 7:
+
+            score += 35
+
+        elif days_left <= 15:
+
+            score += 20
+
+    except:
+
+        pass
+
+    score += min(
+        invoice.amount / 1000,
+        40
+    )
+
+    category = (
+        invoice.category or ""
+    ).lower()
+
+    if (
+        "rent" in category or
+        "salary" in category or
+        "utility" in category
+    ):
+        score += 35
+
+    return min(
+    round(score),
+    100
+)
+
+
+
+
 @app.get("/invoices")
 def get_invoices():
 
     db = SessionLocal()
 
-    invoices = db.query(Invoice).all()
+    invoices = db.query(
+        Invoice
+    ).all()
 
     result = []
 
     for invoice in invoices:
+
+        score = priority_score(
+            invoice
+        )
+
+        if score >= 80:
+
+            risk_level = "Critical"
+
+        elif score >= 60:
+
+            risk_level = "High"
+
+        elif score >= 40:
+
+            risk_level = "Medium"
+
+        else:
+
+            risk_level = "Low"
+
         result.append({
-            "id": invoice.id,
-            "vendor": invoice.vendor,
-            "amount": invoice.amount,
-            "due_date": invoice.due_date,
-            "category": invoice.category
+
+            "id":
+                invoice.id,
+
+            "vendor":
+                invoice.vendor,
+
+            "amount":
+                invoice.amount,
+
+            "due_date":
+                invoice.due_date,
+
+            "category":
+                invoice.category,
+
+            "transaction_type":
+                invoice.transaction_type,
+
+            "ai_score":
+                score,
+
+            "risk_level":
+                risk_level
+
         })
+
+    result.sort(
+        key=lambda x: x["ai_score"],
+        reverse=True
+    )
 
     db.close()
 
     return result
-
 
 @app.get("/analytics")
 def analytics():
@@ -447,12 +639,12 @@ def delete_invoice(invoice_id: int):
     return {
         "message": "Invoice deleted"
     }
-class ScenarioRequest(BaseModel):
+class ScenarioSimulationRequest(BaseModel):
     amount: float
 
 
 @app.post("/simulate-scenario")
-def simulate_scenario(data: ScenarioRequest):
+def simulate_scenario(data: ScenarioSimulationRequest):
 
     db = SessionLocal()
 
@@ -489,37 +681,155 @@ def payment_priority():
 
     db = SessionLocal()
 
-    invoices = db.query(Invoice).all()
+    invoices = db.query(
+        Invoice
+    ).filter(
+        Invoice.transaction_type == "payable"
+    ).all()
+
+    from datetime import datetime
 
     results = []
 
     for invoice in invoices:
 
-        score = 50
+        # =====================
+        # DUE DATE SCORE
+        # MAX = 50
+        # =====================
 
-        if invoice.amount > 10000:
-            score += 30
+        try:
 
-        elif invoice.amount > 5000:
-            score += 15
+            due_date = datetime.strptime(
+                invoice.due_date,
+                "%d-%m-%Y"
+            )
+
+            days_left = (
+                due_date -
+                datetime.today()
+            ).days
+
+            if days_left <= 0:
+
+                due_score = 50
+
+            elif days_left <= 3:
+
+                due_score = 45
+
+            elif days_left <= 7:
+
+                due_score = 35
+
+            elif days_left <= 15:
+
+                due_score = 20
+
+            else:
+
+                due_score = 10
+
+        except:
+
+            due_score = 10
+
+        # =====================
+        # AMOUNT SCORE
+        # MAX = 30
+        # =====================
+
+        amount_score = min(
+            invoice.amount / 1000,
+            30
+        )
+
+        # =====================
+        # CATEGORY SCORE
+        # MAX = 20
+        # =====================
 
         category = (
             invoice.category or ""
         ).lower()
 
-        if (
-            "utility" in category or
-            "salary" in category or
-            "rent" in category
-        ):
-            score += 20
+        if "rent" in category:
 
-        action = (
-            "Pay Immediately"
-            if score >= 70
-            else "Delay Priority"
+            category_score = 20
+
+        elif "salary" in category:
+
+            category_score = 20
+
+        elif (
+            "utility" in category or
+            "utilities" in category
+        ):
+
+            category_score = 15
+
+        elif (
+            "cloud" in category or
+            "software" in category
+        ):
+
+            category_score = 10
+
+        else:
+
+            category_score = 5
+
+        # =====================
+# NORMALIZED WEIGHTED SCORE
+# Due Date = 50%
+# Amount = 30%
+# Category = 20%
+# =====================
+
+        score = round(
+
+            (
+
+                (due_score / 50) * 0.50 +
+
+                (amount_score / 30) * 0.30 +
+
+                (category_score / 20) * 0.20
+
+            ) * 100
+
         )
 
+        # =====================
+        # PRIORITY LEVEL
+        # =====================
+
+        if score >= 80:
+
+            action = "Critical"
+
+        elif score >= 60:
+
+            action = "High"
+
+        elif score >= 40:
+
+            action = "Medium"
+
+        else:
+
+            action = "Low"
+
+        # =====================
+        # REASON
+        # =====================
+
+        reason = (
+    "Weighted score based on "
+    "50% due-date urgency, "
+    "30% invoice value, "
+    "and 20% business-critical category."
+)
         results.append({
 
             "vendor":
@@ -538,7 +848,8 @@ def payment_priority():
                 action,
 
             "reason":
-                f"Priority score {score} based on invoice value and category."
+                reason
+
         })
 
     results.sort(
@@ -623,3 +934,184 @@ def debug():
         }
         for i in invoices
     ]
+
+
+
+@app.post("/manual-expense")
+def add_manual_expense(
+    data: ManualExpenseRequest
+):
+
+    db = SessionLocal()
+
+    invoice = Invoice(
+
+    vendor=data.vendor,
+
+    amount=data.amount,
+
+    category=data.category,
+
+    due_date=data.due_date,
+
+    transaction_type=
+        data.transaction_type
+
+)
+
+    db.add(invoice)
+
+    db.commit()
+
+    db.close()
+
+    return {
+        "success": True
+    }
+
+
+
+
+@app.get("/payment-plan")
+def payment_plan(
+    scenario_amount: float = 0
+):
+
+    db = SessionLocal()
+
+    invoices = db.query(
+        Invoice
+    ).filter(
+        Invoice.transaction_type == "payable"
+    ).all()
+
+    from datetime import datetime
+
+    
+
+    invoices.sort(
+        key=priority_score,
+        reverse=True
+    )
+
+    remaining_balance = (
+        CURRENT_BALANCE -
+        scenario_amount
+    )
+
+    pay_now = []
+    delay = []
+
+    SAFETY_THRESHOLD = 25000
+
+    for invoice in invoices:
+
+        if (
+            remaining_balance -
+            invoice.amount
+        ) >= SAFETY_THRESHOLD:
+
+            pay_now.append({
+
+                "vendor":
+                    invoice.vendor,
+
+                "amount":
+                    invoice.amount,
+
+                "score":
+                    priority_score(invoice)
+
+            })
+
+            remaining_balance -= (
+                invoice.amount
+            )
+
+        else:
+
+            delay.append({
+
+                "vendor":
+                    invoice.vendor,
+
+                "amount":
+                    invoice.amount,
+
+                "score":
+                    priority_score(invoice)
+
+            })
+
+    db.close()
+
+    return {
+
+        "pay_now":
+            pay_now,
+
+        "delay":
+            delay,
+
+        "remaining_balance":
+            remaining_balance,
+
+        "scenario_amount":
+            scenario_amount
+
+    }
+
+
+
+@app.post("/ai-recommendation")
+def ai_recommendation(
+    data: ScenarioRequest
+):
+
+    prompt = f"""
+You are an expert CFO.
+
+Analyze the following scenario:
+
+Current Balance: ₹{data.current_balance}
+Scenario Cost: ₹{data.scenario_cost}
+Projected Balance: ₹{data.projected_balance}
+Projected Runway: {data.projected_runway} days
+Total Payables: ₹{data.total_payables}
+
+Return ONLY HTML.
+
+Structure:
+
+<h3>AI CFO Recommendation</h3>
+
+<h4>Risk Level</h4>
+<p><strong>[LOW / MEDIUM / HIGH / CRITICAL]</strong></p>
+
+<h4>Recommendation</h4>
+<p>...</p>
+
+<h4>Key Concern</h4>
+<p>...</p>
+
+<h4>Suggested Action</h4>
+<ul>
+<li>...</li>
+<li>...</li>
+<li>...</li>
+</ul>
+
+Keep the response concise and professional.
+Do not use markdown.
+Do not use code blocks.
+Return only HTML.
+"""
+
+    response = llm.invoke(
+            prompt
+        )
+
+    return {
+            "recommendation":
+                response.content
+        }

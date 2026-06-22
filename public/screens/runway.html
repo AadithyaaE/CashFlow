@@ -122,6 +122,44 @@
           },
         }
     </script>
+
+    <style>
+
+        body {
+            margin: 0;
+        }
+
+        #aiRecommendation h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        #aiRecommendation h4 {
+            font-size: 17px;
+            font-weight: 600;
+            margin-top: 14px;
+            margin-bottom: 6px;
+        }
+
+        #aiRecommendation p {
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        #aiRecommendation ul {
+            padding-left: 20px;
+        }
+
+        #aiRecommendation li {
+            margin-bottom: 6px;
+        }
+
+    </style>
+
+
+    
 </head>
 <body class="bg-background text-on-surface font-body-md overflow-x-hidden">
 <!-- Sidebar Navigation Shell -->
@@ -408,56 +446,159 @@
                     </button>
 </div>
 <div class="space-y-md">
+    <!-- AI CFO Summary -->
+
+<div
+    id="scenarioSummary"
+    class="p-md rounded-xl border border-outline-variant bg-primary-fixed/10">
+
+    <h4 class="font-headline-sm mb-md">
+        AI CFO Summary
+    </h4>
+    <div
+    id="selectedScenariosCard"
+    class="mt-md p-md rounded-xl border border-outline-variant bg-surface-container-low">
+
+    <h4 class="font-bold mb-sm">
+        Selected Scenarios
+    </h4>
+
+    <div id="selectedScenariosList">
+
+        <p class="text-on-surface-variant">
+            No scenarios added.
+        </p>
+
+    </div>
+
+</div>
+
+    <div class="grid grid-cols-2 gap-md">
+
+        <div>
+
+            Current Balance
+
+            <p
+                id="currentBalanceScenario"
+                class="font-bold">
+
+                ₹75,000
+
+            </p>
+
+        </div>
+
+        <div>
+
+            Scenario Cost
+
+            <p
+                id="scenarioCost"
+                class="font-bold">
+
+                ₹0
+
+            </p>
+
+        </div>
+
+        <div>
+
+            Projected Balance
+
+            <p
+                id="projectedBalance"
+                class="font-bold">
+
+                ₹75,000
+
+            </p>
+
+        </div>
+
+        <div>
+
+            Projected Runway
+
+            <p
+                id="projectedRunway"
+                class="font-bold">
+
+                90 Days
+
+            </p>
+
+        </div>
+
+    </div>
+
+    <div
+        id="scenarioRecommendation"
+        class="mt-md text-sm font-medium">
+
+        Enter a scenario and click Apply.
+
+    </div>
+
+<div
+    id="aiRecommendation"
+    class="hidden mt-md p-lg rounded-xl border border-outline-variant bg-surface-container-low">
+</div>
+
+
+</div>
 <!-- Scenario Input 1 -->
-<div class="flex flex-col md:flex-row gap-md items-end bg-surface-container-low p-md rounded-xl border border-outline-variant/50">
+<div
+    id="scenarioContainer"
+    class="space-y-md">
 
-    <div class="flex-1 space-y-xs">
+    <div
+        class="scenario-row flex flex-col md:flex-row gap-md items-end bg-surface-container-low p-md rounded-xl border border-outline-variant/50">
 
-        <label class="font-label-md text-on-surface-variant px-xs">
-            Scenario Description
-        </label>
+        <div class="flex-1 space-y-xs">
 
-        <div class="relative">
-
-            <span class="absolute left-md top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant text-md">
-                shopping_cart
-            </span>
+            <label class="font-label-md text-on-surface-variant px-xs">
+                Scenario Description
+            </label>
 
             <input
-                id="scenarioDescription"
-                class="w-full pl-xl pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-body-md focus:ring-primary focus:border-primary"
+                class="scenarioDescription w-full pl-md pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg"
                 type="text"
-                value="New Equipment Purchase"/>
+                placeholder="Scenario Description">
+
+        </div>
+
+        <div class="w-full md:w-32 space-y-xs">
+
+            <label class="font-label-md text-on-surface-variant px-xs">
+                Amount
+            </label>
+
+            <input
+                class="scenarioAmount w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg"
+                type="number"
+                placeholder="Amount">
 
         </div>
 
     </div>
 
-    <div class="w-full md:w-32 space-y-xs">
+</div>
 
-        <label class="font-label-md text-on-surface-variant px-xs">
-            Amount
-        </label>
-
-        <div class="relative">
-
-            <span class="absolute left-sm top-1/2 -translate-y-1/2 font-mono-data text-on-surface-variant">
-                ₹
-            </span>
-
-            <input
-                id="scenarioAmount"
-                class="w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg font-mono-data focus:ring-primary focus:border-primary"
-                type="text"
-                value="50000"/>
-
-        </div>
-
-    </div>
+<div class="flex gap-md mt-md">
 
     <button
-        id="applyScenario"
-        class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm active:scale-95 transition-transform h-[46px]">
+        id="addScenarioBtn"
+        class="px-lg py-sm border border-outline-variant rounded-lg">
+
+        + Add Scenario
+
+    </button>
+
+    <button
+        id="applyScenarioBtn"
+        class="px-lg py-sm bg-primary text-on-primary rounded-lg">
 
         Apply
 
@@ -497,16 +638,39 @@
 <h3 class="font-headline-md text-on-surface">Payment Prioritization</h3>
 </div>
 <div
-    id="priorityContainer"
-    class="space-y-md">
+    id="prioritySection"
+    class="hidden">
+
+    <div
+        id="priorityContainer"
+        class="space-y-md">
+    </div>
+
 </div>
 
 <button
+    id="generatePlanBtn"
     class="w-full mt-lg py-sm border border-outline text-on-surface font-label-md rounded-lg">
 
     Generate Optimized Payment Plan
 
+
+
 </button>
+
+<div
+    id="paymentPlanResult"
+    class="hidden mt-md p-md rounded-xl border border-outline-variant bg-surface-container-low">
+
+    <h4 class="font-bold mb-md">
+        Optimized Payment Plan
+    </h4>
+
+    <div id="paymentPlanContent">
+
+    </div>
+
+</div>
 </div>
 </div>
 <!-- Atmospheric Image Footer Section -->
@@ -918,75 +1082,75 @@ setInterval(
 
 </script>
 
-<script>
+<!-- <script> -->
 
-document
-.getElementById(
-    "applyScenario"
-)
-.addEventListener(
-    "click",
-    simulateScenario
-);
+// document
+// .getElementById(
+//     "applyScenarioBtn"
+// )
+// .addEventListener(
+//     "click",
+//     simulateScenario
+// );
 
-async function simulateScenario() {
+// async function simulateScenario() {
 
-    const amount =
-        parseFloat(
-            document
-            .getElementById(
-                "scenarioAmount"
-            )
-            .value
-            .replace(/,/g, "")
-        );
+//     const amount =
+//         parseFloat(
+//             document
+//             .getElementById(
+//                 "scenarioAmount"
+//             )
+//             .value
+//             .replace(/,/g, "")
+//         );
 
-    const response =
-        await fetch(
-            "http://127.0.0.1:8000/simulate-scenario",
-            {
-                method: "POST",
+//     const response =
+//         await fetch(
+//             "http://127.0.0.1:8000/simulate-scenario",
+//             {
+//                 method: "POST",
 
-                headers: {
-                    "Content-Type":
-                        "application/json"
-                },
+//                 headers: {
+//                     "Content-Type":
+//                         "application/json"
+//                 },
 
-                body: JSON.stringify({
-                    amount
-                })
-            }
-        );
+//                 body: JSON.stringify({
+//                     amount
+//                 })
+//             }
+//         );
 
-    const result =
-        await response.json();
+//     const result =
+//         await response.json();
 
-    document
-        .getElementById(
-            "scenarioResult"
-        )
-        .classList
-        .remove(
-            "hidden"
-        );
+//     document
+//         .getElementById(
+//             "scenarioResult"
+//         )
+//         .classList
+//         .remove(
+//             "hidden"
+//         );
 
-    document
-        .getElementById(
-            "newBalance"
-        )
-        .innerText =
-            `₹${result.new_balance.toLocaleString()}`;
+//     document
+//         .getElementById(
+//             "newBalance"
+//         )
+//         .innerText =
+//             `₹${result.new_balance.toLocaleString()}`;
 
-    document
-        .getElementById(
-            "newRunway"
-        )
-        .innerText =
-            `${result.new_runway} days`;
+//     document
+//         .getElementById(
+//             "newRunway"
+//         )
+//         .innerText =
+//             `${result.new_runway} days`;
 
-}
+// }
 
-</script>
+<!-- </script> -->
 
 
 <script>
@@ -1032,11 +1196,18 @@ async function loadPriorities() {
 
                     <span
                         class="px-sm py-xs rounded-md text-[10px] font-bold uppercase tracking-tight
-                        ${
-                            item.action === "Pay Immediately"
-                            ? "bg-primary-fixed text-on-primary-fixed-variant"
-                            : "bg-surface-container-highest text-on-surface-variant"
-                        }">
+                       ${
+    item.action === "Critical"
+    ? "bg-red-100 text-red-700"
+
+    : item.action === "High"
+    ? "bg-orange-100 text-orange-700"
+
+    : item.action === "Medium"
+    ? "bg-yellow-100 text-yellow-700"
+
+    : "bg-green-100 text-green-700"
+}">
 
                         ${item.action}
 
@@ -1068,14 +1239,14 @@ async function loadPriorities() {
 
         `;
     });
+
+    document
+        .getElementById(
+            "prioritySection"
+        )
+        .classList
+        .remove("hidden");
 }
-
-loadPriorities();
-
-setInterval(
-    loadPriorities,
-    5000
-);
 
 
 async function loadSidebarStats() {
@@ -1109,7 +1280,406 @@ async function loadSidebarStats() {
     }
 }
 
+async function applyScenario() {
+
+
+
+    const response =
+        await fetch(
+            "http://127.0.0.1:8000/dashboard"
+        );
+
+    const dashboard =
+        await response.json();
+
+    let scenarioAmount = 0;
+    const scenarios=[];
+
+    document
+    .querySelectorAll(
+        ".scenario-row"
+    )
+    .forEach(row => {
+
+        const description =
+    row.querySelector(
+        ".scenarioDescription"
+    ).value.trim();
+
+const amount =
+    Number(
+        row.querySelector(
+            ".scenarioAmount"
+        ).value || 0
+    );
+
+if (
+    description === "" &&
+    amount === 0
+) {
+    return;
+}
+
+scenarioAmount += amount;
+
+scenarios.push({
+    description,
+    amount
+});
+
+    });
+
+    localStorage.setItem(
+        "scenarioAmount",
+        scenarioAmount
+    );
+
+    const currentBalance =
+        dashboard.current_balance;
+
+    const projectedBalance =
+        currentBalance -
+        scenarioAmount;
+
+    const projectedRunway =
+        dashboard.total_payables > 0
+
+        ? Math.round(
+            (
+                projectedBalance /
+                dashboard.total_payables
+            ) * 30
+        )
+
+        : 365;
+
+    document.getElementById(
+        "currentBalanceScenario"
+    ).innerText =
+        `₹${currentBalance.toLocaleString()}`;
+
+    document.getElementById(
+        "scenarioCost"
+    ).innerText =
+        `₹${scenarioAmount.toLocaleString()}`;
+
+    document.getElementById(
+        "projectedBalance"
+    ).innerText =
+        `₹${projectedBalance.toLocaleString()}`;
+
+    document.getElementById(
+        "projectedRunway"
+    ).innerText =
+        `${projectedRunway} Days`;
+    
+    const scenarioList =
+    document.getElementById(
+        "selectedScenariosList"
+    );
+
+scenarioList.innerHTML = "";
+
+scenarios.forEach(s => {
+
+    scenarioList.innerHTML += `
+
+        <div class="flex justify-between py-xs">
+
+            <span>
+                ${s.description}
+            </span>
+
+            <span>
+                ₹${s.amount.toLocaleString()}
+            </span>
+
+        </div>
+
+    `;
+
+});
+
+scenarioList.innerHTML += `
+
+    <hr class="my-sm">
+
+    <div class="flex justify-between font-bold">
+
+        <span>
+            Total
+        </span>
+
+        <span>
+            ₹${scenarioAmount.toLocaleString()}
+        </span>
+
+    </div>
+
+`;
+
+    let recommendation = "";
+
+    if (projectedBalance <= 25000) {
+
+        recommendation =
+            "🔴 High Risk: Balance falls below safety threshold.";
+
+    }
+
+    else if (projectedRunway < 60) {
+
+        recommendation =
+            "🟡 Moderate Risk: Runway drops below 60 days.";
+
+    }
+
+    else {
+
+        recommendation =
+            "🟢 Scenario is financially safe.";
+
+    }
+
+    document.getElementById(
+        "scenarioRecommendation"
+    ).innerText =
+        recommendation;
+
+    const aiResponse =
+    await fetch(
+        "http://127.0.0.1:8000/ai-recommendation",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                current_balance: currentBalance,
+                scenario_cost: scenarioAmount,
+                projected_balance: projectedBalance,
+                projected_runway: projectedRunway,
+                total_payables: dashboard.total_payables
+            })
+        }
+    );
+    const aiData =
+    await aiResponse.json();
+
+console.log(
+    "Gemini:",
+    aiData
+);
+
+console.log(aiData.recommendation);
+console.log(typeof aiData.recommendation);
+
+const box = document.getElementById("aiRecommendation");
+
+box.innerHTML = aiData.recommendation;
+
+console.log(box.innerHTML);
+
+document.getElementById(
+    "aiRecommendation"
+).innerHTML =
+    aiData.recommendation;
+
+document.getElementById(
+    "aiRecommendation"
+).classList.remove(
+    "hidden"
+);
+
+
+
+}
+async function generatePaymentPlan() {
+
+    await loadPriorities();
+
+    const scenarioAmount =
+        Number(
+            localStorage.getItem(
+                "scenarioAmount"
+            ) || 0
+        );
+
+    const response =
+        await fetch(
+            `http://127.0.0.1:8000/payment-plan?scenario_amount=${scenarioAmount}`
+        );
+
+    const data =
+        await response.json();
+
+    let html = "";
+
+    html += `
+    <div class="mb-md">
+        <strong>
+            PAY NOW 
+            (${data.pay_now.length})
+        </strong>
+    </div>
+`;
+if (data.pay_now.length === 0) {
+
+    html += `
+        <div class="text-red-600 mb-md">
+            No invoices can be paid without
+            breaking the ₹25,000 safety threshold.
+        </div>
+    `;
+}
+
+    data.pay_now.forEach(item => {
+
+        html += `
+            <div>
+                ✓ ${item.vendor}
+                - ₹${item.amount.toLocaleString()}
+            </div>
+        `;
+
+    });
+
+    html += `
+    <div class="mt-md mb-md">
+        <strong>
+            DELAY (${data.delay.length})
+        </strong>
+    </div>
+`;
+
+    data.delay.forEach(item => {
+
+        html += `
+            <div>
+                ✓ ${item.vendor}
+                - ₹${item.amount.toLocaleString()}
+            </div>
+        `;
+
+    });
+
+    html += `
+        <div class="mt-md">
+
+            <strong>
+                Projected Balance:
+            </strong>
+
+            ₹${data.remaining_balance.toLocaleString()}
+
+        </div>
+    `;
+
+    document
+        .getElementById(
+            "paymentPlanContent"
+        )
+        .innerHTML = html;
+
+    document
+        .getElementById(
+            "paymentPlanResult"
+        )
+        .classList
+        .remove("hidden");
+}
+    document
+    .getElementById("generatePlanBtn")
+    .addEventListener(
+        "click",
+        () => {
+            console.log("BUTTON CLICKED");
+            generatePaymentPlan();
+        }
+    );
+
 loadSidebarStats();
+
+document
+    .getElementById(
+        "addScenarioBtn"
+    )
+    .addEventListener(
+        "click",
+        addScenarioRow
+    );
+
+function addScenarioRow() {
+
+    const container =
+        document.getElementById(
+            "scenarioContainer"
+        );
+
+    const row =
+        document.createElement(
+            "div"
+        );
+
+    row.className =
+        "scenario-row flex flex-col md:flex-row gap-md items-end bg-surface-container-low p-md rounded-xl border border-outline-variant/50";
+
+    row.innerHTML = `
+
+    <div class="flex-1">
+
+        <input
+            class="scenarioDescription w-full pl-md pr-md py-sm bg-surface-container-lowest border-outline-variant rounded-lg"
+            type="text"
+            placeholder="Scenario Description">
+
+    </div>
+
+    <div class="w-full md:w-32">
+
+        <input
+            class="scenarioAmount w-full pl-md pr-sm py-sm bg-surface-container-lowest border-outline-variant rounded-lg"
+            type="number"
+            placeholder="Amount">
+
+    </div>
+
+    <button
+        class="removeScenarioBtn px-md py-sm bg-red-500 text-white rounded-lg">
+
+        ✕
+    </button>
+
+`;
+    container.appendChild(
+        row
+    );
+    row
+    .querySelector(
+        ".removeScenarioBtn"
+    )
+    .addEventListener(
+        "click",
+        () => {
+
+            row.remove();
+
+        }
+    );
+}
+
+
+
+document
+    .getElementById(
+        "applyScenarioBtn"
+    )
+    .addEventListener(
+        "click",
+        applyScenario
+    );
+
+
 
 </script>
 </body></html>

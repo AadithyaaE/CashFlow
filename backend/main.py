@@ -107,9 +107,25 @@ def priority_score(invoice):
             100
         )
 
-llm = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash"
-)
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
+
+llm = None
+
+if GOOGLE_API_KEY:
+
+    llm = ChatGoogleGenerativeAI(
+        model="gemini-2.5-flash",
+        google_api_key=GOOGLE_API_KEY
+    )
+
+else:
+
+    print("WARNING: Gemini API key not found. AI features disabled.")
 
 app.add_middleware(
     CORSMiddleware,
@@ -1120,6 +1136,12 @@ Return only HTML.
 @app.post("/cfo-chat")
 def cfo_chat(data: ChatRequest):
 
+    if llm is None:
+
+        return {
+            "error": "Gemini API key not configured."
+        }
+
     from datetime import datetime, timedelta
 
     db = SessionLocal()
@@ -1139,15 +1161,9 @@ def cfo_chat(data: ChatRequest):
                 "%d-%m-%Y"
             )
 
-            if (
-                due <=
-                datetime.today()
-                + timedelta(days=30)
-            ):
+            if due <= datetime.today() + timedelta(days=30):
 
-                upcoming_bills += (
-                    invoice.amount
-                )
+                upcoming_bills += invoice.amount
 
         except:
 
@@ -1155,47 +1171,24 @@ def cfo_chat(data: ChatRequest):
 
     global CURRENT_BALANCE
 
-    current_balance = (
-        CURRENT_BALANCE
-    )
+    current_balance = CURRENT_BALANCE
 
     total_payables = sum(
-
         invoice.amount
-
         for invoice in invoices
-
-        if invoice.transaction_type
-        == "payable"
-
+        if invoice.transaction_type == "payable"
     )
 
     total_receivables = sum(
-
         invoice.amount
-
         for invoice in invoices
-
-        if invoice.transaction_type
-        == "receivable"
-
+        if invoice.transaction_type == "receivable"
     )
 
-    monthly_burn = (
-        total_payables
-    )
-
-    if monthly_burn > 0:
+    if total_payables > 0:
 
         runway_days = round(
-
-            (
-                current_balance
-                /
-                monthly_burn
-            )
-            * 30
-
+            (current_balance / total_payables) * 30
         )
 
     else:
@@ -1240,23 +1233,16 @@ User Question:
 {data.question}
 
 Rules:
-
 1. Use the business data above.
 2. Mention actual numbers.
 3. Give practical CFO recommendations.
-4. Be concise.
-5. Keep answer under 120 words.
+4. Keep the answer under 120 words.
 """
 
-    response = llm.invoke(
-        prompt
-    )
+    response = llm.invoke(prompt)
 
     db.close()
 
     return {
-
-        "answer":
-            response.content
-
+        "answer": response.content
     }

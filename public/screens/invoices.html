@@ -555,6 +555,9 @@
 </div>
 </div>
 </aside>
+
+
+<script src="api.js"></script>
 <script>
         const tableBody = document.getElementById(
     "invoice-table-body"
@@ -564,8 +567,8 @@ async function loadInvoices() {
 
     try {
 
-        const response = await fetch(
-            "http://127.0.0.1:8000/invoices"
+        const response = await api(
+            "/invoices"
         );
 
         const invoices =
@@ -799,13 +802,13 @@ fileInput.addEventListener("change", async () => {
 
         progressBar.style.width = "60%";
 
-        const response = await fetch(
-            "http://127.0.0.1:8000/upload-invoice",
-            {
-                method: "POST",
-                body: formData
-            }
-        );
+        const response = await api(
+    "/upload-invoice",
+    {
+        method: "POST",
+        body: formData
+    }
+);
 
         const result = await response.json();
 
@@ -816,9 +819,13 @@ fileInput.addEventListener("change", async () => {
             progressOverlay.classList.add("hidden");
             progressBar.style.width = "0%";
 
-            alert(
-                `Invoice Uploaded\n\nVendor: ${result.vendor}\nAmount: ₹${result.amount}`
-            );
+           alert(
+    `Invoice Uploaded
+
+Vendor: ${result.invoice.vendor}
+
+Amount: ₹${result.invoice.amount}`
+);
 
             loadInvoices();
 

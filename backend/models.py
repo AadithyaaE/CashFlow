@@ -1,25 +1,40 @@
 from sqlalchemy import Column, Integer, String, Float
 from database import Base
 from pydantic import BaseModel
-
+from sqlalchemy import ForeignKey
 
 class Invoice(Base):
+
     __tablename__ = "invoices"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    user_id = Column(
+        Integer,
+        ForeignKey("users.id")
+    )
 
     vendor = Column(String)
+
     amount = Column(Float)
 
     due_date = Column(String)
 
     category = Column(String)
+
     transaction_type = Column(
+        String,
+        default="payable"
+    )
+
+    currency = Column(
     String,
-    default="payable"
+    default="INR"
 )
-
-
 class ManualExpenseRequest(
     BaseModel
 ):
@@ -51,3 +66,28 @@ class ScenarioRequest(BaseModel):
 
 class ChatRequest(BaseModel):
     question: str
+
+
+class User(Base):
+
+    __tablename__ = "users"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    name = Column(String)
+
+    email = Column(
+        String,
+        unique=True
+    )
+
+    password = Column(String)
+
+    current_balance = Column(
+        Float,
+        default=0
+    )

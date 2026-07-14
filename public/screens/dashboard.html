@@ -445,8 +445,14 @@
     </div>
 
 </div>
+</div> <!-- End AI CFO Card -->
+</div> <!-- End Right Column -->
 
-        <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+</div> <!-- End Top Dashboard Grid -->
+
+<div class="grid grid-cols-1 gap-lg mt-lg">
+
+    <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
             <div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
                 <h3 class="font-headline-md text-headline-md text-on-surface tracking-tight">Upcoming Obligations</h3>
                 <button class="text-primary font-label-md hover:underline">View Calendar</button>
@@ -495,6 +501,8 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="api.js"></script>
+
 
 <script>
     // Animate Health Score Gauge
@@ -520,36 +528,79 @@
     // ==========================================
     // CORE ASYNC DASHBOARD LOAD & POLLING ENGINE
     // ==========================================
-    async function loadDashboard() {
-        try {
-            const response = await fetch("http://127.0.0.1:8000/dashboard");
-            const data = await response.json();
+   async function loadDashboard() {
 
-            document.getElementById(
-    "upcomingBills"
-).innerText =
-    `₹${data.total_payables.toLocaleString()}`;
+    try {
 
-            const currentBalance = document.getElementById("currentBalance");
-            const totalPayables = document.getElementById("totalPayables");
-            const totalReceivables = document.getElementById("totalReceivables");
-            const overviewBalance = document.getElementById("overviewBalance");
-            const cashRunway = document.getElementById("cashRunway");
-            const cashRunwayWidget = document.getElementById("cashRunwayWidget");
-            
-
-            if (currentBalance) currentBalance.innerText = `₹${data.current_balance.toLocaleString()}`;
-            if (overviewBalance) overviewBalance.innerText = `₹${data.current_balance.toLocaleString()}`;
-            if (totalPayables) totalPayables.innerText = `₹${data.total_payables.toLocaleString()}`;
-            if (totalReceivables) totalReceivables.innerText = `₹${(data.total_receivables || 0).toLocaleString()}`;
-            if (cashRunway) cashRunway.innerText = `${data.cash_runway} Days`;
-            if (cashRunwayWidget) cashRunwayWidget.innerText = `${data.cash_runway} Days`;
-
-            console.log("Dashboard Updated Successfully", data);
-        } catch (err) {
-            console.error("Dashboard metric sync error:", err);
+        const response = await api("/dashboard");
+        if (!response.ok) {
+            throw new Error("Unauthorized");
         }
+
+        const data = await response.json();
+
+        document.getElementById("upcomingBills").innerText =
+            `₹${data.total_payables.toLocaleString()}`;
+
+        const currentBalance =
+            document.getElementById("currentBalance");
+
+        const totalPayables =
+            document.getElementById("totalPayables");
+
+        const totalReceivables =
+            document.getElementById("totalReceivables");
+
+        const overviewBalance =
+            document.getElementById("overviewBalance");
+
+        const cashRunway =
+            document.getElementById("cashRunway");
+
+        const cashRunwayWidget =
+            document.getElementById("cashRunwayWidget");
+
+        if (currentBalance)
+            currentBalance.innerText =
+                `₹${data.current_balance.toLocaleString()}`;
+
+        if (overviewBalance)
+            overviewBalance.innerText =
+                `₹${data.current_balance.toLocaleString()}`;
+
+        if (totalPayables)
+            totalPayables.innerText =
+                `₹${data.total_payables.toLocaleString()}`;
+
+        if (totalReceivables)
+            totalReceivables.innerText =
+                `₹${(data.total_receivables || 0).toLocaleString()}`;
+
+        if (cashRunway)
+            cashRunway.innerText =
+                `${data.cash_runway} Days`;
+
+        if (cashRunwayWidget)
+            cashRunwayWidget.innerText =
+                `${data.cash_runway} Days`;
+
+        console.log(
+            "Dashboard Updated Successfully",
+            data
+        );
+
     }
+
+    catch (err) {
+
+        console.error(
+            "Dashboard metric sync error:",
+            err
+        );
+
+    }
+
+}
 
     // Set polling intervals
     setInterval(loadDashboard, 5000);
@@ -561,8 +612,7 @@
     // ==========================
     async function loadSidebarStats() {
         try {
-            const response = await fetch("http://127.0.0.1:8000/dashboard");
-            const data = await response.json();
+            const response = await api("/dashboard");
 
             const balance = document.getElementById("sidebarBalance");
             const runway = document.getElementById("sidebarRunway");
@@ -579,7 +629,7 @@
     // ==========================
     async function loadLiquidityChart() {
         try {
-            const response = await fetch("http://127.0.0.1:8000/dashboard");
+            const response = await api("/dashboard");
             const dashboard = await response.json();
             const balance =
     dashboard.current_balance;
@@ -641,7 +691,7 @@ const netCashflow =
     // ============================
     async function loadExpenseChart() {
         try {
-            const response = await fetch("http://127.0.0.1:8000/analytics");
+            const response = await api("/analytics");
             const analytics = await response.json();
 
             const labels = Object.keys(analytics.categories);
@@ -678,7 +728,7 @@ const netCashflow =
     // ==================================
     async function loadUpcomingObligations() {
         try {
-            const response = await fetch("http://127.0.0.1:8000/invoices");
+            const response = await api("/invoices");
             const invoices = await response.json();
 
             const table = document.getElementById("invoiceTable");
@@ -739,7 +789,8 @@ const netCashflow =
         if (!balance) return;
 
         try {
-            await fetch("http://127.0.0.1:8000/update-balance", {
+            await api(
+             "/update-balance",{
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ balance: balance })
@@ -808,8 +859,8 @@ async function sendMessage(){
     .value = "";
 
     const response =
-    await fetch(
-        "http://127.0.0.1:8000/cfo-chat",
+    await api(
+    "/cfo-chat",
         {
             method: "POST",
 

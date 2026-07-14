@@ -145,45 +145,63 @@
 </nav>
 <main class="relative">
 <!-- Hero Section -->
-<section class="hero-gradient pt-xl md:pt-32 pb-xl px-lg">
-<div class="max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-2 gap-xl items-center">
-<div class="flex flex-col space-y-lg">
-<div class="inline-flex items-center gap-sm bg-primary-fixed/30 text-primary px-md py-xs rounded-full w-fit">
-<span class="material-symbols-outlined text-[16px]">auto_awesome</span>
-<span class="font-label-md uppercase tracking-wider">New: AI CFO Agent v2.0</span>
-</div>
-<h1 class="font-headline-xl text-headline-xl text-on-surface tracking-tighter leading-tight max-w-xl">
-                        Your AI CFO for Smarter <span class="text-primary">Cash Flow</span> Decisions
-                    </h1>
-<p class="font-body-lg text-body-lg text-on-surface-variant max-w-lg">
-                        Upload invoices, receipts, and bank statements. Let AI predict cash shortages, prioritize payments, and recommend the best next action for your business growth.
-                    </p>
-<div class="flex flex-wrap gap-md pt-md">
-<button class="bg-primary text-on-primary px-xl py-lg rounded-xl font-label-md font-bold text-lg hover:shadow-lg hover:shadow-primary/20 transition-all active:scale-95">Get Started Free</button>
-<button class="bg-surface-container-lowest text-on-surface border border-outline-variant px-xl py-lg rounded-xl font-label-md font-bold text-lg hover:bg-surface-container-low transition-all active:scale-95 flex items-center gap-sm">
-<span class="material-symbols-outlined">play_circle</span>
-                            View Demo
-                        </button>
-</div>
-<div class="flex items-center gap-xl pt-lg border-t border-outline-variant/30 mt-xl">
-<div class="flex flex-col">
-<span class="font-headline-md text-on-surface">99.8%</span>
-<span class="font-body-sm text-on-surface-variant">Prediction Accuracy</span>
-</div>
-<div class="flex flex-col">
-<span class="font-headline-md text-on-surface">15k+</span>
-<span class="font-body-sm text-on-surface-variant">Active Businesses</span>
-</div>
-<div class="flex flex-col">
-<span class="font-headline-md text-on-surface">$2B+</span>
-<span class="font-body-sm text-on-surface-variant">Cash Managed</span>
-</div>
-</div>
-</div>
-<div class="relative order-first lg:order-last">
-<div class="relative z-10 rounded-2xl overflow-hidden shadow-2xl border border-outline-variant/50">
-<img alt="CashPilot AI Dashboard Preview" class="w-full h-auto object-cover" data-alt="A premium high-fidelity dashboard of a financial software platform showing complex cash flow charts and real-time data visualizations. The interface features a clean, white background with indigo and slate blue accents, reflecting a modern corporate aesthetic. Elegant line graphs show upward trends, and soft shadows provide depth to data cards. The overall mood is professional, sophisticated, and data-driven." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZ-Gr8NVbvVaDvOWnXAmARKMa5fyG_9KJ89TNojW4cFzgCUrhscZkT7BR5sxU15oKPIkcSf5Laga-3P7qdCkQ0uQCHnKbFLlATi5RmHadDQMPXuZVMMBbwvj_0Hz0dRMq9aVgxOY70DaQsj7iGyHISfgyihm2BMiIiyuP3cwmv9uNOsB8xeBkj9IoPXIiVokFd3UtosAa0iH9WkTQ1YFyDcdJtzLft6TDl6aFa4VUzAjyNm9zzwbN_Zf5dQMQdxMdsIRUxGF26eO_w"/>
-<div class="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent pointer-events-none"></div>
+<div class="glass-card rounded-3xl p-10 shadow-2xl max-w-md mx-auto">
+
+    <h2 class="text-3xl font-bold mb-2">
+        Welcome Back
+    </h2>
+
+    <p class="text-on-surface-variant mb-8">
+        Sign in to continue to CashPilot AI
+    </p>
+
+    <form id="loginForm" class="space-y-5">
+
+        <div>
+            <label class="block mb-2 font-medium">
+                Email
+            </label>
+
+            <input
+                id="email"
+                type="text"
+                class="w-full rounded-xl border border-outline-variant px-4 py-3"
+                placeholder="Enter your email"
+            >
+        </div>
+
+        <div>
+            <label class="block mb-2 font-medium">
+                Password
+            </label>
+
+            <input
+                id="password"
+                type="password"
+                class="w-full rounded-xl border border-outline-variant px-4 py-3"
+                placeholder="Enter your password"
+            >
+        </div>
+
+        <button
+            type="submit"
+            class="w-full bg-primary text-white py-3 rounded-xl font-bold">
+
+            Sign In
+
+        </button>
+
+        <button
+            type="button"
+            id="registerBtn"
+            class="w-full border border-outline py-3 rounded-xl">
+
+            Create Account
+
+        </button>
+
+    </form>
+
 </div>
 <!-- Decorative Elements -->
 <div class="absolute -top-6 -right-6 w-32 h-32 bg-primary-fixed/40 rounded-full blur-3xl -z-0"></div>
@@ -394,4 +412,118 @@
 <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
 <a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
 </div>
-</div></body></html>
+</div>
+...
+<!-- All your HTML -->
+
+<script>
+
+document
+.getElementById("loginForm")
+.addEventListener("submit", async (e) => {
+
+    e.preventDefault();
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/login",
+        {
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                email: document.getElementById("email").value,
+
+                password: document.getElementById("password").value
+
+            })
+
+        }
+    );
+
+    const data = await response.json();
+
+    if (response.ok) {
+
+        localStorage.setItem(
+            "token",
+            data.access_token
+        );
+
+        localStorage.setItem(
+            "user",
+            data.name
+        );
+
+        window.location.href =
+            "/screens/dashboard.html";
+
+    }
+
+    else {
+
+        alert(data.detail);
+
+    }
+
+});
+document
+.getElementById("registerBtn")
+.addEventListener("click", async () => {
+
+    const name = prompt("Enter your full name");
+
+    if (!name) return;
+
+    const email = document
+        .getElementById("email")
+        .value
+        .trim();
+
+    const password = document
+        .getElementById("password")
+        .value;
+
+    if (!email || !password) {
+
+        alert("Please enter an email and password first.");
+
+        return;
+    }
+
+    const response = await fetch(
+        "http://127.0.0.1:8000/register",
+        {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                name: name,
+
+                email: email,
+
+                password: password
+
+            })
+
+        }
+    );
+
+    const data = await response.json();
+
+    alert(data.message);
+
+});
+
+</script>
+
+</body>
+</html>

@@ -10,7 +10,123 @@ from models import Base, Invoice,ManualExpenseRequest
 from pydantic import BaseModel
 from langchain_google_genai import ChatGoogleGenerativeAI
 from models import ScenarioRequest,ChatRequest
+from passlib.context import CryptContext
+from jose import jwt
+from pydantic import BaseModel
+from models import User
+from fastapi import Depends
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
+from jose import jwt, JWTError
+from models import User
+from datetime import datetime, timedelta
 
+
+
+class RegisterRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto"
+)
+
+SECRET_KEY = "cashpilot_secret_key_change_this"
+ALGORITHM = "HS256"
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="login"
+)
+
+
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+
+
+def create_access_token(data: dict):
+
+    to_encode = data.copy()
+
+    expire = datetime.utcnow() + timedelta(
+        minutes=ACCESS_TOKEN_EXPIRE_MINUTES
+    )
+
+    to_encode.update(
+        {
+            "exp": expire
+        }
+    )
+
+    encoded_jwt = jwt.encode(
+        to_encode,
+        SECRET_KEY,
+        algorithm=ALGORITHM
+    )
+
+    return encoded_jwt
+
+def hash_password(password):
+    return pwd_context.hash(password)
+
+def verify_password(password, hashed):
+    return pwd_context.verify(password, hashed)
+
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme)
+):
+
+    print("TOKEN RECEIVED:", token)
+
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Invalid authentication"
+    )
+
+    try:
+
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        print("PAYLOAD:", payload)
+
+        email = payload.get("email")
+
+        print("EMAIL:", email)
+
+        if email is None:
+            raise credentials_exception
+
+    except Exception as e:
+
+        print("JWT ERROR:", e)
+
+        raise credentials_exception
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    print("USER:", user)
+
+    db.close()
+
+    if user is None:
+        raise credentials_exception
+
+    return user
 
 
 Base.metadata.create_all(bind=engine)
@@ -366,7 +482,8 @@ def home():
 
 @app.post("/upload-invoice")
 async def upload_invoice(
-    file: UploadFile = File(...)
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_user)
 ):
 
     filepath = os.path.join(
@@ -384,19 +501,41 @@ async def upload_invoice(
     db = SessionLocal()
 
     invoice = Invoice(
+
         vendor=data["vendor"],
+
         amount=data["amount"],
+
         due_date=data["due_date"],
-        category=data["category"]
+
+        category=data["category"],
+
+        currency=data.get("currency", "INR"),
+
+        transaction_type=data.get(
+            "transaction_type",
+            "payable"
+        ),
+
+        user_id=current_user.id
+
     )
 
     db.add(invoice)
 
     db.commit()
 
+    db.refresh(invoice)
+
     db.close()
 
-    return data
+    return {
+
+        "message": "Invoice uploaded successfully",
+
+        "invoice": data
+
+    }
 
 
 
@@ -406,15 +545,18 @@ from datetime import datetime
 
 
 @app.get("/dashboard")
-def dashboard():
+def dashboard(
+    current_user: User = Depends(get_current_user)
+):
 
     from datetime import datetime, timedelta
 
     upcoming_bills = 0
     db = SessionLocal()
 
-    invoices = db.query(Invoice).all()
-
+    invoices = db.query(Invoice).filter(
+    Invoice.user_id == current_user.id
+).all()
     for invoice in invoices:
 
         try:
@@ -538,13 +680,19 @@ def calculate_ai_score(invoice):
 
 
 @app.get("/invoices")
-def get_invoices():
-
+def get_invoices(
+    current_user: User = Depends(get_current_user)
+):
+    print("INSIDE /invoices")
     db = SessionLocal()
 
     invoices = db.query(
         Invoice
+    ).filter(
+        Invoice.user_id == current_user.id
     ).all()
+
+    print("Invoices:", invoices)
 
     result = []
 
@@ -572,29 +720,21 @@ def get_invoices():
 
         result.append({
 
-            "id":
-                invoice.id,
+            "id": invoice.id,
 
-            "vendor":
-                invoice.vendor,
+            "vendor": invoice.vendor,
 
-            "amount":
-                invoice.amount,
+            "amount": invoice.amount,
 
-            "due_date":
-                invoice.due_date,
+            "due_date": invoice.due_date,
 
-            "category":
-                invoice.category,
+            "category": invoice.category,
 
-            "transaction_type":
-                invoice.transaction_type,
+            "transaction_type": invoice.transaction_type,
 
-            "ai_score":
-                score,
+            "ai_score": score,
 
-            "risk_level":
-                risk_level
+            "risk_level": risk_level
 
         })
 
@@ -608,11 +748,17 @@ def get_invoices():
     return result
 
 @app.get("/analytics")
-def analytics():
+def analytics(
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    invoices = db.query(Invoice).all()
+    invoices = db.query(
+        Invoice
+    ).filter(
+        Invoice.user_id == current_user.id
+    ).all()
 
     categories = {}
 
@@ -621,6 +767,7 @@ def analytics():
         category = invoice.category
 
         if category not in categories:
+
             categories[category] = 0
 
         categories[category] += invoice.amount
@@ -628,7 +775,9 @@ def analytics():
     db.close()
 
     return {
+
         "categories": categories
+
     }
 
 @app.delete("/invoice/{invoice_id}")
@@ -664,7 +813,9 @@ def simulate_scenario(data: ScenarioSimulationRequest):
 
     db = SessionLocal()
 
-    invoices = db.query(Invoice).all()
+    invoices = db.query(Invoice).filter(
+    Invoice.user_id == current_user.id
+).all()
 
     total_payables = sum(
         invoice.amount
@@ -693,14 +844,17 @@ def simulate_scenario(data: ScenarioSimulationRequest):
     }
 
 @app.get("/payment-priority")
-def payment_priority():
+def payment_priority(
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
     invoices = db.query(
         Invoice
     ).filter(
-        Invoice.transaction_type == "payable"
+        Invoice.transaction_type == "payable",
+        Invoice.user_id == current_user.id
     ).all()
 
     from datetime import datetime
@@ -796,11 +950,8 @@ def payment_priority():
             category_score = 5
 
         # =====================
-# NORMALIZED WEIGHTED SCORE
-# Due Date = 50%
-# Amount = 30%
-# Category = 20%
-# =====================
+        # FINAL SCORE
+        # =====================
 
         score = round(
 
@@ -836,35 +987,26 @@ def payment_priority():
 
             action = "Low"
 
-        # =====================
-        # REASON
-        # =====================
-
         reason = (
-    "Weighted score based on "
-    "50% due-date urgency, "
-    "30% invoice value, "
-    "and 20% business-critical category."
-)
+            "Weighted score based on "
+            "50% due-date urgency, "
+            "30% invoice value, "
+            "and 20% business-critical category."
+        )
+
         results.append({
 
-            "vendor":
-                invoice.vendor,
+            "vendor": invoice.vendor,
 
-            "amount":
-                invoice.amount,
+            "amount": invoice.amount,
 
-            "due_date":
-                invoice.due_date,
+            "due_date": invoice.due_date,
 
-            "score":
-                score,
+            "score": score,
 
-            "action":
-                action,
+            "action": action,
 
-            "reason":
-                reason
+            "reason": reason
 
         })
 
@@ -879,11 +1021,15 @@ def payment_priority():
 
 
 @app.get("/analytics-summary")
-def analytics_summary():
+def analytics_summary(
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    invoices = db.query(Invoice).all()
+    invoices = db.query(Invoice).filter(
+        Invoice.user_id == current_user.id
+    ).all()
 
     total_spend = sum(
         i.amount
@@ -909,46 +1055,46 @@ def analytics_summary():
     db.close()
 
     return {
+
         "total_spend": total_spend,
+
         "largest_invoice": largest_invoice,
+
         "invoice_count": len(invoices),
+
         "categories": categories
+
     }
-
-
-from pydantic import BaseModel
-
-class BalanceRequest(BaseModel):
-    balance: float
-
-
-@app.post("/update-balance")
-def update_balance(data: BalanceRequest):
-
-    global CURRENT_BALANCE
-
-    CURRENT_BALANCE = data.balance
-
-    return {
-        "success": True,
-        "balance": CURRENT_BALANCE
-    }
-
 
 @app.get("/debug")
-def debug():
+def debug(
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    invoices = db.query(Invoice).all()
+    invoices = db.query(
+        Invoice
+    ).filter(
+        Invoice.user_id == current_user.id
+    ).all()
+
+    db.close()
 
     return [
+
         {
+
             "vendor": i.vendor,
+
             "due_date": i.due_date,
+
             "amount": i.amount
+
         }
+
         for i in invoices
+
     ]
 
 
@@ -1246,3 +1392,96 @@ Rules:
     return {
         "answer": response.content
     }
+
+@app.post("/register")
+def register(data: RegisterRequest):
+
+    db = SessionLocal()
+
+    existing = db.query(User).filter(
+        User.email == data.email
+    ).first()
+
+    if existing:
+
+        db.close()
+
+        return {
+            "message": "Email already exists"
+        }
+
+    user = User(
+        name=data.name,
+        email=data.email,
+        password=hash_password(data.password)
+    )
+
+    db.add(user)
+
+    db.commit()
+
+    db.close()
+
+    return {
+        "message": "Registration successful"
+    }
+
+@app.post("/login")
+def login(data: LoginRequest):
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == data.email
+    ).first()
+
+    if not user or not verify_password(data.password, user.password):
+
+        db.close()
+
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid email or password"
+        )
+
+    token = create_access_token(
+        {"email": user.email}
+    )
+
+    db.close()
+
+    return {
+
+        "access_token": token,
+
+        "token_type": "bearer",
+
+        "name": user.name
+
+    }
+@app.get("/me")
+def me(
+
+    current_user: User = Depends(get_current_user)
+
+):
+
+    return {
+
+        "id": current_user.id,
+
+        "name": current_user.name,
+
+        "email": current_user.email
+
+    }
+@app.get("/users")
+def get_users():
+
+    db = SessionLocal()
+
+    users = db.query(User).all()
+
+    db.close()
+
+    return users

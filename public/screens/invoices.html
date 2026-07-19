@@ -286,7 +286,7 @@
 <div class="flex items-center gap-lg">
 <div class="relative group">
 <span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
-<input class="pl-xl pr-md py-xs bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary font-body-sm w-64 transition-all" placeholder="Search invoices..." type="text"/>
+<input id="searchInput" class="pl-xl pr-md py-xs bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary font-body-sm w-64 transition-all" placeholder="Search vendor, category, invoice #..." type="text"/>
 </div>
 <div class="flex items-center gap-sm">
 <div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-md" data-user-initials></div>
@@ -302,71 +302,77 @@
 <div class="mb-md p-md bg-white shadow-sm rounded-full group-hover:scale-110 transition-transform">
 <span class="material-symbols-outlined text-primary text-[40px]" style="font-variation-settings: 'wght' 300;">cloud_upload</span>
 </div>
-<h3 class="font-headline-md text-on-surface mb-xs">Drag and drop documents</h3>
-<p class="font-body-sm text-on-surface-variant mb-lg">Support for PDF, JPG, PNG, receipts, and bank statements.</p>
+<h3 class="font-headline-md text-on-surface mb-xs">Drag and drop an invoice</h3>
+<p class="font-body-sm text-on-surface-variant mb-lg">PDF, JPG or PNG, up to 10 MB. Scanned and photographed invoices are supported.</p>
 <div class="flex gap-md">
-<button class="px-lg py-sm bg-white border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-colors shadow-sm">Browse Files</button>
-<button class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm active:scale-95 transition-all">Connect Drive</button>
+<button type="button" id="browseFilesBtn" class="px-lg py-sm bg-white border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-colors shadow-sm">Browse Files</button>
 </div>
 <!-- Progress Overlay (Hidden by default) -->
 <div class="hidden absolute inset-0 bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-xl" id="upload-progress">
 <span class="material-symbols-outlined text-primary animate-bounce mb-md">auto_awesome</span>
-<p class="font-label-md text-primary font-bold mb-sm">AI Analyzing Invoice Intelligence...</p>
+<p class="font-label-md text-primary font-bold mb-sm" id="upload-progress-label">Uploading invoice…</p>
 <div class="w-full max-w-md h-2 bg-surface-container rounded-full overflow-hidden">
-<div class="w-0 h-full bg-primary transition-all duration-500 ease-out" id="progress-bar"></div>
+<div class="w-0 h-full bg-primary transition-all duration-300 ease-out" id="progress-bar"></div>
 </div>
-<p class="font-body-sm text-on-surface-variant mt-sm">Processing 'Amazon_Logistics_Inv_442.pdf'</p>
+<p class="font-body-sm text-on-surface-variant mt-sm" id="upload-progress-file"></p>
 </div>
 </div>
 </div>
-<!-- Analysis Stats Card -->
+<!-- Status Overview Card -->
 <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex flex-col justify-between shadow-sm">
 <div>
 <div class="flex justify-between items-center mb-lg">
-<h4 class="font-label-md font-bold uppercase tracking-wider text-on-surface-variant">Queue Status</h4>
-<span class="material-symbols-outlined text-on-surface-variant">more_vert</span>
+<h4 class="font-label-md font-bold uppercase tracking-wider text-on-surface-variant">Status Overview</h4>
 </div>
 <div class="space-y-md">
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-sm">
-<div class="w-2 h-2 rounded-full bg-primary"></div>
-<span class="font-body-sm">Pending Verification</span>
+<div class="w-2 h-2 rounded-full bg-secondary"></div>
+<span class="font-body-sm">Pending</span>
 </div>
-<span class="font-mono-data font-bold">12</span>
+<span id="statCountPending" class="font-mono-data font-bold">0</span>
 </div>
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-sm">
-<div class="w-2 h-2 rounded-full bg-green-500"></div>
-<span class="font-body-sm">Auto-reconciled</span>
+<div class="w-2 h-2 rounded-full bg-amber-500"></div>
+<span class="font-body-sm">Due Soon</span>
 </div>
-<span class="font-mono-data font-bold">148</span>
+<span id="statCountDueSoon" class="font-mono-data font-bold">0</span>
 </div>
 <div class="flex items-center justify-between">
 <div class="flex items-center gap-sm">
 <div class="w-2 h-2 rounded-full bg-error"></div>
-<span class="font-body-sm">Flagged for Review</span>
+<span class="font-body-sm">Overdue</span>
 </div>
-<span class="font-mono-data font-bold">3</span>
+<span id="statCountOverdue" class="font-mono-data font-bold">0</span>
+</div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-sm">
+<div class="w-2 h-2 rounded-full bg-green-500"></div>
+<span class="font-body-sm">Paid</span>
+</div>
+<span id="statCountPaid" class="font-mono-data font-bold">0</span>
 </div>
 </div>
 </div>
 <div class="mt-xl pt-lg border-t border-outline-variant">
-<p class="font-body-sm text-on-surface-variant mb-md">AI Accuracy Rating</p>
+<p class="font-body-sm text-on-surface-variant mb-md">Total Invoices</p>
 <div class="flex items-end gap-sm">
-<span class="font-headline-lg text-primary font-bold">99.2%</span>
-<span class="font-label-md text-green-600 mb-base flex items-center">+0.4% <span class="material-symbols-outlined text-[14px]">arrow_upward</span></span>
+<span id="statCountTotal" class="font-headline-lg text-primary font-bold">0</span>
 </div>
 </div>
 </div>
 </section>
 <!-- Table Section -->
 <section class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
-<div class="p-lg border-b border-outline-variant flex flex-col md:flex-row md:items-center justify-between gap-md">
+<div class="p-lg border-b border-outline-variant">
     <div class="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg mb-lg">
 
     <h3 class="font-headline-md mb-md">
         Add Manual Expense
     </h3>
+
+    <div id="expenseFormError" class="hidden mb-md bg-error-container text-on-error-container text-sm rounded-lg px-4 py-2"></div>
 
     <div class="grid md:grid-cols-5 gap-md">
 
@@ -405,6 +411,8 @@
     <input
         id="amountInput"
         type="number"
+        min="0.01"
+        step="0.01"
         placeholder="Amount"
         class="border rounded-lg p-sm">
 
@@ -422,39 +430,95 @@
 
 
     <button
+        id="addExpenseBtn"
         onclick="addExpense()"
-        class="mt-md px-lg py-sm bg-primary text-white rounded-lg">
+        class="mt-md px-lg py-sm bg-primary text-white rounded-lg disabled:opacity-60 disabled:cursor-not-allowed">
 
         Add Expense
 
     </button>
 
 </div>
+
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-md">
 <h3 class="font-headline-md font-bold">Invoice Intelligence</h3>
 <div class="flex items-center gap-sm">
-<button class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors">
+<button id="filtersToggleBtn" class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors">
 <span class="material-symbols-outlined text-[18px]">filter_list</span>
                             Filters
                         </button>
-<button class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors">
+<button id="exportBtn" class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors">
 <span class="material-symbols-outlined text-[18px]">download</span>
                             Export
                         </button>
 </div>
 </div>
+
+<!-- Filter Panel (hidden by default) -->
+<div id="filterPanel" class="hidden mt-md p-md bg-surface-container-low rounded-xl grid grid-cols-2 md:grid-cols-5 gap-md">
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Status</label>
+<select id="filterStatus" class="w-full border rounded-lg p-sm text-sm">
+<option value="all">All</option>
+<option value="paid">Paid</option>
+<option value="pending">Pending</option>
+<option value="due_soon">Due Soon</option>
+<option value="overdue">Overdue</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Category</label>
+<select id="filterCategory" class="w-full border rounded-lg p-sm text-sm">
+<option value="all">All</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Payment Type</label>
+<select id="filterType" class="w-full border rounded-lg p-sm text-sm">
+<option value="all">All</option>
+<option value="payable">Payable</option>
+<option value="receivable">Receivable</option>
+</select>
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Due From</label>
+<input id="filterDueFrom" type="date" class="w-full border rounded-lg p-sm text-sm">
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Due To</label>
+<input id="filterDueTo" type="date" class="w-full border rounded-lg p-sm text-sm">
+</div>
+<div class="col-span-2 md:col-span-5 flex justify-end">
+<button id="clearFiltersBtn" class="px-md py-xs text-primary font-label-md hover:underline">Clear Filters</button>
+</div>
+</div>
+
+<!-- Bulk Action Bar (hidden until rows are selected) -->
+<div id="bulkActionBar" class="hidden mt-md p-sm px-md bg-primary-fixed/20 rounded-xl flex items-center justify-between">
+<span id="bulkSelectedCount" class="font-label-md text-on-surface">0 selected</span>
+<div class="flex items-center gap-sm">
+<button id="bulkExportBtn" class="px-md py-xs bg-white border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-colors">Export Selected</button>
+<button id="bulkDeleteBtn" class="px-md py-xs bg-error text-white rounded-lg font-label-md hover:opacity-90 transition-colors">Delete Selected</button>
+</div>
+</div>
+
+</div>
 <div class="overflow-x-auto">
 <table class="w-full text-left border-collapse">
 <thead class="bg-surface-container-low border-b border-outline-variant">
 <tr>
-<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Vendor Name</th>
+<th class="px-lg py-md w-10">
+    <input type="checkbox" id="selectAllCheckbox" aria-label="Select all invoices">
+</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider cursor-pointer select-none" data-sort-key="vendor">Vendor Name <span class="sort-indicator"></span></th>
 <th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Invoice No.</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Amount</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Due Date</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider cursor-pointer select-none" data-sort-key="amount">Amount <span class="sort-indicator"></span></th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider cursor-pointer select-none" data-sort-key="due_date_parsed">Due Date <span class="sort-indicator"></span></th>
 <th class="px-lg py-md text-left">
     TYPE
 </th>
 <th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">Status</th>
-<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider">AI Priority</th>
+<th class="px-lg py-md font-label-md text-on-surface-variant uppercase tracking-wider cursor-pointer select-none" data-sort-key="ai_score">AI Priority <span class="sort-indicator"></span></th>
 <th class="px-lg py-md"></th>
 </tr>
 </thead>
@@ -464,10 +528,10 @@
 </table>
 </div>
 <div class="p-md flex items-center justify-between bg-surface-container-low/30">
-<p class="font-body-sm text-on-surface-variant">Showing 8 of 152 invoices</p>
+<p id="paginationSummary" class="font-body-sm text-on-surface-variant">Showing 0 of 0 invoices</p>
 <div class="flex gap-xs">
-<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-white text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">chevron_left</span></button>
-<button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-white text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">chevron_right</span></button>
+<button id="prevPageBtn" class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-white text-on-surface-variant hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"><span class="material-symbols-outlined">chevron_left</span></button>
+<button id="nextPageBtn" class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant bg-white text-on-surface-variant hover:text-primary disabled:opacity-40 disabled:cursor-not-allowed"><span class="material-symbols-outlined">chevron_right</span></button>
 </div>
 </div>
 </section>
@@ -492,9 +556,12 @@
 <aside class="fixed top-0 right-0 h-screen w-full max-w-lg bg-surface-container-lowest shadow-2xl z-50 translate-x-full drawer-transition flex flex-col border-l border-outline-variant" id="invoice-drawer">
 <div class="p-lg border-b border-outline-variant flex items-center justify-between bg-white">
 <h3 class="font-headline-md font-bold">Invoice Details</h3>
+<div class="flex items-center gap-sm">
+<button id="drawer-edit-btn" class="px-md py-xs border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-colors">Edit</button>
 <button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors" onclick="closeDrawer()">
 <span class="material-symbols-outlined">close</span>
 </button>
+</div>
 </div>
 <div class="flex-1 overflow-y-auto custom-scrollbar p-lg space-y-xl">
 <!-- Header Info -->
@@ -503,34 +570,71 @@
                     A
                 </div>
 <div class="text-right">
-<p class="inline-block px-sm py-xs rounded-lg font-label-md mb-sm" id="drawer-status">Paid</p>
-<h4 class="font-headline-md font-bold" id="drawer-vendor-name">Acme Corp</h4>
+<p class="inline-block px-sm py-xs rounded-lg font-label-md mb-sm" id="drawer-status">Pending</p>
+<h4 class="font-headline-md font-bold" id="drawer-vendor-name">—</h4>
 </div>
 </div>
-<!-- Main Data Grid -->
-<div class="grid grid-cols-2 gap-lg p-lg bg-surface-container-low rounded-xl">
+
+<!-- Read-only Data Grid -->
+<div id="drawer-view-grid" class="grid grid-cols-2 gap-lg p-lg bg-surface-container-low rounded-xl">
 <div>
 <p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Invoice Number</p>
-<p class="font-body-md font-bold text-on-surface" id="drawer-inv-no">INV-2024-001</p>
+<p class="font-body-md font-bold text-on-surface" id="drawer-inv-no">—</p>
 </div>
 <div>
 <p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Amount Due</p>
-<p class="font-headline-md font-bold text-primary" id="drawer-amount">$12,450.00</p>
+<p class="font-headline-md font-bold text-primary" id="drawer-amount">—</p>
 </div>
 <div>
-<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Issue Date</p>
-<p class="font-body-md text-on-surface">Oct 12, 2023</p>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Category</p>
+<p class="font-body-md text-on-surface" id="drawer-category">—</p>
 </div>
 <div>
 <p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Due Date</p>
-<p class="font-body-md text-on-surface" id="drawer-due">Nov 12, 2023</p>
+<p class="font-body-md text-on-surface" id="drawer-due">—</p>
+</div>
+<div>
+<p class="font-label-md text-on-surface-variant uppercase tracking-wider mb-xs">Payment Type</p>
+<p class="font-body-md text-on-surface capitalize" id="drawer-type">—</p>
 </div>
 </div>
-<!-- AI Strategy Section -->
+
+<!-- Edit Form (hidden until Edit is clicked) -->
+<div id="drawer-edit-grid" class="hidden grid grid-cols-2 gap-md p-lg bg-surface-container-low rounded-xl">
+<div class="col-span-2">
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Vendor</label>
+<input id="drawer-edit-vendor" class="w-full border rounded-lg p-sm text-sm">
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Amount</label>
+<input id="drawer-edit-amount" type="number" min="0.01" step="0.01" class="w-full border rounded-lg p-sm text-sm">
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Category</label>
+<input id="drawer-edit-category" class="w-full border rounded-lg p-sm text-sm">
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Due Date</label>
+<input id="drawer-edit-due" type="date" class="w-full border rounded-lg p-sm text-sm">
+</div>
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Payment Type</label>
+<select id="drawer-edit-type" class="w-full border rounded-lg p-sm text-sm">
+<option value="payable">Payable</option>
+<option value="receivable">Receivable</option>
+</select>
+</div>
+<div class="col-span-2 flex justify-end gap-sm mt-sm">
+<button id="drawer-edit-cancel" class="px-lg py-sm border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-lowest transition-colors">Cancel</button>
+<button id="drawer-edit-save" class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md font-bold disabled:opacity-60 disabled:cursor-not-allowed">Save Changes</button>
+</div>
+</div>
+
+<!-- AI Priority Section -->
 <div class="space-y-md">
 <div class="flex items-center gap-sm">
 <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-<h4 class="font-label-md font-bold uppercase tracking-wider text-primary">AI Payment Strategy</h4>
+<h4 class="font-label-md font-bold uppercase tracking-wider text-primary">AI Payment Priority</h4>
 </div>
 <div class="p-lg bg-primary/5 border border-primary/20 rounded-xl relative overflow-hidden">
 <div class="absolute top-0 right-0 p-md opacity-10">
@@ -538,415 +642,1109 @@
 </div>
 <div class="relative z-10">
 <div class="flex items-center gap-sm mb-sm">
-<span class="px-sm py-xs bg-primary text-on-primary rounded font-mono-data font-bold" id="drawer-priority-score">94</span>
-<span class="font-label-md font-semibold text-primary">High Priority Strategy</span>
+<span class="px-sm py-xs bg-primary text-on-primary rounded font-mono-data font-bold" id="drawer-priority-score">—</span>
+<span class="font-label-md font-semibold text-primary" id="drawer-priority-label">—</span>
 </div>
 <p class="font-body-sm text-on-surface leading-relaxed mb-md">
-                            "Pay this invoice within the next 48 hours to secure a 2% early settlement discount ($249.00). Current cash flow projections show surplus availability for the Q4 cycle. Deferring this payment increases the risk of vendor credit rating impact."
+                            Weighted score based on 50% due-date urgency, 30% invoice value, and 20% business-critical category.
                         </p>
-<button class="w-full py-md bg-primary text-on-primary rounded-lg font-label-md font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all">
-                            Execute Early Payment
+<button id="drawer-toggle-paid" class="w-full py-md bg-primary text-on-primary rounded-lg font-label-md font-bold shadow-lg shadow-primary/20 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed">
+                            Mark as Paid
                         </button>
 </div>
 </div>
 </div>
-<!-- Visual Preview Placeholder -->
-<div class="space-y-md">
-<p class="font-label-md font-bold uppercase tracking-wider text-on-surface-variant">Document Preview</p>
-<div class="aspect-[3/4] bg-surface-container rounded-xl flex items-center justify-center border border-outline-variant overflow-hidden">
-<img alt="Invoice Preview" class="w-full h-full object-cover grayscale opacity-50" data-alt="A sophisticated digital rendering of a financial document with clean typography, tables, and minimalist branding. The image has a professional, light-mode corporate aesthetic with subtle blue and slate grey tones. Soft lighting emphasizes the crisp edges of the paper texture within a high-tech financial software interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC5wJ8GDQmqtpIPo0QgJSYywgn1qqQDzbVYot7V30pzayWuf9KINoxURXA_lnG-i26Br3GSiWIzzk54bxMhpfhTRN46kKJJnKJ8waj4WLXGiT51y4ZOxpKOkVHpB_Hl0eZe9g9-yidOPgn58blmDNeAg_H8Xj9dLiTiA4cNvcooq0plJGr2LsgVN2TNrOajrUsKV-ljHCCgHrMdt6M5FmHa3DFHNJEbpP5YrsecU9VdRNBydMoqNZNthWSVRMOqeOXpBh0dVxvaEJfA"/>
-</div>
+
+<div class="flex justify-end">
+<button id="drawer-delete-btn" class="px-lg py-sm text-error font-label-md font-semibold hover:underline">Delete this invoice</button>
 </div>
 </div>
 </aside>
 
+<!-- Extraction Preview Modal (shown after upload, before anything is saved) -->
+<div class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] hidden items-center justify-center p-md" id="extraction-overlay">
+<div class="bg-surface-container-lowest rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col border border-outline-variant">
+
+<div class="p-lg border-b border-outline-variant flex items-center justify-between">
+<div>
+<h3 class="font-headline-md font-bold">Review Extracted Invoice</h3>
+<p class="font-body-sm text-on-surface-variant mt-xs">Nothing is saved yet — check the fields below first.</p>
+</div>
+<button class="w-10 h-10 rounded-full hover:bg-surface-container flex items-center justify-center transition-colors" onclick="discardExtractionPreview()">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+
+<div id="extraction-review-banner" class="hidden mx-lg mt-lg p-md bg-amber-100 text-amber-800 rounded-xl text-sm flex items-start gap-sm">
+<span class="material-symbols-outlined text-[20px]">warning</span>
+<span>We couldn't confidently read some fields on this document. Please review and correct them before saving.</span>
+</div>
+
+<div class="flex-1 overflow-y-auto p-lg grid grid-cols-2 gap-md">
+
+<div class="col-span-2">
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Vendor Name</label>
+<input id="extract-vendor" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Invoice Number</label>
+<input id="extract-invoice-number" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Invoice Date</label>
+<input id="extract-invoice-date" type="date" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Due Date</label>
+<input id="extract-due-date" type="date" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Payment Type</label>
+<select id="extract-type" class="w-full border rounded-lg p-sm text-sm">
+<option value="payable">Payable</option>
+<option value="receivable">Receivable</option>
+</select>
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Amount (converted to INR)</label>
+<input id="extract-amount" type="number" min="0.01" step="0.01" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Original Currency Detected</label>
+<input id="extract-currency" class="w-full border rounded-lg p-sm text-sm bg-surface-container-low" readonly>
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Category</label>
+<input id="extract-category" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">GST / Tax</label>
+<input id="extract-gst" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div>
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Payment Terms</label>
+<input id="extract-payment-terms" class="w-full border rounded-lg p-sm text-sm">
+</div>
+
+<div class="col-span-2">
+<label class="block text-xs font-label-md text-on-surface-variant mb-xs">Description</label>
+<textarea id="extract-description" rows="2" class="w-full border rounded-lg p-sm text-sm"></textarea>
+</div>
+
+</div>
+
+<div class="p-lg border-t border-outline-variant flex justify-end gap-sm">
+<button class="px-lg py-sm border border-outline-variant rounded-lg font-label-md hover:bg-surface-container-low transition-colors" onclick="discardExtractionPreview()">Discard</button>
+<button id="extraction-confirm-btn" class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md font-bold disabled:opacity-60 disabled:cursor-not-allowed">Confirm &amp; Save</button>
+</div>
+
+</div>
+</div>
 
 <script src="api.js"></script>
 <script>
         CashPilot.initPage();
 
-        const tableBody = document.getElementById(
-    "invoice-table-body"
-);
+        // ==========================================
+        // STATE
+        // ==========================================
+        let allInvoices = [];
+        let invoicesLoaded = false;
+        let selectedIds = new Set();
+        let sortState = { key: "ai_score", dir: "desc" };
+        let filters = { status: "all", category: "all", type: "all", dueFrom: "", dueTo: "" };
+        let searchTerm = "";
+        let currentPage = 1;
+        const PAGE_SIZE = 10;
+        let currentDrawerId = null;
 
-async function loadInvoices() {
+        const tableBody = document.getElementById("invoice-table-body");
 
-    try {
+        // ==========================================
+        // DATE HELPERS (backend uses DD-MM-YYYY strings)
+        // ==========================================
+        function ddmmyyyyToInputDate(value) {
+            const d = CashPilot.parseBackendDate(value);
+            if (!d) return "";
+            const mm = String(d.getMonth() + 1).padStart(2, "0");
+            const dd = String(d.getDate()).padStart(2, "0");
+            return `${d.getFullYear()}-${mm}-${dd}`;
+        }
 
-        const response = await api(
-            "/invoices"
-        );
+        function inputDateToDdmmyyyy(value) {
+            if (!value) return "";
+            return value.split("-").reverse().join("-");
+        }
 
-        const invoices =
-            await response.json();
-
-        tableBody.innerHTML = "";
-
-        invoices.forEach(invoice => {
-
-            tableBody.innerHTML += `
-                <tr class="hover:bg-surface-container-low transition-colors">
-
-                    <td class="px-lg py-md">
-                        <div class="flex items-center gap-md">
-
-                            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center font-bold text-primary">
-                                ${invoice.vendor.charAt(0)}
-                            </div>
-
-                            <span class="font-body-md font-semibold text-on-surface">
-                                ${invoice.vendor}
-                            </span>
-
-                        </div>
-                    </td>
-
-                    <td class="px-lg py-md font-mono-data text-on-surface-variant">
-                        INV-${invoice.id}
-                    </td>
-
-                    <td class="px-lg py-md font-mono-data font-bold">
-                        ₹${invoice.amount.toLocaleString()}
-                    </td>
-
-                    <td class="px-lg py-md font-body-sm text-on-surface-variant">
-    ${invoice.due_date}
-</td>
-
-<td class="px-lg py-md">
-
-    <span
-        class="
-            px-sm py-xs rounded-lg font-label-md
-            ${
-                invoice.transaction_type === "receivable"
-                ? "bg-green-100 text-green-700"
-                : "bg-red-100 text-red-700"
+        // ==========================================
+        // STATUS (Paid / Overdue / Due Soon / Pending)
+        // ==========================================
+        function computeStatus(invoice) {
+            if (invoice.is_paid) {
+                return { key: "paid", label: "Paid", className: "bg-green-100 text-green-700" };
             }
-        ">
 
-        ${invoice.transaction_type}
+            const due = CashPilot.parseBackendDate(invoice.due_date);
+            if (due) {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
 
-    </span>
+                if (diffDays < 0) {
+                    return { key: "overdue", label: "Overdue", className: "bg-red-100 text-red-700" };
+                }
+                if (diffDays <= 3) {
+                    return { key: "due_soon", label: "Due Soon", className: "bg-amber-100 text-amber-700" };
+                }
+            }
 
-</td>
+            return { key: "pending", label: "Pending", className: "bg-blue-100 text-blue-700" };
+        }
 
-<td class="px-lg py-md">
-                        <span class="px-sm py-xs rounded-lg font-label-md bg-blue-100 text-blue-700">
-                            Pending
-                        </span>
+        // ==========================================
+        // LOAD
+        // ==========================================
+        async function loadInvoices() {
+
+            renderLoadingState();
+
+            try {
+
+                const invoices = await CashPilot.apiJson("/invoices");
+
+                allInvoices = invoices;
+                invoicesLoaded = true;
+
+                populateCategoryFilterOptions();
+                renderStatusCounts();
+                renderAll();
+
+            } catch (err) {
+
+                console.error(err);
+                renderErrorState(err.message);
+
+            }
+        }
+
+        function populateCategoryFilterOptions() {
+
+            const select = document.getElementById("filterCategory");
+            const previousValue = select.value;
+
+            const categories = [...new Set(allInvoices.map((i) => i.category).filter(Boolean))].sort();
+
+            select.innerHTML = '<option value="all">All</option>' +
+                categories.map((c) => `<option value="${CashPilot.escapeHtml(c)}">${CashPilot.escapeHtml(c)}</option>`).join("");
+
+            if (categories.includes(previousValue)) select.value = previousValue;
+
+        }
+
+        function renderStatusCounts() {
+
+            const counts = { paid: 0, pending: 0, due_soon: 0, overdue: 0 };
+
+            allInvoices.forEach((invoice) => {
+                counts[computeStatus(invoice).key]++;
+            });
+
+            document.getElementById("statCountTotal").textContent = allInvoices.length;
+            document.getElementById("statCountPaid").textContent = counts.paid;
+            document.getElementById("statCountPending").textContent = counts.pending;
+            document.getElementById("statCountDueSoon").textContent = counts.due_soon;
+            document.getElementById("statCountOverdue").textContent = counts.overdue;
+
+        }
+
+        // ==========================================
+        // FILTER + SEARCH + SORT (all client-side over the fetched list)
+        // ==========================================
+        function getVisibleInvoices() {
+
+            let rows = allInvoices.slice();
+
+            if (searchTerm) {
+                const q = searchTerm.toLowerCase();
+                rows = rows.filter((i) =>
+                    (i.vendor || "").toLowerCase().includes(q) ||
+                    (i.category || "").toLowerCase().includes(q) ||
+                    `inv-${i.id}`.includes(q)
+                );
+            }
+
+            if (filters.status !== "all") {
+                rows = rows.filter((i) => computeStatus(i).key === filters.status);
+            }
+
+            if (filters.category !== "all") {
+                rows = rows.filter((i) => i.category === filters.category);
+            }
+
+            if (filters.type !== "all") {
+                rows = rows.filter((i) => i.transaction_type === filters.type);
+            }
+
+            if (filters.dueFrom) {
+                const from = new Date(filters.dueFrom);
+                rows = rows.filter((i) => {
+                    const d = CashPilot.parseBackendDate(i.due_date);
+                    return d && d >= from;
+                });
+            }
+
+            if (filters.dueTo) {
+                const to = new Date(filters.dueTo);
+                rows = rows.filter((i) => {
+                    const d = CashPilot.parseBackendDate(i.due_date);
+                    return d && d <= to;
+                });
+            }
+
+            rows.sort((a, b) => {
+
+                let av, bv;
+
+                if (sortState.key === "due_date_parsed") {
+                    av = CashPilot.parseBackendDate(a.due_date);
+                    bv = CashPilot.parseBackendDate(b.due_date);
+                    av = av ? av.getTime() : Infinity;
+                    bv = bv ? bv.getTime() : Infinity;
+                } else if (sortState.key === "vendor") {
+                    av = (a.vendor || "").toLowerCase();
+                    bv = (b.vendor || "").toLowerCase();
+                } else {
+                    av = a[sortState.key];
+                    bv = b[sortState.key];
+                }
+
+                if (av < bv) return sortState.dir === "asc" ? -1 : 1;
+                if (av > bv) return sortState.dir === "asc" ? 1 : -1;
+                return 0;
+
+            });
+
+            return rows;
+
+        }
+
+        // ==========================================
+        // RENDER
+        // ==========================================
+        function renderLoadingState() {
+            if (invoicesLoaded) return; // only show the skeleton on first load
+            tableBody.innerHTML = Array.from({ length: 4 }).map(() => `
+                <tr>
+                    <td class="px-lg py-md" colspan="9">
+                        <div class="h-6 w-full rounded bg-surface-container animate-pulse"></div>
                     </td>
+                </tr>
+            `).join("");
+        }
 
-                    <td class="px-lg py-md">
-                        <div class="flex items-center gap-sm">
-
-                            <div class="w-24 h-1.5 bg-surface-container rounded-full overflow-hidden">
-
-                                <div
-    class="h-full bg-primary"
-    style="width:${Math.min(invoice.ai_score,100)}%">
-</div>
-
-                            </div>
-
-                            <span class="
-font-mono-data font-bold
-${
-    invoice.ai_score >= 80
-    ? 'text-red-600'
-    : invoice.ai_score >= 60
-    ? 'text-orange-600'
-    : invoice.ai_score >= 40
-    ? 'text-yellow-600'
-    : 'text-green-600'
-}
-">
-
-    ${invoice.ai_score}
-
-    <span class="text-xs ml-1">
-
-        ${invoice.risk_level}
-
-    </span>
-
-</span>
-
-                        </div>
+        function renderErrorState(message) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="px-lg py-xl text-center">
+                        <p class="text-error font-label-md font-semibold mb-xs">Couldn't load invoices</p>
+                        <p class="text-on-surface-variant text-sm mb-md">${CashPilot.escapeHtml(message || "Please try again.")}</p>
+                        <button onclick="loadInvoices()" class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md">Retry</button>
                     </td>
-
-                    <td class="px-lg py-md text-right">
-
-    <button
-        onclick="deleteInvoice(${invoice.id})"
-        class="text-red-500 hover:text-red-700">
-
-        <span class="material-symbols-outlined">
-            delete
-        </span>
-
-    </button>
-
-</td>
-
                 </tr>
             `;
+            CashPilot.toast(message || "Couldn't load invoices.", "error");
+        }
+
+        function renderAll() {
+            renderTable();
+            updateBulkBar();
+        }
+
+        function renderTable() {
+
+            const visible = getVisibleInvoices();
+
+            // Drop selections for rows no longer visible/existing so the bulk
+            // bar never references stale ids.
+            const visibleIds = new Set(allInvoices.map((i) => i.id));
+            selectedIds.forEach((id) => { if (!visibleIds.has(id)) selectedIds.delete(id); });
+
+            const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+            currentPage = Math.min(currentPage, totalPages);
+
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const pageRows = visible.slice(start, start + PAGE_SIZE);
+
+            if (!allInvoices.length) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="px-lg py-2xl text-center">
+                            <span class="material-symbols-outlined text-on-surface-variant text-4xl mb-sm">receipt_long</span>
+                            <p class="font-label-md font-semibold text-on-surface">No invoices yet</p>
+                            <p class="text-on-surface-variant text-sm mt-xs">Upload a PDF invoice above or add a manual expense to get started.</p>
+                        </td>
+                    </tr>
+                `;
+            } else if (!pageRows.length) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="px-lg py-2xl text-center">
+                            <span class="material-symbols-outlined text-on-surface-variant text-4xl mb-sm">search_off</span>
+                            <p class="font-label-md font-semibold text-on-surface">No invoices match your filters</p>
+                            <button onclick="clearFilters()" class="mt-sm text-primary font-label-md hover:underline">Clear filters</button>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tableBody.innerHTML = pageRows.map((invoice) => renderRow(invoice)).join("");
+            }
+
+            const summary = document.getElementById("paginationSummary");
+            summary.textContent = visible.length
+                ? `Showing ${start + 1}-${Math.min(start + PAGE_SIZE, visible.length)} of ${visible.length} invoices`
+                : "Showing 0 of 0 invoices";
+
+            document.getElementById("prevPageBtn").disabled = currentPage <= 1;
+            document.getElementById("nextPageBtn").disabled = currentPage >= totalPages;
+
+            document.getElementById("selectAllCheckbox").checked =
+                pageRows.length > 0 && pageRows.every((i) => selectedIds.has(i.id));
+
+            document.querySelectorAll(".sort-indicator").forEach((el) => { el.textContent = ""; });
+            const activeHeader = document.querySelector(`[data-sort-key="${sortState.key}"] .sort-indicator`);
+            if (activeHeader) activeHeader.textContent = sortState.dir === "asc" ? "▲" : "▼";
+
+        }
+
+        function renderRow(invoice) {
+
+            const status = computeStatus(invoice);
+            const vendor = CashPilot.escapeHtml(invoice.vendor || "Unknown Vendor");
+            const category = CashPilot.escapeHtml(invoice.category || "");
+            const dueDate = CashPilot.escapeHtml(invoice.due_date || "");
+            const initial = CashPilot.escapeHtml((invoice.vendor || "V").charAt(0).toUpperCase());
+            const checked = selectedIds.has(invoice.id) ? "checked" : "";
+
+            const scoreColor =
+                invoice.ai_score >= 80 ? "text-red-600" :
+                invoice.ai_score >= 60 ? "text-orange-600" :
+                invoice.ai_score >= 40 ? "text-yellow-600" : "text-green-600";
+
+            return `
+                <tr class="hover:bg-surface-container-low transition-colors">
+                    <td class="px-lg py-md">
+                        <input type="checkbox" class="row-checkbox" data-id="${invoice.id}" ${checked} aria-label="Select invoice">
+                    </td>
+                    <td class="px-lg py-md cursor-pointer" onclick="openDrawer(${invoice.id})">
+                        <div class="flex items-center gap-md">
+                            <div class="w-10 h-10 rounded-lg bg-surface-container flex items-center justify-center font-bold text-primary">
+                                ${initial}
+                            </div>
+                            <span class="font-body-md font-semibold text-on-surface">${vendor}</span>
+                        </div>
+                    </td>
+                    <td class="px-lg py-md font-mono-data text-on-surface-variant">INV-${invoice.id}</td>
+                    <td class="px-lg py-md font-mono-data font-bold">${CashPilot.formatCurrency(invoice.amount)}</td>
+                    <td class="px-lg py-md font-body-sm text-on-surface-variant">${dueDate}</td>
+                    <td class="px-lg py-md">
+                        <span class="px-sm py-xs rounded-lg font-label-md ${invoice.transaction_type === "receivable" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"} capitalize">
+                            ${invoice.transaction_type}
+                        </span>
+                    </td>
+                    <td class="px-lg py-md">
+                        <span class="px-sm py-xs rounded-lg font-label-md ${status.className}">${status.label}</span>
+                    </td>
+                    <td class="px-lg py-md">
+                        <div class="flex items-center gap-sm">
+                            <div class="w-24 h-1.5 bg-surface-container rounded-full overflow-hidden">
+                                <div class="h-full bg-primary" style="width:${Math.min(invoice.ai_score, 100)}%"></div>
+                            </div>
+                            <span class="font-mono-data font-bold ${scoreColor}">
+                                ${invoice.ai_score}
+                                <span class="text-xs ml-1">${invoice.risk_level}</span>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="px-lg py-md text-right">
+                        <div class="flex items-center justify-end gap-sm">
+                            <button onclick="openDrawer(${invoice.id})" class="text-on-surface-variant hover:text-primary" title="View details" aria-label="View details">
+                                <span class="material-symbols-outlined">visibility</span>
+                            </button>
+                            <button onclick="deleteInvoice(${invoice.id})" class="text-red-500 hover:text-red-700" title="Delete" aria-label="Delete invoice">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+        }
+
+        // ==========================================
+        // SEARCH / FILTER / SORT WIRING
+        // ==========================================
+        let searchDebounce;
+        document.getElementById("searchInput").addEventListener("input", (e) => {
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                searchTerm = e.target.value.trim();
+                currentPage = 1;
+                renderAll();
+            }, 250);
         });
 
-    } catch (err) {
+        document.getElementById("filtersToggleBtn").addEventListener("click", () => {
+            document.getElementById("filterPanel").classList.toggle("hidden");
+        });
 
-        console.error(err);
+        ["filterStatus", "filterCategory", "filterType", "filterDueFrom", "filterDueTo"].forEach((id) => {
+            document.getElementById(id).addEventListener("change", (e) => {
+                const key = { filterStatus: "status", filterCategory: "category", filterType: "type", filterDueFrom: "dueFrom", filterDueTo: "dueTo" }[id];
+                filters[key] = e.target.value;
+                currentPage = 1;
+                renderAll();
+            });
+        });
 
-    }
-}
+        function clearFilters() {
+            filters = { status: "all", category: "all", type: "all", dueFrom: "", dueTo: "" };
+            document.getElementById("filterStatus").value = "all";
+            document.getElementById("filterCategory").value = "all";
+            document.getElementById("filterType").value = "all";
+            document.getElementById("filterDueFrom").value = "";
+            document.getElementById("filterDueTo").value = "";
+            currentPage = 1;
+            renderAll();
+        }
 
-loadInvoices();
+        document.getElementById("clearFiltersBtn").addEventListener("click", clearFilters);
 
-setInterval(
-    loadInvoices,
-    5000
-);
+        document.querySelectorAll("[data-sort-key]").forEach((th) => {
+            th.addEventListener("click", () => {
+                const key = th.getAttribute("data-sort-key");
+                if (sortState.key === key) {
+                    sortState.dir = sortState.dir === "asc" ? "desc" : "asc";
+                } else {
+                    sortState.key = key;
+                    sortState.dir = key === "vendor" || key === "due_date_parsed" ? "asc" : "desc";
+                }
+                renderAll();
+            });
+        });
 
+        document.getElementById("prevPageBtn").addEventListener("click", () => {
+            if (currentPage > 1) { currentPage--; renderAll(); }
+        });
 
-async function deleteInvoice(id) {
+        document.getElementById("nextPageBtn").addEventListener("click", () => {
+            currentPage++;
+            renderAll();
+        });
 
-    const confirmed =
-        confirm("Delete this invoice?");
+        // ==========================================
+        // SELECTION + BULK ACTIONS
+        // ==========================================
+        tableBody.addEventListener("change", (e) => {
+            if (!e.target.classList.contains("row-checkbox")) return;
+            const id = Number(e.target.getAttribute("data-id"));
+            if (e.target.checked) selectedIds.add(id); else selectedIds.delete(id);
+            updateBulkBar();
+            document.getElementById("selectAllCheckbox").checked =
+                getVisibleInvoices().slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE).every((i) => selectedIds.has(i.id));
+        });
 
-    if (!confirmed) return;
+        document.getElementById("selectAllCheckbox").addEventListener("change", (e) => {
+            const pageRows = getVisibleInvoices().slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+            pageRows.forEach((i) => { if (e.target.checked) selectedIds.add(i.id); else selectedIds.delete(i.id); });
+            renderAll();
+        });
 
-    try {
+        function updateBulkBar() {
+            const bar = document.getElementById("bulkActionBar");
+            const count = selectedIds.size;
+            bar.classList.toggle("hidden", count === 0);
+            document.getElementById("bulkSelectedCount").textContent = `${count} selected`;
+        }
 
-        const response = await fetch(
-            `http://127.0.0.1:8000/invoice/${id}`,
-            {
-                method: "DELETE"
+        document.getElementById("bulkDeleteBtn").addEventListener("click", async () => {
+
+            const ids = [...selectedIds];
+            if (!ids.length) return;
+
+            const confirmed = await CashPilot.confirm({
+                title: "Delete selected invoices?",
+                message: `This will permanently delete ${ids.length} invoice${ids.length === 1 ? "" : "s"}. This cannot be undone.`,
+                confirmLabel: "Delete",
+            });
+            if (!confirmed) return;
+
+            const results = await Promise.allSettled(ids.map((id) => CashPilot.apiJson(`/invoice/${id}`, { method: "DELETE" })));
+            const failed = results.filter((r) => r.status === "rejected").length;
+
+            selectedIds.clear();
+
+            if (failed) {
+                CashPilot.toast(`Deleted ${ids.length - failed} of ${ids.length}. ${failed} failed.`, "error");
+            } else {
+                CashPilot.toast(`Deleted ${ids.length} invoice${ids.length === 1 ? "" : "s"}.`, "success");
             }
-        );
 
-        const result =
-            await response.json();
+            await loadInvoices();
 
-        console.log(result);
+        });
 
-        loadInvoices();
+        // ==========================================
+        // CSV EXPORT
+        // ==========================================
+        function toCSV(rows) {
 
-    } catch (err) {
+            const headers = ["Vendor", "Invoice Number", "Amount", "Due Date", "Category", "Payment Type", "Status", "AI Score", "Risk Level"];
 
-        console.error(err);
+            const escapeCell = (value) => {
+                const s = String(value ?? "");
+                return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+            };
 
-        alert("Delete failed");
+            const lines = [headers.join(",")];
 
-    }
-}
-        function openDrawer(data) {
+            rows.forEach((invoice) => {
+                lines.push([
+                    invoice.vendor,
+                    `INV-${invoice.id}`,
+                    invoice.amount,
+                    invoice.due_date,
+                    invoice.category,
+                    invoice.transaction_type,
+                    computeStatus(invoice).label,
+                    invoice.ai_score,
+                    invoice.risk_level,
+                ].map(escapeCell).join(","));
+            });
+
+            return lines.join("\n");
+
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+        }
+
+        document.getElementById("exportBtn").addEventListener("click", () => {
+            const rows = getVisibleInvoices();
+            if (!rows.length) { CashPilot.toast("No invoices to export.", "error"); return; }
+            downloadCSV(toCSV(rows), `invoices-${new Date().toISOString().slice(0, 10)}.csv`);
+            CashPilot.toast(`Exported ${rows.length} invoice${rows.length === 1 ? "" : "s"}.`, "success");
+        });
+
+        document.getElementById("bulkExportBtn").addEventListener("click", () => {
+            const rows = allInvoices.filter((i) => selectedIds.has(i.id));
+            if (!rows.length) return;
+            downloadCSV(toCSV(rows), `invoices-selected-${new Date().toISOString().slice(0, 10)}.csv`);
+            CashPilot.toast(`Exported ${rows.length} invoice${rows.length === 1 ? "" : "s"}.`, "success");
+        });
+
+        // ==========================================
+        // DELETE (single)
+        // ==========================================
+        async function deleteInvoice(id) {
+
+            const confirmed = await CashPilot.confirm({
+                title: "Delete this invoice?",
+                message: "This will permanently delete the invoice. This cannot be undone.",
+                confirmLabel: "Delete",
+            });
+            if (!confirmed) return;
+
+            try {
+                await CashPilot.apiJson(`/invoice/${id}`, { method: "DELETE" });
+                selectedIds.delete(id);
+                CashPilot.toast("Invoice deleted.", "success");
+                if (currentDrawerId === id) closeDrawer();
+                await loadInvoices();
+            } catch (err) {
+                CashPilot.toast(err.message || "Delete failed.", "error");
+            }
+
+        }
+
+        // ==========================================
+        // DETAIL DRAWER (view / edit / mark paid / delete)
+        // ==========================================
+        function openDrawer(id) {
+
+            const invoice = allInvoices.find((i) => i.id === id);
+            if (!invoice) return;
+
+            currentDrawerId = id;
+            exitEditMode();
+            populateDrawer(invoice);
+
             const drawer = document.getElementById('invoice-drawer');
             const overlay = document.getElementById('drawer-overlay');
-            
-            // Populate drawer
-            document.getElementById('drawer-vendor-name').textContent = data.vendor;
-            document.getElementById('drawer-vendor-badge').textContent = data.vendor.charAt(0);
-            document.getElementById('drawer-inv-no').textContent = data.inv;
-            document.getElementById('drawer-amount').textContent = data.amount;
-            document.getElementById('drawer-due').textContent = data.due;
-            document.getElementById('drawer-priority-score').textContent = data.score;
-            
-            const statusEl = document.getElementById('drawer-status');
-            statusEl.textContent = data.status;
-            statusEl.className = `inline-block px-sm py-xs rounded-lg font-label-md mb-sm ${
-                data.status === 'Paid' ? 'bg-green-100 text-green-700' : 
-                data.status === 'Late' ? 'bg-red-100 text-red-700' : 
-                'bg-blue-100 text-blue-700'
-            }`;
 
             overlay.classList.remove('hidden');
             setTimeout(() => {
                 overlay.classList.add('opacity-100');
                 drawer.classList.remove('translate-x-full');
             }, 10);
+
+        }
+
+        function populateDrawer(invoice) {
+
+            const status = computeStatus(invoice);
+
+            document.getElementById('drawer-vendor-name').textContent = invoice.vendor || "Unknown Vendor";
+            document.getElementById('drawer-vendor-badge').textContent = (invoice.vendor || "V").charAt(0).toUpperCase();
+            document.getElementById('drawer-inv-no').textContent = `INV-${invoice.id}`;
+            document.getElementById('drawer-amount').textContent = CashPilot.formatCurrency(invoice.amount);
+            document.getElementById('drawer-category').textContent = invoice.category || "—";
+            document.getElementById('drawer-due').textContent = invoice.due_date || "—";
+            document.getElementById('drawer-type').textContent = invoice.transaction_type;
+            document.getElementById('drawer-priority-score').textContent = invoice.ai_score;
+            document.getElementById('drawer-priority-label').textContent = `${invoice.risk_level} Priority`;
+
+            const statusEl = document.getElementById('drawer-status');
+            statusEl.textContent = status.label;
+            statusEl.className = `inline-block px-sm py-xs rounded-lg font-label-md mb-sm ${status.className}`;
+
+            const toggleBtn = document.getElementById('drawer-toggle-paid');
+            toggleBtn.textContent = invoice.is_paid ? "Mark as Unpaid" : "Mark as Paid";
+
         }
 
         function closeDrawer() {
             const drawer = document.getElementById('invoice-drawer');
             const overlay = document.getElementById('drawer-overlay');
-            
+
             drawer.classList.add('translate-x-full');
             overlay.classList.remove('opacity-100');
             setTimeout(() => {
                 overlay.classList.add('hidden');
             }, 300);
+
+            exitEditMode();
+            currentDrawerId = null;
         }
 
-        // Mock Upload Animation
-        const dropzone = document.getElementById("dropzone");
-const progressOverlay = document.getElementById("upload-progress");
-const progressBar = document.getElementById("progress-bar");
+        document.getElementById('drawer-toggle-paid').addEventListener("click", async () => {
 
-const fileInput = document.createElement("input");
+            const invoice = allInvoices.find((i) => i.id === currentDrawerId);
+            if (!invoice) return;
 
-fileInput.type = "file";
-fileInput.accept = ".pdf";
+            const btn = document.getElementById('drawer-toggle-paid');
+            btn.disabled = true;
 
-dropzone.addEventListener("click", () => {
-    fileInput.click();
-});
-
-fileInput.addEventListener("change", async () => {
-
-    const file = fileInput.files[0];
-
-    if (!file) return;
-
-    progressOverlay.classList.remove("hidden");
-    progressBar.style.width = "20%";
-
-    const formData = new FormData();
-
-    formData.append("file", file);
-
-    try {
-
-        progressBar.style.width = "60%";
-
-        const response = await api(
-    "/upload-invoice",
-    {
-        method: "POST",
-        body: formData
-    }
-);
-
-        const result = await response.json();
-
-        progressBar.style.width = "100%";
-
-        setTimeout(() => {
-
-            progressOverlay.classList.add("hidden");
-            progressBar.style.width = "0%";
-
-           alert(
-    `Invoice Uploaded
-
-Vendor: ${result.invoice.vendor}
-
-Amount: ₹${result.invoice.amount}`
-);
-
-            loadInvoices();
-
-        }, 1000);
-
-    } catch (err) {
-
-        console.error(err);
-
-        alert("Upload failed");
-
-        progressOverlay.classList.add("hidden");
-        progressBar.style.width = "0%";
-    }
-});
-
-
-
-async function deleteInvoice(id) {
-
-    const confirmed =
-        confirm("Delete this invoice?");
-
-    if (!confirmed) return;
-
-    try {
-
-        await fetch(
-            `http://127.0.0.1:8000/invoice/${id}`,
-            {
-                method: "DELETE"
+            try {
+                await CashPilot.apiJson(`/invoice/${invoice.id}`, {
+                    method: "PUT",
+                    body: JSON.stringify({ is_paid: !invoice.is_paid }),
+                });
+                CashPilot.toast(invoice.is_paid ? "Marked as unpaid." : "Marked as paid.", "success");
+                await loadInvoices();
+                const refreshed = allInvoices.find((i) => i.id === currentDrawerId);
+                if (refreshed) populateDrawer(refreshed);
+            } catch (err) {
+                CashPilot.toast(err.message || "Couldn't update invoice.", "error");
+            } finally {
+                btn.disabled = false;
             }
-        );
 
-        loadInvoices();
+        });
 
-    } catch (err) {
+        document.getElementById('drawer-delete-btn').addEventListener("click", () => {
+            if (currentDrawerId !== null) deleteInvoice(currentDrawerId);
+        });
 
-        console.error(err);
+        // --- Edit mode ---
 
-    }
-}
+        function enterEditMode() {
 
-async function addExpense() {
+            const invoice = allInvoices.find((i) => i.id === currentDrawerId);
+            if (!invoice) return;
 
-    const vendor =
-        document.getElementById(
-            "vendorInput"
-        ).value;
+            document.getElementById('drawer-edit-vendor').value = invoice.vendor || "";
+            document.getElementById('drawer-edit-amount').value = invoice.amount;
+            document.getElementById('drawer-edit-category').value = invoice.category || "";
+            document.getElementById('drawer-edit-due').value = ddmmyyyyToInputDate(invoice.due_date);
+            document.getElementById('drawer-edit-type').value = invoice.transaction_type;
 
-    const category =
-        document.getElementById(
-            "categoryInput"
-        ).value;
-
-    const transactionType =
-    document.getElementById(
-        "transactionType"
-    ).value;
-
-    const amount =
-        Number(
-            document.getElementById(
-                "amountInput"
-            ).value
-        );
-
-    const dueDate =
-        document.getElementById(
-            "dueDateInput"
-        ).value;
-
-    const formattedDate =
-        dueDate
-            .split("-")
-            .reverse()
-            .join("-");
-
-    await fetch(
-
-        "http://127.0.0.1:8000/manual-expense",
-
-        {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
-            body: JSON.stringify({
-
-    vendor,
-
-    amount,
-
-    category,
-
-    due_date: formattedDate,
-
-    transaction_type:
-        transactionType
-
-})
+            document.getElementById('drawer-view-grid').classList.add('hidden');
+            document.getElementById('drawer-edit-grid').classList.remove('hidden');
 
         }
 
-    );
+        function exitEditMode() {
+            document.getElementById('drawer-view-grid').classList.remove('hidden');
+            document.getElementById('drawer-edit-grid').classList.add('hidden');
+        }
 
-    alert(
-        "Expense Added"
-    );
+        document.getElementById('drawer-edit-btn').addEventListener("click", enterEditMode);
+        document.getElementById('drawer-edit-cancel').addEventListener("click", exitEditMode);
 
-    location.reload();
-}
+        document.getElementById('drawer-edit-save').addEventListener("click", async () => {
+
+            if (currentDrawerId === null) return;
+
+            const vendor = document.getElementById('drawer-edit-vendor').value.trim();
+            const amount = Number(document.getElementById('drawer-edit-amount').value);
+            const category = document.getElementById('drawer-edit-category').value.trim();
+            const dueDateRaw = document.getElementById('drawer-edit-due').value;
+            const transactionType = document.getElementById('drawer-edit-type').value;
+
+            if (!vendor) { CashPilot.toast("Vendor is required.", "error"); return; }
+            if (!amount || amount <= 0) { CashPilot.toast("Amount must be greater than 0.", "error"); return; }
+            if (!category) { CashPilot.toast("Category is required.", "error"); return; }
+            if (!dueDateRaw) { CashPilot.toast("Due date is required.", "error"); return; }
+
+            const saveBtn = document.getElementById('drawer-edit-save');
+            saveBtn.disabled = true;
+
+            try {
+
+                await CashPilot.apiJson(`/invoice/${currentDrawerId}`, {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        vendor,
+                        amount,
+                        category,
+                        due_date: inputDateToDdmmyyyy(dueDateRaw),
+                        transaction_type: transactionType,
+                    }),
+                });
+
+                CashPilot.toast("Invoice updated.", "success");
+                await loadInvoices();
+
+                const refreshed = allInvoices.find((i) => i.id === currentDrawerId);
+                if (refreshed) { populateDrawer(refreshed); exitEditMode(); }
+
+            } catch (err) {
+                CashPilot.toast(err.message || "Couldn't save changes.", "error");
+            } finally {
+                saveBtn.disabled = false;
+            }
+
+        });
+
+        // ==========================================
+        // UPLOAD (real progress via XHR, validation, dedupe, drag & drop)
+        // ==========================================
+        const dropzone = document.getElementById("dropzone");
+        const progressOverlay = document.getElementById("upload-progress");
+        const progressBar = document.getElementById("progress-bar");
+        const progressLabel = document.getElementById("upload-progress-label");
+        const progressFile = document.getElementById("upload-progress-file");
+
+        const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
+        let uploadInProgress = false;
+
+        const fileInput = document.createElement("input");
+        fileInput.type = "file";
+        fileInput.accept = ".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png";
+
+        document.getElementById("browseFilesBtn").addEventListener("click", (e) => {
+            e.stopPropagation();
+            fileInput.click();
+        });
+
+        dropzone.addEventListener("click", () => {
+            if (!uploadInProgress) fileInput.click();
+        });
+
+        dropzone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropzone.classList.add("border-primary");
+        });
+
+        dropzone.addEventListener("dragleave", () => {
+            dropzone.classList.remove("border-primary");
+        });
+
+        dropzone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropzone.classList.remove("border-primary");
+            if (uploadInProgress) return;
+            const file = e.dataTransfer.files && e.dataTransfer.files[0];
+            if (file) handleFileSelected(file);
+        });
+
+        fileInput.addEventListener("change", () => {
+            const file = fileInput.files[0];
+            fileInput.value = ""; // allow re-selecting the same file later
+            if (file) handleFileSelected(file);
+        });
+
+        const SUPPORTED_UPLOAD_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];
+
+        function validateInvoiceFile(file) {
+            const ext = file.name.toLowerCase().split(".").pop();
+            if (!SUPPORTED_UPLOAD_EXTENSIONS.includes(ext)) {
+                return "Only PDF, JPG, JPEG, or PNG files are supported.";
+            }
+            if (file.size === 0) {
+                return "This file is empty.";
+            }
+            if (file.size > MAX_UPLOAD_BYTES) {
+                return "File exceeds the 10 MB upload limit.";
+            }
+            return null;
+        }
+
+        function handleFileSelected(file) {
+
+            if (uploadInProgress) return;
+
+            const validationError = validateInvoiceFile(file);
+            if (validationError) {
+                CashPilot.toast(validationError, "error");
+                return;
+            }
+
+            uploadInProgress = true;
+            dropzone.classList.add("pointer-events-none");
+            progressOverlay.classList.remove("hidden");
+            progressBar.style.width = "0%";
+            progressLabel.textContent = "Uploading invoice…";
+            progressFile.textContent = file.name;
+
+            const formData = new FormData();
+            formData.append("file", file);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("POST", CashPilot.API_URL + "/upload-invoice");
+            xhr.setRequestHeader("Authorization", `Bearer ${CashPilot.getToken() || ""}`);
+
+            xhr.upload.addEventListener("progress", (e) => {
+                if (!e.lengthComputable) return;
+                const pct = Math.round((e.loaded / e.total) * 90); // reserve the last 10% for server-side extraction
+                progressBar.style.width = `${pct}%`;
+                if (pct >= 90) progressLabel.textContent = "Reading document with AI…";
+            });
+
+            xhr.addEventListener("load", () => {
+
+                uploadInProgress = false;
+                dropzone.classList.remove("pointer-events-none");
+
+                let result = {};
+                try { result = JSON.parse(xhr.responseText); } catch (_) {}
+
+                if (xhr.status >= 200 && xhr.status < 300) {
+
+                    progressBar.style.width = "100%";
+                    progressLabel.textContent = "Extracted!";
+
+                    setTimeout(() => {
+                        progressOverlay.classList.add("hidden");
+                        progressBar.style.width = "0%";
+                        progressLabel.textContent = "Uploading invoice…";
+                    }, 400);
+
+                    openExtractionPreview(result.extracted, result.needs_review);
+
+                } else if (xhr.status === 401) {
+
+                    progressOverlay.classList.add("hidden");
+                    progressBar.style.width = "0%";
+                    // api.js's shared 401 handling isn't reachable from raw XHR;
+                    // reuse the same session-expiry treatment other pages use.
+                    CashPilot.clearToken();
+                    CashPilot.toast("Session expired. Please sign in again.", "error");
+                    setTimeout(() => { window.location.href = "/screens/index.html"; }, 900);
+
+                } else {
+
+                    progressOverlay.classList.add("hidden");
+                    progressBar.style.width = "0%";
+                    CashPilot.toast(result.detail || "Upload failed. Please try again.", "error");
+
+                }
+
+            });
+
+            xhr.addEventListener("error", () => {
+                uploadInProgress = false;
+                dropzone.classList.remove("pointer-events-none");
+                progressOverlay.classList.add("hidden");
+                progressBar.style.width = "0%";
+                CashPilot.toast("Could not reach the server. Check your connection and try again.", "error");
+            });
+
+            xhr.send(formData);
+
+        }
+
+        // ==========================================
+        // EXTRACTION PREVIEW (review -> edit -> confirm before saving)
+        // Saving reuses the existing POST /manual-expense endpoint — the
+        // extraction step itself never writes to the database.
+        // ==========================================
+        let extractionSaving = false;
+
+        function openExtractionPreview(extracted, needsReview) {
+
+            document.getElementById("extract-vendor").value = extracted.vendor || "";
+            document.getElementById("extract-invoice-number").value = extracted.invoice_number || "";
+            document.getElementById("extract-invoice-date").value = ddmmyyyyToInputDate(extracted.invoice_date);
+            document.getElementById("extract-due-date").value = ddmmyyyyToInputDate(extracted.due_date);
+            document.getElementById("extract-type").value = "payable";
+            document.getElementById("extract-amount").value = extracted.amount || "";
+            document.getElementById("extract-currency").value = extracted.currency || "INR";
+            document.getElementById("extract-category").value = extracted.category || "";
+            document.getElementById("extract-gst").value = extracted.gst || "";
+            document.getElementById("extract-payment-terms").value = extracted.payment_terms || "";
+            document.getElementById("extract-description").value = extracted.description || "";
+
+            document.getElementById("extraction-review-banner").classList.toggle("hidden", !needsReview);
+
+            document.getElementById("extraction-overlay").classList.remove("hidden");
+            document.getElementById("extraction-overlay").classList.add("flex");
+
+        }
+
+        function discardExtractionPreview() {
+            document.getElementById("extraction-overlay").classList.add("hidden");
+            document.getElementById("extraction-overlay").classList.remove("flex");
+        }
+
+        document.getElementById("extraction-confirm-btn").addEventListener("click", async () => {
+
+            if (extractionSaving) return;
+
+            const vendor = document.getElementById("extract-vendor").value.trim();
+            const category = document.getElementById("extract-category").value.trim();
+            const transactionType = document.getElementById("extract-type").value;
+            const amount = Number(document.getElementById("extract-amount").value);
+            const dueDateRaw = document.getElementById("extract-due-date").value;
+            const invoiceDateRaw = document.getElementById("extract-invoice-date").value;
+
+            if (!vendor) { CashPilot.toast("Vendor is required.", "error"); return; }
+            if (!amount || amount <= 0) { CashPilot.toast("Amount must be greater than 0.", "error"); return; }
+            if (!category) { CashPilot.toast("Category is required.", "error"); return; }
+            if (!dueDateRaw) { CashPilot.toast("Due date is required.", "error"); return; }
+
+            const btn = document.getElementById("extraction-confirm-btn");
+            extractionSaving = true;
+            btn.disabled = true;
+
+            try {
+
+                await CashPilot.apiJson("/manual-expense", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        vendor,
+                        amount,
+                        category,
+                        due_date: inputDateToDdmmyyyy(dueDateRaw),
+                        transaction_type: transactionType,
+                        invoice_number: document.getElementById("extract-invoice-number").value.trim() || null,
+                        invoice_date: invoiceDateRaw ? inputDateToDdmmyyyy(invoiceDateRaw) : null,
+                        gst: document.getElementById("extract-gst").value.trim() || null,
+                        payment_terms: document.getElementById("extract-payment-terms").value.trim() || null,
+                        description: document.getElementById("extract-description").value.trim() || null,
+                    }),
+                });
+
+                CashPilot.toast(`Saved invoice for ${vendor}.`, "success");
+                discardExtractionPreview();
+                await loadInvoices();
+
+            } catch (err) {
+                CashPilot.toast(err.message || "Couldn't save this invoice.", "error");
+            } finally {
+                extractionSaving = false;
+                btn.disabled = false;
+            }
+
+        });
+
+        // ==========================================
+        // MANUAL EXPENSE FORM
+        // ==========================================
+        let expenseSubmitting = false;
+
+        function setExpenseError(message) {
+            const el = document.getElementById("expenseFormError");
+            if (!message) { el.classList.add("hidden"); el.textContent = ""; return; }
+            el.textContent = message;
+            el.classList.remove("hidden");
+        }
+
+        async function addExpense() {
+
+            if (expenseSubmitting) return;
+
+            setExpenseError("");
+
+            const vendor = document.getElementById("vendorInput").value.trim();
+            const category = document.getElementById("categoryInput").value;
+            const transactionType = document.getElementById("transactionType").value;
+            const amountRaw = document.getElementById("amountInput").value;
+            const amount = Number(amountRaw);
+            const dueDate = document.getElementById("dueDateInput").value;
+
+            if (!vendor) { setExpenseError("Vendor is required."); return; }
+            if (!amountRaw || Number.isNaN(amount) || amount <= 0) { setExpenseError("Amount must be greater than 0."); return; }
+            if (!category) { setExpenseError("Category is required."); return; }
+            if (!dueDate) { setExpenseError("Due date is required."); return; }
+
+            const btn = document.getElementById("addExpenseBtn");
+            expenseSubmitting = true;
+            btn.disabled = true;
+
+            try {
+
+                await CashPilot.apiJson("/manual-expense", {
+                    method: "POST",
+                    body: JSON.stringify({
+                        vendor,
+                        amount,
+                        category,
+                        due_date: inputDateToDdmmyyyy(dueDate),
+                        transaction_type: transactionType,
+                    }),
+                });
+
+                CashPilot.toast("Expense added.", "success");
+
+                document.getElementById("vendorInput").value = "";
+                document.getElementById("amountInput").value = "";
+                document.getElementById("dueDateInput").value = "";
+
+                await loadInvoices();
+
+            } catch (err) {
+                setExpenseError(err.message || "Couldn't add this expense.");
+            } finally {
+                expenseSubmitting = false;
+                btn.disabled = false;
+            }
+
+        }
+
+        // ==========================================
+        // INIT
+        // ==========================================
+        loadInvoices();
+        setInterval(loadInvoices, 30000);
     </script>
 <div data-page-switcher>
 <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">

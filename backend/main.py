@@ -1,6 +1,5 @@
 import os
 import re
-import fitz
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, UploadFile, File
@@ -16,6 +15,7 @@ from models import (
 from pydantic import BaseModel, field_validator
 from langchain_google_genai import ChatGoogleGenerativeAI
 from models import ScenarioRequest, ChatRequest, UpdateBalanceRequest
+from extraction import get_document_text, extract_invoice_fields, ExtractionError
 import bcrypt
 from jose import jwt, JWTError
 from models import User
@@ -223,6 +223,18 @@ with engine.connect() as _conn:
         _conn.execute(_text("ALTER TABLE users ADD COLUMN company_name VARCHAR"))
         _conn.commit()
 
+    _existing_invoice_cols = {
+        row[1] for row in _conn.execute(_text("PRAGMA table_info(invoices)"))
+    }
+    if "is_paid" not in _existing_invoice_cols:
+        _conn.execute(_text("ALTER TABLE invoices ADD COLUMN is_paid BOOLEAN DEFAULT 0"))
+        _conn.commit()
+
+    for _col in ("invoice_number", "invoice_date", "gst", "payment_terms", "description"):
+        if _col not in _existing_invoice_cols:
+            _conn.execute(_text(f"ALTER TABLE invoices ADD COLUMN {_col} VARCHAR"))
+            _conn.commit()
+
 app = FastAPI()
 
 def priority_score(invoice):
@@ -314,6 +326,18 @@ def priority_score(invoice):
             100
         )
 
+
+def is_valid_due_date(value):
+    # Mirrors the "%d-%m-%Y" format every other part of this file expects
+    # (priority_score, /dashboard, etc.) so invoices created here don't
+    # silently fail to score/sort/alert correctly later.
+    try:
+        datetime.strptime(value, "%d-%m-%Y")
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 llm = None
@@ -352,231 +376,13 @@ UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
-def extract_pdf_text(filepath):
-    doc = fitz.open(filepath)
-
-    text = ""
-
-    for page in doc:
-        text += page.get_text()
-
-    return text
-
-
-import re
-
-def parse_invoice(text):
-
-    import re
-
-    amount = 0
-    amount_inr = 0
-    vendor = "Unknown Vendor"
-    due_date = "Unknown"
-    category = "General"
-    currency = "INR"
-
-    # ==========================
-    # AMOUNT + CURRENCY
-    # ==========================
-
-    amount_match = re.search(
-        r"Amount:\s*([$₹€£])?\s*([\d,]+(?:\.\d+)?)",
-        text,
-        re.IGNORECASE
-    )
-
-    if not amount_match:
-
-        amount_match = re.search(
-            r"Total\s+Due\s+([$₹€£])?\s*([\d,]+(?:\.\d+)?)",
-            text,
-            re.IGNORECASE
-        )
-
-    if not amount_match:
-
-        amount_match = re.search(
-            r"Total\s+([$₹€£])?\s*([\d,]+(?:\.\d+)?)",
-            text,
-            re.IGNORECASE
-        )
-
-    if not amount_match:
-
-        amount_match = re.search(
-            r"([$₹€£])\s*([\d,]+(?:\.\d+)?)",
-            text
-        )
-
-    if amount_match:
-
-        symbol = amount_match.group(1)
-
-        amount = float(
-            amount_match.group(2)
-            .replace(",", "")
-        )
-
-        if symbol == "$":
-            currency = "USD"
-
-        elif symbol == "€":
-            currency = "EUR"
-
-        elif symbol == "£":
-            currency = "GBP"
-
-        else:
-            currency = "INR"
-
-    # ==========================
-    # CONVERT TO INR
-    # ==========================
-
-    exchange_rates = {
-        "INR": 1,
-        "USD": 86,
-        "EUR": 99,
-        "GBP": 116
-    }
-
-    amount_inr = round(
-        amount *
-        exchange_rates.get(
-            currency,
-            1
-        ),
-        2
-    )
-
-    # ==========================
-    # VENDOR
-    # ==========================
-
-    vendor_match = re.search(
-        r"Vendor:\s*(.*)",
-        text,
-        re.IGNORECASE
-    )
-
-    if vendor_match:
-
-        vendor = vendor_match.group(1).strip()
-
-    else:
-
-        from_match = re.search(
-            r"From:\s*\n?([^\n]+)",
-            text,
-            re.IGNORECASE
-        )
-
-        if from_match:
-
-            vendor = (
-                from_match.group(1)
-                .strip()
-            )
-
-    # ==========================
-    # DUE DATE
-    # ==========================
-
-    due_date_match = re.search(
-        r"Due Date:\s*(.*)",
-        text,
-        re.IGNORECASE
-    )
-
-    if due_date_match:
-
-        due_date = (
-            due_date_match.group(1)
-            .strip()
-        )
-
-    # ==========================
-    # CATEGORY
-    # ==========================
-
-    category_match = re.search(
-        r"Category:\s*(.*)",
-        text,
-        re.IGNORECASE
-    )
-
-    if category_match:
-
-        category = (
-            category_match.group(1)
-            .strip()
-        )
-
-    else:
-
-        lower_text = text.lower()
-
-        if (
-            "aws" in lower_text or
-            "amazon web services" in lower_text
-        ):
-
-            category = "Cloud Services"
-
-        elif (
-            "azure" in lower_text or
-            "microsoft azure" in lower_text
-        ):
-
-            category = "Cloud Services"
-
-        elif (
-            "google workspace" in lower_text
-        ):
-
-            category = "Software"
-
-        elif (
-            "stripe" in lower_text
-        ):
-
-            category = "Payments"
-
-        elif (
-            "rent" in lower_text
-        ):
-
-            category = "Rent"
-
-        elif (
-            "utility" in lower_text or
-            "electricity" in lower_text or
-            "internet" in lower_text
-        ):
-
-            category = "Utilities"
-
-    return {
-
-        "vendor": vendor,
-
-        "amount": amount_inr,
-
-        "currency": currency,
-
-        "due_date": due_date,
-
-        "category": category
-
-    }
-
 @app.get("/")
 def home():
     return {"message": "CashPilot Backend Running"}
 
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
+SUPPORTED_UPLOAD_EXTENSIONS = {"pdf", "jpg", "jpeg", "png"}
 
 
 @app.post("/upload-invoice")
@@ -584,11 +390,22 @@ async def upload_invoice(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user)
 ):
+    """Extracts structured fields from an uploaded invoice (PDF, scanned PDF,
+    or JPG/PNG image) and returns them for the user to review and edit.
+
+    This does NOT create an Invoice record — the frontend shows the
+    extracted fields in a preview and only persists them once the user
+    confirms, via the existing POST /manual-expense endpoint.
+    """
 
     original_name = os.path.basename(file.filename or "")
+    extension = original_name.rsplit(".", 1)[-1].lower() if "." in original_name else ""
 
-    if not original_name.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+    if extension not in SUPPORTED_UPLOAD_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail="Only PDF, JPG, JPEG, or PNG files are supported",
+        )
 
     contents = await file.read()
 
@@ -611,49 +428,20 @@ async def upload_invoice(
         f.write(contents)
 
     try:
-        text = extract_pdf_text(filepath)
+        text = get_document_text(llm, filepath, extension)
+        fields = extract_invoice_fields(llm, text)
+    except ExtractionError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
     except Exception:
-        raise HTTPException(status_code=400, detail="Could not read this PDF file")
-
-    data = parse_invoice(text)
-
-    db = SessionLocal()
-
-    invoice = Invoice(
-
-        vendor=data["vendor"],
-
-        amount=data["amount"],
-
-        due_date=data["due_date"],
-
-        category=data["category"],
-
-        currency=data.get("currency", "INR"),
-
-        transaction_type=data.get(
-            "transaction_type",
-            "payable"
-        ),
-
-        user_id=current_user.id
-
-    )
-
-    db.add(invoice)
-
-    db.commit()
-
-    db.refresh(invoice)
-
-    db.close()
+        raise HTTPException(
+            status_code=502,
+            detail="Extraction failed unexpectedly. Please try again or enter the invoice manually.",
+        )
 
     return {
-
-        "message": "Invoice uploaded successfully",
-
-        "invoice": data
-
+        "message": "Invoice extracted successfully",
+        "needs_review": fields["needs_review"],
+        "extracted": fields,
     }
 
 
@@ -810,7 +598,19 @@ def get_invoices(
 
             "ai_score": score,
 
-            "risk_level": risk_level
+            "risk_level": risk_level,
+
+            "is_paid": bool(invoice.is_paid),
+
+            "invoice_number": invoice.invoice_number,
+
+            "invoice_date": invoice.invoice_date,
+
+            "gst": invoice.gst,
+
+            "payment_terms": invoice.payment_terms,
+
+            "description": invoice.description
 
         })
 
@@ -926,6 +726,24 @@ def update_invoice(
         db.close()
         raise HTTPException(status_code=400, detail="Amount must be greater than 0")
 
+    if "vendor" in update_data and not (update_data["vendor"] or "").strip():
+        db.close()
+        raise HTTPException(status_code=400, detail="Vendor is required")
+
+    if "category" in update_data and not (update_data["category"] or "").strip():
+        db.close()
+        raise HTTPException(status_code=400, detail="Category is required")
+
+    if "due_date" in update_data and not is_valid_due_date(update_data["due_date"]):
+        db.close()
+        raise HTTPException(status_code=400, detail="Due date must be in DD-MM-YYYY format")
+
+    if "vendor" in update_data and update_data["vendor"] is not None:
+        update_data["vendor"] = update_data["vendor"].strip()
+
+    if "category" in update_data and update_data["category"] is not None:
+        update_data["category"] = update_data["category"].strip()
+
     for field, value in update_data.items():
         if value is not None:
             setattr(invoice, field, value)
@@ -940,6 +758,7 @@ def update_invoice(
         "due_date": invoice.due_date,
         "category": invoice.category,
         "transaction_type": invoice.transaction_type,
+        "is_paid": bool(invoice.is_paid),
     }
 
     db.close()
@@ -1231,6 +1050,12 @@ def add_manual_expense(
     if not data.vendor or not data.vendor.strip():
         raise HTTPException(status_code=400, detail="Vendor is required")
 
+    if not data.category or not data.category.strip():
+        raise HTTPException(status_code=400, detail="Category is required")
+
+    if not is_valid_due_date(data.due_date):
+        raise HTTPException(status_code=400, detail="Due date must be in DD-MM-YYYY format")
+
     db = SessionLocal()
 
     invoice = Invoice(
@@ -1239,14 +1064,24 @@ def add_manual_expense(
 
     amount=data.amount,
 
-    category=data.category,
+    category=data.category.strip(),
 
     due_date=data.due_date,
 
     transaction_type=
         data.transaction_type,
 
-    user_id=current_user.id
+    user_id=current_user.id,
+
+    invoice_number=(data.invoice_number or "").strip() or None,
+
+    invoice_date=(data.invoice_date or "").strip() or None,
+
+    gst=(data.gst or "").strip() or None,
+
+    payment_terms=(data.payment_terms or "").strip() or None,
+
+    description=(data.description or "").strip() or None,
 
 )
 
@@ -1262,6 +1097,11 @@ def add_manual_expense(
         "due_date": invoice.due_date,
         "category": invoice.category,
         "transaction_type": invoice.transaction_type,
+        "invoice_number": invoice.invoice_number,
+        "invoice_date": invoice.invoice_date,
+        "gst": invoice.gst,
+        "payment_terms": invoice.payment_terms,
+        "description": invoice.description,
     }
 
     db.close()

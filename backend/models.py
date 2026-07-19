@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float
+from sqlalchemy import Column, Integer, String, Float, Boolean
 from database import Base
 from pydantic import BaseModel
 from sqlalchemy import ForeignKey
@@ -35,6 +35,19 @@ class Invoice(Base):
     String,
     default="INR"
 )
+
+    is_paid = Column(Boolean, default=False)
+
+    invoice_number = Column(String, nullable=True)
+
+    invoice_date = Column(String, nullable=True)
+
+    gst = Column(String, nullable=True)
+
+    payment_terms = Column(String, nullable=True)
+
+    description = Column(String, nullable=True)
+
 class ManualExpenseRequest(
     BaseModel
 ):
@@ -49,6 +62,16 @@ class ManualExpenseRequest(
 
     transaction_type: str
 
+    invoice_number: str | None = None
+
+    invoice_date: str | None = None
+
+    gst: str | None = None
+
+    payment_terms: str | None = None
+
+    description: str | None = None
+
 
 class InvoiceUpdateRequest(BaseModel):
 
@@ -61,6 +84,8 @@ class InvoiceUpdateRequest(BaseModel):
     due_date: str | None = None
 
     transaction_type: str | None = None
+
+    is_paid: bool | None = None
 
 
 class VendorNegotiationRequest(BaseModel):

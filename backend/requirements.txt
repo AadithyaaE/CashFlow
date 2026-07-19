@@ -8,6 +8,7 @@ fastapi==0.137.1
 greenlet==3.5.1
 h11==0.16.0
 idna==3.18
+langchain-core==1.4.9
 langchain-google-genai==4.2.7
 pydantic==2.13.4
 pydantic_core==2.46.4

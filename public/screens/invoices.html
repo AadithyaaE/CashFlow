@@ -269,6 +269,10 @@
 <span class="material-symbols-outlined group-hover:text-primary transition-colors">help</span>
 <span class="font-label-md">Support</span>
 </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group cursor-pointer" href="#" data-action="logout">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">logout</span>
+<span class="font-label-md">Log Out</span>
+</a>
 </div>
 </aside>
 <!-- Main Content Area -->
@@ -285,8 +289,8 @@
 <input class="pl-xl pr-md py-xs bg-surface-container rounded-full border-none focus:ring-2 focus:ring-primary font-body-sm w-64 transition-all" placeholder="Search invoices..." type="text"/>
 </div>
 <div class="flex items-center gap-sm">
-<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-md">JD</div>
-<span class="font-label-md text-on-surface font-semibold">John Doe</span>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-md" data-user-initials></div>
+<span class="font-label-md text-on-surface font-semibold" data-user-name></span>
 </div>
 </div>
 </header>
@@ -559,6 +563,8 @@
 
 <script src="api.js"></script>
 <script>
+        CashPilot.initPage();
+
         const tableBody = document.getElementById(
     "invoice-table-body"
 );

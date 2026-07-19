@@ -50,6 +50,29 @@ class ManualExpenseRequest(
     transaction_type: str
 
 
+class InvoiceUpdateRequest(BaseModel):
+
+    vendor: str | None = None
+
+    amount: float | None = None
+
+    category: str | None = None
+
+    due_date: str | None = None
+
+    transaction_type: str | None = None
+
+
+class VendorNegotiationRequest(BaseModel):
+
+    vendor: str
+
+    amount: float
+
+    due_date: str
+    category: str | None = None
+    goal: str = "extension"
+
 
 class ScenarioRequest(BaseModel):
 
@@ -87,7 +110,13 @@ class User(Base):
 
     password = Column(String)
 
+    company_name = Column(String, nullable=True)
+
     current_balance = Column(
         Float,
-        default=0
+        default=75000
     )
+
+
+class UpdateBalanceRequest(BaseModel):
+    balance: float

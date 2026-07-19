@@ -321,6 +321,10 @@
 <span class="material-symbols-outlined" data-icon="help">help</span>
 <span class="font-label-md">Support</span>
 </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all cursor-pointer" href="#" data-action="logout">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md">Log Out</span>
+</a>
 </div>
 </aside>
 <!-- Main Content Canvas -->
@@ -331,10 +335,13 @@
 <h2 class="font-headline-lg text-headline-lg text-on-surface">Cash Runway Explorer</h2>
 <p class="font-body-md text-on-surface-variant">Real-time depletion analysis and financial forecasting.</p>
 </div>
+<div class="flex items-center gap-lg">
 <div class="flex gap-md bg-surface-container rounded-xl p-xs border border-outline-variant">
 <button class="px-lg py-sm bg-surface-container-lowest rounded-lg shadow-sm font-label-md text-primary">Daily</button>
 <button class="px-lg py-sm font-label-md text-on-surface-variant hover:text-on-surface">Weekly</button>
 <button class="px-lg py-sm font-label-md text-on-surface-variant hover:text-on-surface">Monthly</button>
+</div>
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-label-md" data-user-initials></div>
 </div>
 </header>
 <!-- Bento Grid Layout -->
@@ -730,7 +737,10 @@
 <span class="text-[10px] font-label-md">Settings</span>
 </a>
 </div>
+<script src="api.js"></script>
 <script>
+
+CashPilot.initPage();
 
 // Ripple effect
 document.querySelectorAll('button').forEach(btn => {
@@ -747,8 +757,8 @@ async function loadRunway() {
 
     try {
 
-        const response = await fetch(
-            "http://127.0.0.1:8000/dashboard"
+        const response = await api(
+            "/dashboard"
         );
 
         const data = await response.json();
@@ -826,8 +836,8 @@ setInterval(
 async function loadRunwayGraph() {
 
     const response =
-        await fetch(
-            "http://127.0.0.1:8000/dashboard"
+        await api(
+            "/dashboard"
         );
 
     const dashboard =
@@ -926,8 +936,8 @@ setInterval(
 async function loadRunwayGraph() {
 
     const response =
-        await fetch(
-            "http://127.0.0.1:8000/dashboard"
+        await api(
+            "/dashboard"
         );
 
     const dashboard =
@@ -1158,8 +1168,8 @@ setInterval(
 async function loadPriorities() {
 
     const response =
-        await fetch(
-            "http://127.0.0.1:8000/payment-priority"
+        await api(
+            "/payment-priority"
         );
 
     const priorities =
@@ -1252,8 +1262,8 @@ async function loadPriorities() {
 async function loadSidebarStats() {
 
     const response =
-        await fetch(
-            "http://127.0.0.1:8000/dashboard"
+        await api(
+            "/dashboard"
         );
 
     const data =
@@ -1285,8 +1295,8 @@ async function applyScenario() {
 
 
     const response =
-        await fetch(
-            "http://127.0.0.1:8000/dashboard"
+        await api(
+            "/dashboard"
         );
 
     const dashboard =
@@ -1447,13 +1457,10 @@ scenarioList.innerHTML += `
         recommendation;
 
     const aiResponse =
-    await fetch(
-        "http://127.0.0.1:8000/ai-recommendation",
+    await api(
+        "/ai-recommendation",
         {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
             body: JSON.stringify({
                 current_balance: currentBalance,
                 scenario_cost: scenarioAmount,
@@ -1506,8 +1513,8 @@ async function generatePaymentPlan() {
         );
 
     const response =
-        await fetch(
-            `http://127.0.0.1:8000/payment-plan?scenario_amount=${scenarioAmount}`
+        await api(
+            `/payment-plan?scenario_amount=${scenarioAmount}`
         );
 
     const data =

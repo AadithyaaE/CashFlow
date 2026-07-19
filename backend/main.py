@@ -1,46 +1,107 @@
 import os
-import fitz
 import re
+import fitz
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, UploadFile, File
 
 from database import SessionLocal, engine
-from models import Base, Invoice,ManualExpenseRequest
-from pydantic import BaseModel
+from models import (
+    Base,
+    Invoice,
+    ManualExpenseRequest,
+    InvoiceUpdateRequest,
+    VendorNegotiationRequest,
+)
+from pydantic import BaseModel, field_validator
 from langchain_google_genai import ChatGoogleGenerativeAI
-from models import ScenarioRequest,ChatRequest
-from passlib.context import CryptContext
-from jose import jwt
-from pydantic import BaseModel
-from models import User
-from fastapi import Depends
-from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from models import ScenarioRequest, ChatRequest, UpdateBalanceRequest
+import bcrypt
 from jose import jwt, JWTError
 from models import User
+from fastapi import Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
+load_dotenv()
+
+EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 
 
 class RegisterRequest(BaseModel):
     name: str
     email: str
     password: str
+    company_name: str | None = None
+
+    @field_validator("name")
+    @classmethod
+    def name_not_blank(cls, v):
+        if not v or not v.strip():
+            raise ValueError("Name is required")
+        return v.strip()
+
+    @field_validator("email")
+    @classmethod
+    def email_is_valid(cls, v):
+        v = (v or "").strip().lower()
+        if not EMAIL_RE.match(v):
+            raise ValueError("Enter a valid email address")
+        return v
+
+    @field_validator("password")
+    @classmethod
+    def password_is_strong(cls, v):
+        if not v or len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
 
 
 class LoginRequest(BaseModel):
     email: str
     password: str
 
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, v):
+        # Must mirror RegisterRequest's normalization, or a user who signed
+        # up as "Foo@Bar.com" (stored lowercased) can't log back in with the
+        # same casing they registered with.
+        return (v or "").strip().lower()
 
 
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
+class ForgotPasswordRequest(BaseModel):
+    email: str
 
-SECRET_KEY = "cashpilot_secret_key_change_this"
+    @field_validator("email")
+    @classmethod
+    def normalize_email(cls, v):
+        return (v or "").strip().lower()
+
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def password_is_strong(cls, v):
+        if not v or len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
+
+
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+if not SECRET_KEY:
+    import secrets as _secrets
+    SECRET_KEY = _secrets.token_hex(32)
+    print(
+        "WARNING: JWT_SECRET_KEY not set in environment. Using a random "
+        "key generated for this process only — all sessions will be "
+        "invalidated on restart. Set JWT_SECRET_KEY in backend/.env."
+    )
+
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="login"
@@ -48,6 +109,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24
+PASSWORD_RESET_EXPIRE_MINUTES = 30
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
 
 
 def create_access_token(data: dict):
@@ -72,22 +136,44 @@ def create_access_token(data: dict):
 
     return encoded_jwt
 
-def hash_password(password):
-    return pwd_context.hash(password)
 
-def verify_password(password, hashed):
-    return pwd_context.verify(password, hashed)
+def create_password_reset_token(email: str) -> str:
+
+    # Carries a "purpose" claim so this can never be accepted by
+    # get_current_user as a regular session token, and expires much sooner
+    # than a normal login session.
+    expire = datetime.utcnow() + timedelta(
+        minutes=PASSWORD_RESET_EXPIRE_MINUTES
+    )
+
+    return jwt.encode(
+        {"email": email, "purpose": "password_reset", "exp": expire},
+        SECRET_KEY,
+        algorithm=ALGORITHM,
+    )
+
+def hash_password(password: str) -> str:
+    # bcrypt only uses the first 72 bytes of input; truncate explicitly so
+    # long passwords fail closed instead of raising inside the library.
+    pw_bytes = password.encode("utf-8")[:72]
+    return bcrypt.hashpw(pw_bytes, bcrypt.gensalt()).decode("utf-8")
+
+def verify_password(password: str, hashed: str) -> bool:
+    pw_bytes = password.encode("utf-8")[:72]
+    try:
+        return bcrypt.checkpw(pw_bytes, hashed.encode("utf-8"))
+    except ValueError:
+        return False
 
 
 def get_current_user(
     token: str = Depends(oauth2_scheme)
 ):
 
-    print("TOKEN RECEIVED:", token)
-
     credentials_exception = HTTPException(
         status_code=401,
-        detail="Invalid authentication"
+        detail="Invalid authentication",
+        headers={"WWW-Authenticate": "Bearer"},
     )
 
     try:
@@ -98,18 +184,14 @@ def get_current_user(
             algorithms=[ALGORITHM]
         )
 
-        print("PAYLOAD:", payload)
-
         email = payload.get("email")
 
-        print("EMAIL:", email)
-
-        if email is None:
+        # Password-reset tokens are single-purpose and must never be usable
+        # as a session token, even though they're signed with the same key.
+        if email is None or payload.get("purpose") is not None:
             raise credentials_exception
 
-    except Exception as e:
-
-        print("JWT ERROR:", e)
+    except JWTError:
 
         raise credentials_exception
 
@@ -118,8 +200,6 @@ def get_current_user(
     user = db.query(User).filter(
         User.email == email
     ).first()
-
-    print("USER:", user)
 
     db.close()
 
@@ -130,7 +210,18 @@ def get_current_user(
 
 
 Base.metadata.create_all(bind=engine)
-CURRENT_BALANCE = 75000
+
+# Lightweight migration: add columns introduced after the table was first
+# created, since create_all() only creates missing tables, not columns.
+with engine.connect() as _conn:
+    from sqlalchemy import text as _text
+
+    _existing_cols = {
+        row[1] for row in _conn.execute(_text("PRAGMA table_info(users)"))
+    }
+    if "company_name" not in _existing_cols:
+        _conn.execute(_text("ALTER TABLE users ADD COLUMN company_name VARCHAR"))
+        _conn.commit()
 
 app = FastAPI()
 
@@ -223,11 +314,6 @@ def priority_score(invoice):
             100
         )
 
-import os
-from dotenv import load_dotenv
-
-load_dotenv()
-
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 llm = None
@@ -243,9 +329,19 @@ else:
 
     print("WARNING: Gemini API key not found. AI features disabled.")
 
+_cors_origins_env = os.getenv("CORS_ORIGINS", "")
+CORS_ORIGINS = [o.strip() for o in _cors_origins_env.split(",") if o.strip()] or [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8080",
+    "http://127.0.0.1:8080",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -480,21 +576,44 @@ def home():
     return {"message": "CashPilot Backend Running"}
 
 
+MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
+
+
 @app.post("/upload-invoice")
 async def upload_invoice(
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user)
 ):
 
+    original_name = os.path.basename(file.filename or "")
+
+    if not original_name.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are supported")
+
+    contents = await file.read()
+
+    if len(contents) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=400, detail="File exceeds the 10 MB upload limit")
+
+    if len(contents) == 0:
+        raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+    import uuid
+
+    safe_name = f"{current_user.id}_{uuid.uuid4().hex}_{re.sub(r'[^A-Za-z0-9._-]', '_', original_name)}"
+
     filepath = os.path.join(
         UPLOAD_FOLDER,
-        file.filename
+        safe_name
     )
 
     with open(filepath, "wb") as f:
-        f.write(await file.read())
+        f.write(contents)
 
-    text = extract_pdf_text(filepath)
+    try:
+        text = extract_pdf_text(filepath)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Could not read this PDF file")
 
     data = parse_invoice(text)
 
@@ -573,13 +692,11 @@ def dashboard(
         except:
             pass
 
-    
 
-    
 
-    global CURRENT_BALANCE
 
-    current_balance = CURRENT_BALANCE
+
+    current_balance = current_user.current_balance
 
     total_payables = sum(
     invoice.amount
@@ -617,73 +734,34 @@ def dashboard(
 
  }
 
-from datetime import datetime
 
-def calculate_ai_score(invoice):
+@app.post("/update-balance")
+def update_balance(
+    data: UpdateBalanceRequest,
+    current_user: User = Depends(get_current_user)
+):
 
-    score = 0
+    db = SessionLocal()
 
-    try:
+    user = db.query(User).filter(
+        User.id == current_user.id
+    ).first()
 
-        due_date = datetime.strptime(
-            invoice.due_date,
-            "%d-%m-%Y"
-        )
+    user.current_balance = data.balance
 
-        days_left = (
-            due_date -
-            datetime.today()
-        ).days
+    db.commit()
+    db.refresh(user)
 
-        if days_left < 0:
+    db.close()
 
-            score += 60
-
-        elif days_left <= 3:
-
-            score += 50
-
-        elif days_left <= 7:
-
-            score += 35
-
-        elif days_left <= 15:
-
-            score += 20
-
-    except:
-
-        pass
-
-    score += min(
-        invoice.amount / 1000,
-        40
-    )
-
-    category = (
-        invoice.category or ""
-    ).lower()
-
-    if (
-        "rent" in category or
-        "salary" in category or
-        "utility" in category
-    ):
-        score += 35
-
-    return min(
-    round(score),
-    100
-)
-
-
-
+    return {
+        "current_balance": user.current_balance
+    }
 
 @app.get("/invoices")
 def get_invoices(
     current_user: User = Depends(get_current_user)
 ):
-    print("INSIDE /invoices")
     db = SessionLocal()
 
     invoices = db.query(
@@ -691,8 +769,6 @@ def get_invoices(
     ).filter(
         Invoice.user_id == current_user.id
     ).all()
-
-    print("Invoices:", invoices)
 
     result = []
 
@@ -781,19 +857,25 @@ def analytics(
     }
 
 @app.delete("/invoice/{invoice_id}")
-def delete_invoice(invoice_id: int):
+def delete_invoice(
+    invoice_id: int,
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
     invoice = (
         db.query(Invoice)
-        .filter(Invoice.id == invoice_id)
+        .filter(
+            Invoice.id == invoice_id,
+            Invoice.user_id == current_user.id
+        )
         .first()
     )
 
     if not invoice:
         db.close()
-        return {"error": "Invoice not found"}
+        raise HTTPException(status_code=404, detail="Invoice not found")
 
     db.delete(invoice)
 
@@ -804,25 +886,90 @@ def delete_invoice(invoice_id: int):
     return {
         "message": "Invoice deleted"
     }
+
+
+@app.put("/invoice/{invoice_id}")
+def update_invoice(
+    invoice_id: int,
+    data: InvoiceUpdateRequest,
+    current_user: User = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    invoice = (
+        db.query(Invoice)
+        .filter(
+            Invoice.id == invoice_id,
+            Invoice.user_id == current_user.id
+        )
+        .first()
+    )
+
+    if not invoice:
+        db.close()
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+
+    if "transaction_type" in update_data and update_data["transaction_type"] not in (
+        "payable",
+        "receivable",
+    ):
+        db.close()
+        raise HTTPException(
+            status_code=400,
+            detail="transaction_type must be 'payable' or 'receivable'",
+        )
+
+    if "amount" in update_data and update_data["amount"] is not None and update_data["amount"] <= 0:
+        db.close()
+        raise HTTPException(status_code=400, detail="Amount must be greater than 0")
+
+    for field, value in update_data.items():
+        if value is not None:
+            setattr(invoice, field, value)
+
+    db.commit()
+    db.refresh(invoice)
+
+    result = {
+        "id": invoice.id,
+        "vendor": invoice.vendor,
+        "amount": invoice.amount,
+        "due_date": invoice.due_date,
+        "category": invoice.category,
+        "transaction_type": invoice.transaction_type,
+    }
+
+    db.close()
+
+    return result
+
+
 class ScenarioSimulationRequest(BaseModel):
     amount: float
 
 
 @app.post("/simulate-scenario")
-def simulate_scenario(data: ScenarioSimulationRequest):
+def simulate_scenario(
+    data: ScenarioSimulationRequest,
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
     invoices = db.query(Invoice).filter(
-    Invoice.user_id == current_user.id
-).all()
+        Invoice.user_id == current_user.id
+    ).all()
 
     total_payables = sum(
         invoice.amount
         for invoice in invoices
+        if invoice.transaction_type == "payable"
     )
 
-    current_balance = 75000
+    current_balance = current_user.current_balance
 
     new_balance = (
         current_balance -
@@ -1066,49 +1213,29 @@ def analytics_summary(
 
     }
 
-@app.get("/debug")
-def debug(
+@app.post("/manual-expense")
+def add_manual_expense(
+    data: ManualExpenseRequest,
     current_user: User = Depends(get_current_user)
 ):
 
-    db = SessionLocal()
+    if data.transaction_type not in ("payable", "receivable"):
+        raise HTTPException(
+            status_code=400,
+            detail="transaction_type must be 'payable' or 'receivable'",
+        )
 
-    invoices = db.query(
-        Invoice
-    ).filter(
-        Invoice.user_id == current_user.id
-    ).all()
+    if data.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be greater than 0")
 
-    db.close()
-
-    return [
-
-        {
-
-            "vendor": i.vendor,
-
-            "due_date": i.due_date,
-
-            "amount": i.amount
-
-        }
-
-        for i in invoices
-
-    ]
-
-
-
-@app.post("/manual-expense")
-def add_manual_expense(
-    data: ManualExpenseRequest
-):
+    if not data.vendor or not data.vendor.strip():
+        raise HTTPException(status_code=400, detail="Vendor is required")
 
     db = SessionLocal()
 
     invoice = Invoice(
 
-    vendor=data.vendor,
+    vendor=data.vendor.strip(),
 
     amount=data.amount,
 
@@ -1117,26 +1244,35 @@ def add_manual_expense(
     due_date=data.due_date,
 
     transaction_type=
-        data.transaction_type
+        data.transaction_type,
+
+    user_id=current_user.id
 
 )
 
     db.add(invoice)
 
     db.commit()
+    db.refresh(invoice)
+
+    result = {
+        "id": invoice.id,
+        "vendor": invoice.vendor,
+        "amount": invoice.amount,
+        "due_date": invoice.due_date,
+        "category": invoice.category,
+        "transaction_type": invoice.transaction_type,
+    }
 
     db.close()
 
-    return {
-        "success": True
-    }
-
-
+    return result
 
 
 @app.get("/payment-plan")
 def payment_plan(
-    scenario_amount: float = 0
+    scenario_amount: float = 0,
+    current_user: User = Depends(get_current_user)
 ):
 
     db = SessionLocal()
@@ -1144,12 +1280,9 @@ def payment_plan(
     invoices = db.query(
         Invoice
     ).filter(
-        Invoice.transaction_type == "payable"
+        Invoice.transaction_type == "payable",
+        Invoice.user_id == current_user.id
     ).all()
-
-    from datetime import datetime
-
-    
 
     invoices.sort(
         key=priority_score,
@@ -1157,7 +1290,7 @@ def payment_plan(
     )
 
     remaining_balance = (
-        CURRENT_BALANCE -
+        current_user.current_balance -
         scenario_amount
     )
 
@@ -1227,8 +1360,15 @@ def payment_plan(
 
 @app.post("/ai-recommendation")
 def ai_recommendation(
-    data: ScenarioRequest
+    data: ScenarioRequest,
+    current_user: User = Depends(get_current_user)
 ):
+
+    if llm is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI features are not configured. Set GOOGLE_API_KEY on the server.",
+        )
 
     prompt = f"""
 You are an expert CFO.
@@ -1280,7 +1420,10 @@ Return only HTML.
 
 
 @app.post("/cfo-chat")
-def cfo_chat(data: ChatRequest):
+def cfo_chat(
+    data: ChatRequest,
+    current_user: User = Depends(get_current_user)
+):
 
     if llm is None:
 
@@ -1288,12 +1431,17 @@ def cfo_chat(data: ChatRequest):
             "error": "Gemini API key not configured."
         }
 
+    if not data.question or not data.question.strip():
+        raise HTTPException(status_code=400, detail="Question is required")
+
     from datetime import datetime, timedelta
 
     db = SessionLocal()
 
     invoices = db.query(
         Invoice
+    ).filter(
+        Invoice.user_id == current_user.id
     ).all()
 
     upcoming_bills = 0
@@ -1315,9 +1463,7 @@ def cfo_chat(data: ChatRequest):
 
             pass
 
-    global CURRENT_BALANCE
-
-    current_balance = CURRENT_BALANCE
+    current_balance = current_user.current_balance
 
     total_payables = sum(
         invoice.amount
@@ -1406,24 +1552,34 @@ def register(data: RegisterRequest):
 
         db.close()
 
-        return {
-            "message": "Email already exists"
-        }
+        raise HTTPException(
+            status_code=400,
+            detail="An account with this email already exists",
+        )
 
     user = User(
         name=data.name,
         email=data.email,
-        password=hash_password(data.password)
+        password=hash_password(data.password),
+        company_name=data.company_name,
     )
 
     db.add(user)
 
     db.commit()
+    db.refresh(user)
+
+    token = create_access_token(
+        {"email": user.email}
+    )
 
     db.close()
 
     return {
-        "message": "Registration successful"
+        "message": "Registration successful",
+        "access_token": token,
+        "token_type": "bearer",
+        "name": user.name,
     }
 
 @app.post("/login")
@@ -1472,16 +1628,197 @@ def me(
 
         "name": current_user.name,
 
-        "email": current_user.email
+        "email": current_user.email,
+
+        "company_name": current_user.company_name,
+
+        "current_balance": current_user.current_balance,
 
     }
-@app.get("/users")
-def get_users():
+
+
+class UpdateProfileRequest(BaseModel):
+    name: str | None = None
+    company_name: str | None = None
+
+
+@app.put("/me")
+def update_me(
+    data: UpdateProfileRequest,
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
-    users = db.query(User).all()
+    user = db.query(User).filter(User.id == current_user.id).first()
+
+    if data.name is not None:
+        if not data.name.strip():
+            db.close()
+            raise HTTPException(status_code=400, detail="Name cannot be empty")
+        user.name = data.name.strip()
+
+    if data.company_name is not None:
+        user.company_name = data.company_name.strip() or None
+
+    db.commit()
+    db.refresh(user)
+
+    result = {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "company_name": user.company_name,
+        "current_balance": user.current_balance,
+    }
 
     db.close()
 
-    return users
+    return result
+
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+    @field_validator("new_password")
+    @classmethod
+    def new_password_is_strong(cls, v):
+        if not v or len(v) < 8:
+            raise ValueError("Password must be at least 8 characters")
+        return v
+
+
+@app.post("/change-password")
+def change_password(
+    data: ChangePasswordRequest,
+    current_user: User = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(User.id == current_user.id).first()
+
+    if not verify_password(data.current_password, user.password):
+        db.close()
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+    user.password = hash_password(data.new_password)
+
+    db.commit()
+
+    db.close()
+
+    return {"message": "Password updated successfully"}
+
+
+@app.post("/forgot-password")
+def forgot_password(data: ForgotPasswordRequest):
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(User.email == data.email).first()
+
+    db.close()
+
+    # Always return the same generic response whether or not the email is
+    # registered, so this endpoint can't be used to enumerate accounts.
+    generic_response = {
+        "message": "If an account exists for that email, a password reset link has been sent."
+    }
+
+    if user is None:
+        return generic_response
+
+    reset_token = create_password_reset_token(user.email)
+    reset_link = f"{FRONTEND_URL}/screens/reset-password.html?token={reset_token}"
+
+    # No transactional email provider is configured for this project, so the
+    # reset link is logged server-side for local/dev use. Wire up a real
+    # email provider (SendGrid, SES, etc.) here before shipping to
+    # production — never return the token itself to the client.
+    print(f"[password reset] {user.email} -> {reset_link}")
+
+    return generic_response
+
+
+@app.post("/reset-password")
+def reset_password(data: ResetPasswordRequest):
+
+    credentials_exception = HTTPException(
+        status_code=400,
+        detail="This reset link is invalid or has expired. Please request a new one.",
+    )
+
+    try:
+        payload = jwt.decode(data.token, SECRET_KEY, algorithms=[ALGORITHM])
+    except JWTError:
+        raise credentials_exception
+
+    if payload.get("purpose") != "password_reset":
+        raise credentials_exception
+
+    email = payload.get("email")
+
+    if not email:
+        raise credentials_exception
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(User.email == email).first()
+
+    if user is None:
+        db.close()
+        raise credentials_exception
+
+    user.password = hash_password(data.new_password)
+
+    db.commit()
+    db.close()
+
+    return {"message": "Password reset successfully. You can now log in with your new password."}
+
+
+@app.post("/vendor-negotiation")
+def vendor_negotiation(
+    data: VendorNegotiationRequest,
+    current_user: User = Depends(get_current_user)
+):
+
+    if llm is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI features are not configured. Set GOOGLE_API_KEY on the server.",
+        )
+
+    if data.amount <= 0:
+        raise HTTPException(status_code=400, detail="Amount must be greater than 0")
+
+    goal_text = {
+        "extension": "requesting a payment extension",
+        "discount": "requesting an early-payment discount",
+        "installments": "requesting to split the payment into installments",
+    }.get(data.goal, "requesting a payment extension")
+
+    prompt = f"""
+You are CashPilot AI, an expert CFO assistant helping a business negotiate with a vendor.
+
+Vendor: {data.vendor}
+Amount Due: ₹{data.amount}
+Due Date: {data.due_date}
+Category: {data.category or "General"}
+Negotiation Goal: {goal_text}
+
+Write a short, professional email to this vendor {goal_text}, preserving the
+business relationship while protecting the company's liquidity. Be specific
+and courteous. Do not invent numbers beyond what's provided.
+
+Return ONLY the email body as plain text. No subject line, no markdown, no
+code blocks, no HTML tags.
+"""
+
+    response = llm.invoke(prompt)
+
+    return {
+        "message": response.content
+    }

@@ -257,6 +257,10 @@
 <span class="material-symbols-outlined" data-icon="help">help</span>
 <span class="font-label-md">Support</span>
 </a>
+<a class="flex items-center gap-3 px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high cursor-pointer" href="#" data-action="logout">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-label-md">Log Out</span>
+</a>
 </div>
 </aside>
 <!-- Main Content Canvas -->
@@ -275,6 +279,7 @@
 <span class="material-symbols-outlined" data-icon="add" style="font-size: 18px;">add</span>
                     New Document
                 </button>
+<div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-md" data-user-initials></div>
 </div>
 </header>
 <div class="p-lg max-w-container-max mx-auto space-y-lg">
@@ -621,7 +626,10 @@
 <span class="text-[10px] font-bold">Settings</span>
 </a>
 </nav>
+<script src="api.js"></script>
 <script>
+        CashPilot.initPage();
+
         // Simple Interaction logic
         document.querySelectorAll('select').forEach(sel => {
             sel.addEventListener('change', (e) => {
@@ -650,8 +658,8 @@
         async function loadSidebarStats() {
 
     const response =
-        await fetch(
-            "http://127.0.0.1:8000/dashboard"
+        await api(
+            "/dashboard"
         );
 
     const data =

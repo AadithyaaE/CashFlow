@@ -138,74 +138,49 @@
 </div>
 </div>
 <div class="flex items-center gap-md">
-<button class="hidden md:block px-md py-sm font-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95">Log In</button>
-<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md font-semibold hover:bg-primary-container transition-all cursor-pointer active:scale-95">Get Started</button>
+<a href="/screens/login.html" class="hidden md:block px-md py-sm font-label-md text-on-surface-variant hover:text-primary transition-colors cursor-pointer active:scale-95">Log In</a>
+<a href="/screens/signup.html" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md font-semibold hover:bg-primary-container transition-all cursor-pointer active:scale-95">Get Started</a>
 </div>
 </div>
 </nav>
 <main class="relative">
 <!-- Hero Section -->
-<div class="glass-card rounded-3xl p-10 shadow-2xl max-w-md mx-auto">
-
-    <h2 class="text-3xl font-bold mb-2">
-        Welcome Back
-    </h2>
-
-    <p class="text-on-surface-variant mb-8">
-        Sign in to continue to CashPilot AI
-    </p>
-
-    <form id="loginForm" class="space-y-5">
-
-        <div>
-            <label class="block mb-2 font-medium">
-                Email
-            </label>
-
-            <input
-                id="email"
-                type="text"
-                class="w-full rounded-xl border border-outline-variant px-4 py-3"
-                placeholder="Enter your email"
-            >
-        </div>
-
-        <div>
-            <label class="block mb-2 font-medium">
-                Password
-            </label>
-
-            <input
-                id="password"
-                type="password"
-                class="w-full rounded-xl border border-outline-variant px-4 py-3"
-                placeholder="Enter your password"
-            >
-        </div>
-
-        <button
-            type="submit"
-            class="w-full bg-primary text-white py-3 rounded-xl font-bold">
-
-            Sign In
-
-        </button>
-
-        <button
-            type="button"
-            id="registerBtn"
-            class="w-full border border-outline py-3 rounded-xl">
-
-            Create Account
-
-        </button>
-
-    </form>
-
+<section class="hero-gradient py-2xl">
+<div class="max-w-container-max mx-auto px-lg grid grid-cols-1 lg:grid-cols-2 gap-xl items-center py-xl">
+<div>
+<div class="inline-flex items-center gap-sm bg-primary-fixed/40 text-primary px-md py-xs rounded-full w-fit mb-lg font-label-md">
+<span class="material-symbols-outlined text-[16px]">bolt</span>
+Your AI CFO, on call 24/7
 </div>
-<!-- Decorative Elements -->
-<div class="absolute -top-6 -right-6 w-32 h-32 bg-primary-fixed/40 rounded-full blur-3xl -z-0"></div>
-<div class="absolute -bottom-10 -left-10 w-48 h-48 bg-tertiary-fixed/30 rounded-full blur-3xl -z-0"></div>
+<h1 class="font-headline-xl text-headline-xl text-on-surface mb-lg">Smarter cash flow decisions, powered by AI</h1>
+<p class="font-body-lg text-on-surface-variant mb-xl max-w-lg">Upload invoices, track payables and receivables, and let CashPilot AI predict shortages, prioritize payments, and recommend your next move — before cash gets tight.</p>
+<div class="flex flex-col sm:flex-row gap-md">
+<a href="/screens/signup.html" class="inline-flex items-center justify-center bg-primary text-on-primary px-xl py-lg rounded-xl font-headline-md hover:bg-primary/90 transition-all">Start Free Trial</a>
+<a href="/screens/login.html" class="inline-flex items-center justify-center bg-white text-primary border border-primary/20 px-xl py-lg rounded-xl font-headline-md hover:bg-surface-container-low transition-all">Log In</a>
+</div>
+<p class="mt-lg text-on-surface-variant font-label-md">No credit card required. Free to get started.</p>
+</div>
+<div class="relative">
+<div class="glass-card rounded-3xl p-xl shadow-2xl">
+<div class="flex items-center justify-between mb-lg">
+<span class="font-label-md text-on-surface-variant">Cash Position</span>
+<span class="text-xs font-mono-data text-primary bg-primary/10 px-sm py-xs rounded-full">Live</span>
+</div>
+<p class="font-headline-lg text-headline-lg text-on-surface mb-xs">₹4,82,000</p>
+<p class="font-body-sm text-on-surface-variant mb-lg">Current balance · 47 day runway</p>
+<div class="grid grid-cols-2 gap-md">
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/30">
+<p class="text-xs text-on-surface-variant mb-xs">Payables</p>
+<p class="font-headline-md text-on-surface">₹1,20,400</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/30">
+<p class="text-xs text-on-surface-variant mb-xs">Receivables</p>
+<p class="font-headline-md text-on-surface">₹2,05,000</p>
+</div>
+</div>
+</div>
+<div class="absolute -top-6 -right-6 w-32 h-32 bg-primary-fixed/40 rounded-full blur-3xl -z-10"></div>
+<div class="absolute -bottom-10 -left-10 w-48 h-48 bg-tertiary-fixed/30 rounded-full blur-3xl -z-10"></div>
 </div>
 </div>
 </section>
@@ -316,8 +291,8 @@
 <h2 class="font-headline-lg text-on-surface mb-md">Ready to Pilot Your Growth?</h2>
 <p class="font-body-lg text-on-surface-variant mb-xl">Join thousands of businesses who have mastered their cash flow with AI.</p>
 <div class="flex flex-col sm:flex-row gap-md justify-center">
-<button class="bg-primary text-on-primary px-xl py-lg rounded-xl font-headline-md hover:bg-primary/90 transition-all">Create Free Account</button>
-<button class="bg-white text-primary border border-primary/20 px-xl py-lg rounded-xl font-headline-md hover:bg-surface-container-low transition-all">Schedule a Call</button>
+<a href="/screens/signup.html" class="inline-flex items-center justify-center bg-primary text-on-primary px-xl py-lg rounded-xl font-headline-md hover:bg-primary/90 transition-all">Create Free Account</a>
+<a href="/screens/login.html" class="inline-flex items-center justify-center bg-white text-primary border border-primary/20 px-xl py-lg rounded-xl font-headline-md hover:bg-surface-container-low transition-all">Log In Instead</a>
 </div>
 <p class="mt-lg text-on-surface-variant font-label-md">No credit card required. 14-day full trial.</p>
 </div>
@@ -408,122 +383,10 @@
             }
         });
     </script>
-<div data-page-switcher>
-<div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
-<a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
-</div>
-</div>
-...
-<!-- All your HTML -->
-
+<script src="api.js"></script>
 <script>
-
-document
-.getElementById("loginForm")
-.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    const response = await fetch(
-        "http://127.0.0.1:8000/login",
-        {
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                email: document.getElementById("email").value,
-
-                password: document.getElementById("password").value
-
-            })
-
-        }
-    );
-
-    const data = await response.json();
-
-    if (response.ok) {
-
-        localStorage.setItem(
-            "token",
-            data.access_token
-        );
-
-        localStorage.setItem(
-            "user",
-            data.name
-        );
-
-        window.location.href =
-            "/screens/dashboard.html";
-
-    }
-
-    else {
-
-        alert(data.detail);
-
-    }
-
-});
-document
-.getElementById("registerBtn")
-.addEventListener("click", async () => {
-
-    const name = prompt("Enter your full name");
-
-    if (!name) return;
-
-    const email = document
-        .getElementById("email")
-        .value
-        .trim();
-
-    const password = document
-        .getElementById("password")
-        .value;
-
-    if (!email || !password) {
-
-        alert("Please enter an email and password first.");
-
-        return;
-    }
-
-    const response = await fetch(
-        "http://127.0.0.1:8000/register",
-        {
-
-            method: "POST",
-
-            headers: {
-                "Content-Type": "application/json"
-            },
-
-            body: JSON.stringify({
-
-                name: name,
-
-                email: email,
-
-                password: password
-
-            })
-
-        }
-    );
-
-    const data = await response.json();
-
-    alert(data.message);
-
-});
-
+    // If a session token already exists, skip the marketing page.
+    CashPilot.redirectIfLoggedIn();
 </script>
-
 </body>
 </html>

@@ -187,6 +187,10 @@
             <span class="material-symbols-outlined">help</span>
             Support
         </a>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 cursor-pointer" href="#" data-action="logout">
+            <span class="material-symbols-outlined">logout</span>
+            Log Out
+        </a>
     </div>
 </aside>
 
@@ -200,9 +204,7 @@
             <button class="p-sm text-on-surface-variant hover:text-primary transition-colors">
                 <span class="material-symbols-outlined">notifications</span>
             </button>
-            <div class="h-10 w-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold">
-                JS
-            </div>
+            <div class="h-10 w-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold" data-user-initials></div>
         </div>
     </header>
 
@@ -505,6 +507,8 @@
 
 
 <script>
+    CashPilot.initPage();
+
     // Animate Health Score Gauge
     window.addEventListener('load', () => {
         const circle = document.querySelector('.gauge-ring');
@@ -613,6 +617,7 @@
     async function loadSidebarStats() {
         try {
             const response = await api("/dashboard");
+            const data = await response.json();
 
             const balance = document.getElementById("sidebarBalance");
             const runway = document.getElementById("sidebarRunway");

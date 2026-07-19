@@ -48,6 +48,8 @@ class Invoice(Base):
 
     description = Column(String, nullable=True)
 
+    paid_at = Column(String, nullable=True)
+
 class ManualExpenseRequest(
     BaseModel
 ):

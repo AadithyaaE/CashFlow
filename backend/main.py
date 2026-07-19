@@ -1,5 +1,6 @@
 import os
 import re
+import json
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, UploadFile, File
@@ -230,7 +231,7 @@ with engine.connect() as _conn:
         _conn.execute(_text("ALTER TABLE invoices ADD COLUMN is_paid BOOLEAN DEFAULT 0"))
         _conn.commit()
 
-    for _col in ("invoice_number", "invoice_date", "gst", "payment_terms", "description"):
+    for _col in ("invoice_number", "invoice_date", "gst", "payment_terms", "description", "paid_at"):
         if _col not in _existing_invoice_cols:
             _conn.execute(_text(f"ALTER TABLE invoices ADD COLUMN {_col} VARCHAR"))
             _conn.commit()
@@ -354,13 +355,19 @@ else:
     print("WARNING: Gemini API key not found. AI features disabled.")
 
 _cors_origins_env = os.getenv("CORS_ORIGINS", "")
-CORS_ORIGINS = [o.strip() for o in _cors_origins_env.split(",") if o.strip()] or [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
+CORS_ORIGINS = [
     "http://localhost:8080",
+    "http://localhost:8081",
+    "http://localhost:8082",
+    "http://localhost:8083",
+    "http://localhost:8084",
+    "http://localhost:8085",
     "http://127.0.0.1:8080",
+    "http://127.0.0.1:8081",
+    "http://127.0.0.1:8082",
+    "http://127.0.0.1:8083",
+    "http://127.0.0.1:8084",
+    "http://127.0.0.1:8085",
 ]
 
 app.add_middleware(
@@ -610,7 +617,9 @@ def get_invoices(
 
             "payment_terms": invoice.payment_terms,
 
-            "description": invoice.description
+            "description": invoice.description,
+
+            "paid_at": invoice.paid_at
 
         })
 
@@ -655,6 +664,114 @@ def analytics(
         "categories": categories
 
     }
+
+
+@app.get("/analytics-insights")
+def analytics_insights(
+    current_user: User = Depends(get_current_user)
+):
+    """AI-generated financial insights and recommendations, computed from
+    the same invoice + balance data every other analytics endpoint reads —
+    the client never sends numbers here, so the summary can't be spoofed.
+    """
+
+    if llm is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI features are not configured. Set GOOGLE_API_KEY on the server.",
+        )
+
+    db = SessionLocal()
+
+    invoices = db.query(Invoice).filter(
+        Invoice.user_id == current_user.id
+    ).all()
+
+    db.close()
+
+    if not invoices:
+        return {
+            "key_insight": "No data yet.",
+            "risks": [],
+            "recommendations": [
+                "Upload or add a few invoices and check back — insights need at least some payables and receivables to work with.",
+            ],
+        }
+
+    total_income = sum(i.amount for i in invoices if i.transaction_type == "receivable")
+    total_expenses = sum(i.amount for i in invoices if i.transaction_type == "payable")
+
+    paid = [i for i in invoices if i.is_paid]
+    unpaid = [i for i in invoices if not i.is_paid]
+
+    today = datetime.today()
+    overdue = []
+    for i in unpaid:
+        try:
+            if datetime.strptime(i.due_date, "%d-%m-%Y") < today:
+                overdue.append(i)
+        except (TypeError, ValueError):
+            pass
+
+    vendor_totals = {}
+    for i in invoices:
+        if i.transaction_type == "payable":
+            vendor_totals[i.vendor] = vendor_totals.get(i.vendor, 0) + i.amount
+    top_vendors = sorted(vendor_totals.items(), key=lambda kv: kv[1], reverse=True)[:5]
+
+    monthly_burn = total_expenses
+    if monthly_burn > 0:
+        runway_days = round((current_user.current_balance / monthly_burn) * 30)
+    else:
+        runway_days = 365
+
+    summary = f"""
+Current Balance: INR {current_user.current_balance}
+Cash Runway: {runway_days} days
+Total Income (receivables): INR {total_income}
+Total Expenses (payables): INR {total_expenses}
+Net Cash Flow: INR {total_income - total_expenses}
+Paid Invoices: {len(paid)}
+Outstanding Invoices: {len(unpaid)}
+Overdue Invoices: {len(overdue)} totaling INR {sum(i.amount for i in overdue)}
+Top Vendors by Spend: {", ".join(f"{v} (INR {round(a)})" for v, a in top_vendors) or "None"}
+"""
+
+    prompt = f"""
+You are CashPilot AI, an expert CFO assistant. Analyze this business's real
+financial data and produce a short, actionable briefing.
+
+{summary}
+
+Return ONLY a single valid JSON object with exactly these keys:
+- "key_insight": one sentence, the single most important takeaway
+- "risks": an array of 1-3 short strings, real risks visible in the data above
+- "recommendations": an array of 2-4 short strings, concrete next actions
+
+Be specific and reference the actual numbers above. No markdown, no code
+fences, no extra text outside the JSON object. Do not invent data beyond
+what was given.
+"""
+
+    response = llm.invoke(prompt)
+    raw = (response.content or "").strip()
+
+    match = re.search(r"```(?:json)?\s*(\{.*\})\s*```", raw, re.DOTALL)
+    if not match:
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+    json_text = match.group(1) if (match and match.lastindex) else (match.group(0) if match else raw)
+
+    try:
+        parsed = json.loads(json_text)
+    except (json.JSONDecodeError, TypeError):
+        raise HTTPException(status_code=502, detail="AI insights could not be generated. Please try again.")
+
+    return {
+        "key_insight": str(parsed.get("key_insight") or ""),
+        "risks": [str(r) for r in (parsed.get("risks") or [])],
+        "recommendations": [str(r) for r in (parsed.get("recommendations") or [])],
+    }
+
 
 @app.delete("/invoice/{invoice_id}")
 def delete_invoice(
@@ -744,6 +861,15 @@ def update_invoice(
     if "category" in update_data and update_data["category"] is not None:
         update_data["category"] = update_data["category"].strip()
 
+    # Track when an invoice was marked paid so payment-delay analytics can
+    # compare paid_at against due_date. Only stamp it on the transition to
+    # paid; clear it if the user un-marks the invoice as paid.
+    if "is_paid" in update_data:
+        if update_data["is_paid"] and not invoice.is_paid:
+            invoice.paid_at = datetime.today().strftime("%d-%m-%Y")
+        elif not update_data["is_paid"]:
+            invoice.paid_at = None
+
     for field, value in update_data.items():
         if value is not None:
             setattr(invoice, field, value)
@@ -759,6 +885,7 @@ def update_invoice(
         "category": invoice.category,
         "transaction_type": invoice.transaction_type,
         "is_paid": bool(invoice.is_paid),
+        "paid_at": invoice.paid_at,
     }
 
     db.close()

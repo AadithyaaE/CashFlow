@@ -1,7 +1,7 @@
 // Shared API client + session/UI helpers used by every screen in public/screens/*.html.
 // Loaded via <script src="api.js"></script> before each page's own inline script.
 
-const API_URL = window.__CASHPILOT_API_URL__ || "http://127.0.0.1:8000";
+    const API_URL = window.__CASHPILOT_API_URL__ || "http://127.0.0.1:8000";
 
 // Session token lives in localStorage when "Remember me" was checked
 // (persists across browser restarts) or sessionStorage otherwise (cleared

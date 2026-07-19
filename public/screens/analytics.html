@@ -118,6 +118,11 @@
             backdrop-filter: blur(12px);
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
+        @media print {
+            aside, header, footer, nav, .no-print { display: none !important; }
+            main { margin-left: 0 !important; }
+            body { background: #fff !important; }
+        }
     </style>
 </head>
 <body class="bg-background text-on-surface font-body-md selection:bg-primary-fixed/30 overflow-x-hidden">
@@ -237,12 +242,12 @@
 
         <h4 id="sidebarBalance"
             class="font-headline-md text-primary font-bold mt-xs">
-            ₹75,000
+            <span class="inline-block h-5 w-16 rounded bg-primary-fixed/40 animate-pulse"></span>
         </h4>
 
         <p id="sidebarRunway"
            class="text-xs text-on-surface-variant mt-xs">
-           18 days runway
+           Loading…
         </p>
 
     </div>
@@ -266,332 +271,280 @@
 <!-- Main Content Canvas -->
 <main class="md:ml-64 min-h-screen">
 <!-- Header -->
-<header class="h-16 flex items-center justify-between px-lg sticky top-0 bg-surface/80 backdrop-blur-md z-30 border-b border-outline-variant">
+<header class="flex flex-col gap-md md:flex-row md:h-16 md:items-center md:justify-between px-lg py-md sticky top-0 bg-surface/80 backdrop-blur-md z-30 border-b border-outline-variant no-print">
 <div>
 <h2 class="font-headline-md text-headline-md text-on-surface">Analytics &amp; Insights</h2>
+<p id="rangeSubtitle" class="text-body-sm text-on-surface-variant">Last 30 days</p>
 </div>
-<div class="flex items-center gap-md">
-<div class="hidden sm:flex items-center bg-surface-container-low px-md py-xs rounded-full border border-outline-variant">
-<span class="material-symbols-outlined text-on-surface-variant text-[20px]" data-icon="calendar_today">calendar_today</span>
-<span class="text-body-sm text-on-surface-variant ml-sm">Last 30 Days</span>
+<div class="flex flex-wrap items-center gap-sm">
+
+<div class="flex bg-surface-container-low p-1 rounded-lg border border-outline-variant/30" id="rangeButtons">
+<button data-range="7" class="range-btn px-md py-xs rounded-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">7D</button>
+<button data-range="30" class="range-btn px-md py-xs rounded-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">30D</button>
+<button data-range="90" class="range-btn px-md py-xs rounded-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">90D</button>
+<button data-range="365" class="range-btn px-md py-xs rounded-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">1Y</button>
+<button data-range="custom" class="range-btn px-md py-xs rounded-md text-label-md text-on-surface-variant hover:text-on-surface transition-colors">Custom</button>
 </div>
-<button class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all flex items-center gap-xs">
-<span class="material-symbols-outlined" data-icon="add" style="font-size: 18px;">add</span>
-                    New Document
-                </button>
+
+<div id="customRangeInputs" class="hidden items-center gap-xs">
+<input type="date" id="customFrom" class="text-xs border border-outline-variant rounded-lg px-sm py-xs bg-surface-container-lowest">
+<span class="text-on-surface-variant text-xs">to</span>
+<input type="date" id="customTo" class="text-xs border border-outline-variant rounded-lg px-sm py-xs bg-surface-container-lowest">
+<button id="applyCustomRange" class="text-xs px-sm py-xs bg-primary text-on-primary rounded-lg font-semibold">Go</button>
+</div>
+
+<div class="relative">
+<button id="exportMenuBtn" class="px-md py-xs border border-outline-variant rounded-lg font-label-md flex items-center gap-xs hover:bg-surface-container-low transition-colors bg-surface-container-lowest">
+<span class="material-symbols-outlined text-[18px]">download</span>
+Export
+</button>
+<div id="exportMenu" class="hidden absolute right-0 mt-xs w-40 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg z-40 overflow-hidden">
+<button id="exportCsvBtn" class="w-full text-left px-md py-sm text-body-sm hover:bg-surface-container-low transition-colors">Export CSV</button>
+<button id="exportPdfBtn" class="w-full text-left px-md py-sm text-body-sm hover:bg-surface-container-low transition-colors">Export PDF</button>
+</div>
+</div>
+
+<a href="/screens/invoices.html" class="bg-primary text-on-primary px-lg py-sm rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all flex items-center gap-xs">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+New Document
+</a>
 <div class="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-label-md" data-user-initials></div>
 </div>
 </header>
-<div class="p-lg max-w-container-max mx-auto space-y-lg">
-<!-- Bento Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
-<div class="col-span-1 md:col-span-2 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm relative overflow-hidden group">
-<div class="relative z-10 flex justify-between">
-<div>
-<p class="text-on-surface-variant font-label-md mb-xs">Net Cash Flow</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">$142,500.00</h3>
-<div class="flex items-center gap-xs text-primary mt-sm">
-<span class="material-symbols-outlined text-[18px]" data-icon="trending_up">trending_up</span>
-<span class="text-body-sm font-semibold">12.5% increase vs last month</span>
+
+<div id="analyticsErrorBanner" class="hidden mx-lg mt-lg p-md bg-error-container text-on-error-container rounded-xl text-sm flex items-center gap-sm no-print">
+<span class="material-symbols-outlined text-[20px]">error</span>
+<span id="analyticsErrorText">Something went wrong loading analytics.</span>
 </div>
+
+<div id="analyticsContent" class="p-lg max-w-container-max mx-auto space-y-lg">
+
+<!-- KPI Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-gutter">
+
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between mb-xs">
+<p class="text-on-surface-variant font-label-md">Total Income</p>
+<span class="material-symbols-outlined text-primary text-[20px]">trending_up</span>
 </div>
-<div class="h-12 w-12 rounded-full bg-primary-fixed/20 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<h3 id="kpiIncome" class="text-headline-md font-headline-md text-on-surface"><span class="inline-block h-6 w-24 rounded bg-surface-container-high animate-pulse"></span></h3>
+<p id="kpiIncomeSub" class="text-xs text-on-surface-variant mt-xs">&nbsp;</p>
 </div>
+
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between mb-xs">
+<p class="text-on-surface-variant font-label-md">Total Expenses</p>
+<span class="material-symbols-outlined text-error text-[20px]">trending_down</span>
 </div>
-<!-- Sparkline Visualization -->
-<div class="mt-lg h-16 w-full flex items-end gap-[2px]">
-<div class="bg-primary/20 w-full h-[40%] rounded-t-sm group-hover:h-[55%] transition-all"></div>
-<div class="bg-primary/20 w-full h-[30%] rounded-t-sm group-hover:h-[45%] transition-all"></div>
-<div class="bg-primary/20 w-full h-[50%] rounded-t-sm group-hover:h-[65%] transition-all"></div>
-<div class="bg-primary/20 w-full h-[45%] rounded-t-sm group-hover:h-[60%] transition-all"></div>
-<div class="bg-primary/20 w-full h-[70%] rounded-t-sm group-hover:h-[85%] transition-all"></div>
-<div class="bg-primary w-full h-[90%] rounded-t-sm"></div>
+<h3 id="kpiExpenses" class="text-headline-md font-headline-md text-on-surface"><span class="inline-block h-6 w-24 rounded bg-surface-container-high animate-pulse"></span></h3>
+<p id="kpiExpensesSub" class="text-xs text-on-surface-variant mt-xs">&nbsp;</p>
 </div>
+
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between mb-xs">
+<p class="text-on-surface-variant font-label-md">Net Cash Flow</p>
+<span class="material-symbols-outlined text-[20px]" id="kpiNetIcon">payments</span>
 </div>
-<div class="col-span-1 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
-<p class="text-on-surface-variant font-label-md mb-xs">Days Sales Outstanding</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">32</h3>
-<div class="flex items-center gap-xs text-error mt-sm">
-<span class="material-symbols-outlined text-[18px]" data-icon="arrow_upward">arrow_upward</span>
-<span class="text-body-sm font-semibold">+4 days vs average</span>
+<h3 id="kpiNet" class="text-headline-md font-headline-md text-on-surface"><span class="inline-block h-6 w-24 rounded bg-surface-container-high animate-pulse"></span></h3>
+<p id="kpiNetSub" class="text-xs text-on-surface-variant mt-xs">&nbsp;</p>
 </div>
+
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between mb-xs">
+<p class="text-on-surface-variant font-label-md">Outstanding</p>
+<span class="material-symbols-outlined text-secondary text-[20px]">hourglass_top</span>
 </div>
-<div class="col-span-1 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
-<p class="text-on-surface-variant font-label-md mb-xs">Forecasted Runway</p>
-<h3 class="text-headline-lg font-headline-lg text-on-surface">18 Mo</h3>
-<div class="flex items-center gap-xs text-on-surface-variant mt-sm">
-<span class="material-symbols-outlined text-[18px]" data-icon="check_circle">check_circle</span>
-<span class="text-body-sm font-semibold">Health: Strong</span>
+<h3 id="kpiOutstanding" class="text-headline-md font-headline-md text-on-surface"><span class="inline-block h-6 w-24 rounded bg-surface-container-high animate-pulse"></span></h3>
+<p id="kpiOutstandingSub" class="text-xs text-on-surface-variant mt-xs">&nbsp;</p>
 </div>
+
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between mb-xs">
+<p class="text-on-surface-variant font-label-md">Paid Invoices</p>
+<span class="material-symbols-outlined text-emerald-600 text-[20px]">check_circle</span>
 </div>
+<h3 id="kpiPaid" class="text-headline-md font-headline-md text-on-surface"><span class="inline-block h-6 w-24 rounded bg-surface-container-high animate-pulse"></span></h3>
+<p id="kpiPaidSub" class="text-xs text-on-surface-variant mt-xs">&nbsp;</p>
 </div>
-<!-- Main Charts Row -->
+
+</div>
+
+<!-- Charts Row 1: Cash Flow Trend + Expense Categories -->
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
-<!-- Monthly Cash Flow -->
 <div class="lg:col-span-2 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
 <div class="flex justify-between items-start mb-lg">
 <div>
-<h4 class="font-headline-md text-headline-md text-on-surface">Monthly Cash Flow</h4>
-<p class="text-on-surface-variant text-body-sm">Inflow vs Outflow analysis</p>
-</div>
-<div class="flex gap-md">
-<div class="flex items-center gap-xs">
-<div class="w-2 h-2 rounded-full bg-primary"></div>
-<span class="text-body-sm text-on-surface-variant">Inflow</span>
-</div>
-<div class="flex items-center gap-xs">
-<div class="w-2 h-2 rounded-full bg-secondary-fixed"></div>
-<span class="text-body-sm text-on-surface-variant">Outflow</span>
+<h4 class="font-headline-md text-headline-md text-on-surface">Cash Flow Trend</h4>
+<p class="text-on-surface-variant text-body-sm">Net cash flow over the selected period</p>
 </div>
 </div>
-</div>
-<div class="h-64 flex items-end gap-md pt-lg relative">
-<!-- Y-Axis labels -->
-<div class="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-on-surface-variant/50 pointer-events-none">
-<span>$200k</span><span>$150k</span><span>$100k</span><span>$50k</span><span>0</span>
-</div>
-<!-- Grid lines -->
-<div class="absolute inset-0 flex flex-col justify-between pt-lg pb-1 pointer-events-none opacity-20">
-<div class="border-b border-outline"></div><div class="border-b border-outline"></div><div class="border-b border-outline"></div><div class="border-b border-outline"></div><div class="border-b border-outline-variant"></div>
-</div>
-<!-- Columns -->
-<div class="flex-1 flex flex-col justify-end items-center gap-1 h-full z-10">
-<div class="w-full bg-primary/20 rounded-t h-[40%] group relative">
-<div class="absolute -top-8 left-1/2 -translate-x-1/2 bg-on-surface text-surface text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity">$45k</div>
-</div>
-<div class="w-full bg-primary rounded-t h-[65%]"></div>
-<span class="text-[11px] text-on-surface-variant mt-2">Jan</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center gap-1 h-full z-10">
-<div class="w-full bg-primary/20 rounded-t h-[35%]"></div>
-<div class="w-full bg-primary rounded-t h-[70%]"></div>
-<span class="text-[11px] text-on-surface-variant mt-2">Feb</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center gap-1 h-full z-10">
-<div class="w-full bg-primary/20 rounded-t h-[50%]"></div>
-<div class="w-full bg-primary rounded-t h-[60%]"></div>
-<span class="text-[11px] text-on-surface-variant mt-2">Mar</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center gap-1 h-full z-10">
-<div class="w-full bg-primary/20 rounded-t h-[45%]"></div>
-<div class="w-full bg-primary rounded-t h-[80%]"></div>
-<span class="text-[11px] text-on-surface-variant mt-2">Apr</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center gap-1 h-full z-10">
-<div class="w-full bg-primary/20 rounded-t h-[60%]"></div>
-<div class="w-full bg-primary rounded-t h-[85%]"></div>
-<span class="text-[11px] text-on-surface-variant mt-2">May</span>
-</div>
-<div class="flex-1 flex flex-col justify-end items-center gap-1 h-full z-10">
-<div class="w-full bg-primary/20 rounded-t h-[55%]"></div>
-<div class="w-full bg-primary rounded-t h-[95%]"></div>
-<span class="text-[11px] text-on-surface-variant mt-2">Jun</span>
+<div class="h-64 relative">
+<p id="trendEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-center text-sm text-on-surface-variant px-lg">No invoices with due dates in this range yet.</p>
+<canvas id="chartCashFlowTrend"></canvas>
 </div>
 </div>
-</div>
-<!-- Expense Pie Chart -->
+
 <div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col">
 <h4 class="font-headline-md text-headline-md text-on-surface mb-xs">Expense Categories</h4>
-<p class="text-on-surface-variant text-body-sm mb-lg">Top 5 spending areas</p>
-<div class="relative w-48 h-48 mx-auto my-auto">
-<!-- Simulated SVG Pie Chart -->
-<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
-<circle cx="50" cy="50" fill="transparent" r="40" stroke="#4648d4" stroke-dasharray="125 251" stroke-width="20"></circle>
-<circle cx="50" cy="50" fill="transparent" r="40" stroke="#6063ee" stroke-dasharray="60 251" stroke-dashoffset="-125" stroke-width="20"></circle>
-<circle cx="50" cy="50" fill="transparent" r="40" stroke="#dae2fd" stroke-dasharray="40 251" stroke-dashoffset="-185" stroke-width="20"></circle>
-<circle cx="50" cy="50" fill="transparent" r="40" stroke="#bec6e0" stroke-dasharray="26 251" stroke-dashoffset="-225" stroke-width="20"></circle>
-</svg>
+<p class="text-on-surface-variant text-body-sm mb-lg">Spend by category, this range</p>
+<div class="relative h-40 w-40 mx-auto my-md">
+<p id="categoryEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-center text-xs text-on-surface-variant px-md">No expenses yet.</p>
+<canvas id="chartExpenseCategories"></canvas>
 </div>
-<div class="mt-lg space-y-sm">
-<div class="flex justify-between items-center">
-<div class="flex items-center gap-xs">
-<div class="w-2 h-2 rounded-full bg-primary"></div>
-<span class="text-body-sm text-on-surface">Payroll &amp; HR</span>
-</div>
-<span class="font-mono-data text-body-sm font-semibold">48%</span>
-</div>
-<div class="flex justify-between items-center">
-<div class="flex items-center gap-xs">
-<div class="w-2 h-2 rounded-full bg-primary-container"></div>
-<span class="text-body-sm text-on-surface">Marketing</span>
-</div>
-<span class="font-mono-data text-body-sm font-semibold">22%</span>
-</div>
-<div class="flex justify-between items-center">
-<div class="flex items-center gap-xs">
-<div class="w-2 h-2 rounded-full bg-secondary-container"></div>
-<span class="text-body-sm text-on-surface">Cloud Services</span>
-</div>
-<span class="font-mono-data text-body-sm font-semibold">18%</span>
+<div id="categoryLegend" class="mt-lg space-y-sm text-sm"></div>
 </div>
 </div>
+
+<!-- Charts Row 2: Income vs Expenses + Invoice Status -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-gutter">
+<div class="lg:col-span-2 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex justify-between items-start mb-lg">
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Income vs Expenses</h4>
+<p class="text-on-surface-variant text-body-sm">Grouped by period</p>
+</div>
+<div class="flex gap-md">
+<div class="flex items-center gap-xs"><div class="w-2 h-2 rounded-full bg-primary"></div><span class="text-body-sm text-on-surface-variant">Income</span></div>
+<div class="flex items-center gap-xs"><div class="w-2 h-2 rounded-full bg-error"></div><span class="text-body-sm text-on-surface-variant">Expenses</span></div>
 </div>
 </div>
-<!-- Bottom Row: Liquidity & Negotiation Tool -->
-<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
-<!-- Liquidity Trend (4 columns) -->
-<div class="lg:col-span-4 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm h-full flex flex-col">
-<h4 class="font-headline-md text-headline-md text-on-surface mb-xs">Liquidity Trend</h4>
-<p class="text-on-surface-variant text-body-sm mb-lg">Available liquid assets forecast</p>
-<div class="flex-1 relative mt-xl">
-<!-- Curved Line Mockup using borders -->
-<div class="absolute inset-0 border-b border-outline-variant opacity-20 flex flex-col justify-between">
-<div class="border-b border-outline-variant h-0"></div>
-<div class="border-b border-outline-variant h-0"></div>
-<div class="border-b border-outline-variant h-0"></div>
-</div>
-<svg class="w-full h-full overflow-visible" viewbox="0 0 200 100">
-<path d="M0,80 Q40,75 80,40 T160,20 T200,10" fill="none" stroke="#4648d4" stroke-width="3"></path>
-<circle cx="80" cy="40" fill="#4648d4" r="4"></circle>
-<text fill="#4648d4" font-family="Geist" font-size="8" font-weight="bold" x="85" y="35">Current Point</text>
-</svg>
-<div class="flex justify-between mt-md">
-<span class="text-[10px] text-on-surface-variant">Last Month</span>
-<span class="text-[10px] text-on-surface-variant">Forecast Next 30D</span>
+<div class="h-64 relative">
+<p id="barEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-center text-sm text-on-surface-variant px-lg">No data in this range yet.</p>
+<canvas id="chartIncomeExpenses"></canvas>
 </div>
 </div>
+
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col">
+<h4 class="font-headline-md text-headline-md text-on-surface mb-xs">Invoice Status</h4>
+<p class="text-on-surface-variant text-body-sm mb-lg">Paid, pending, due soon, overdue</p>
+<div class="relative h-40 w-40 mx-auto my-md">
+<p id="statusEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-center text-xs text-on-surface-variant px-md">No invoices yet.</p>
+<canvas id="chartInvoiceStatus"></canvas>
 </div>
-<!-- Vendor Negotiation Assistant (8 columns) -->
-<div class="lg:col-span-8 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div id="statusLegend" class="mt-lg space-y-sm text-sm"></div>
+</div>
+</div>
+
+<!-- AI Insights -->
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
 <div class="flex items-center justify-between mb-lg">
 <div class="flex items-center gap-md">
 <div class="h-10 w-10 rounded bg-primary-container/20 flex items-center justify-center text-primary">
-<span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
+<span class="material-symbols-outlined">psychology</span>
 </div>
 <div>
-<h4 class="font-headline-md text-headline-md text-on-surface">Vendor Negotiation Assistant</h4>
-<p class="text-on-surface-variant text-body-sm">AI-powered payment extension requests</p>
+<h4 class="font-headline-md text-headline-md text-on-surface">AI Financial Insights</h4>
+<p class="text-on-surface-variant text-body-sm">Generated from your real invoice and balance data</p>
 </div>
 </div>
-<div class="hidden sm:block">
-<span class="inline-flex items-center gap-1 px-2 py-1 bg-tertiary-fixed text-on-tertiary-fixed rounded text-xs font-bold">
-<span class="material-symbols-outlined text-[14px]" data-icon="verified">verified</span>
-                                AI SUGGESTED
-                            </span>
+<button id="generateInsightsBtn" class="px-lg py-sm bg-primary text-on-primary rounded-lg font-label-md font-bold disabled:opacity-60 disabled:cursor-not-allowed">Generate Insights</button>
+</div>
+<div id="insightsBody">
+<p class="text-body-sm text-on-surface-variant">Click "Generate Insights" to get an AI-powered summary of your cash position, risks, and recommended next steps.</p>
 </div>
 </div>
-<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
-<!-- Selector -->
-<div class="space-y-md">
-<div class="p-md bg-surface-container-low rounded-lg border border-outline-variant">
-<label class="text-label-md text-on-surface-variant block mb-sm">Select Pending Invoice</label>
-<select class="w-full bg-surface-container-lowest border border-outline-variant rounded-md py-sm px-md text-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all">
-<option>INV-2024-082 (AWS Cloud) - $12,450.00</option>
-<option>INV-2024-091 (G&amp;S Supplies) - $4,200.00</option>
-<option>INV-2024-115 (Stripe Fees) - $2,840.00</option>
-</select>
-</div>
-<div class="p-md bg-surface-container-low rounded-lg border border-outline-variant">
-<label class="text-label-md text-on-surface-variant block mb-sm">Desired Extension</label>
-<div class="flex gap-sm">
-<button class="flex-1 py-sm bg-surface-container-highest rounded border border-primary text-primary font-bold text-body-sm">15 Days</button>
-<button class="flex-1 py-sm bg-surface-container-lowest rounded border border-outline-variant text-on-surface-variant text-body-sm hover:border-primary">30 Days</button>
-</div>
-</div>
-<div class="p-md bg-primary-fixed/10 border border-primary-fixed rounded-lg">
-<p class="text-body-sm text-on-primary-fixed-variant leading-relaxed">
-<span class="font-bold">AI Strategy:</span> Based on your 18-month relationship with AWS, we recommend a "Professional Relationship" tone emphasizing upcoming funding cycles.
-                                </p>
-</div>
-</div>
-<!-- Email Preview -->
-<div class="flex flex-col h-full">
-<div class="flex-1 flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
-<div class="bg-surface-container-high px-md py-sm border-b border-outline-variant flex justify-between items-center">
-<span class="text-label-md font-bold text-on-surface">Email Draft</span>
-<span class="material-symbols-outlined text-on-surface-variant text-[18px]" data-icon="edit">edit</span>
-</div>
-<div class="p-md flex-1 overflow-y-auto max-h-[200px]">
-<div class="text-body-sm text-on-surface leading-relaxed focus:outline-none" contenteditable="true">
-                                        Subject: Extension Request for INV-2024-082<br/><br/>
-                                        Dear AWS Billing Team,<br/><br/>
-                                        We are writing regarding invoice INV-2024-082. As a long-term partner, we've valued our collaboration. We're currently optimizing our Q3 cash cycles and would like to request a 15-day extension for this payment.<br/><br/>
-                                        We appreciate your flexibility and look forward to continuing our partnership.<br/><br/>
-                                        Best regards,<br/>
-                                        CashPilot Finance Team
-                                    </div>
-</div>
-<div class="p-md bg-surface-container-lowest border-t border-outline-variant flex gap-sm">
-<button class="flex-1 flex items-center justify-center gap-sm py-sm border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container-low transition-all">
-<span class="material-symbols-outlined text-[18px]" data-icon="content_copy">content_copy</span>
-<span class="text-label-md">Copy</span>
-</button>
-<button class="flex-1 flex items-center justify-center gap-sm py-sm bg-primary text-on-primary rounded-lg font-bold hover:opacity-90 active:scale-95 transition-all">
-<span class="material-symbols-outlined text-[18px]" data-icon="send">send</span>
-<span class="text-label-md">Send Now</span>
-</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- Detailed Invoices Table (Ramp Style) -->
-<div class="bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden">
+
+<!-- Vendor Analytics + Invoice Analytics -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-stretch">
+
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm overflow-hidden flex flex-col">
 <div class="px-lg py-md border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
-<h4 class="font-label-md font-bold text-on-surface">Upcoming Payables</h4>
-<button class="text-primary text-body-sm font-semibold hover:underline">View All</button>
+<h4 class="font-label-md font-bold text-on-surface">Top Vendors</h4>
+<span class="text-on-surface-variant text-xs">By total spend, this range</span>
 </div>
-<div class="overflow-x-auto">
+<div class="overflow-x-auto flex-1">
 <table class="w-full text-left border-collapse">
 <thead>
 <tr class="bg-surface-container-low border-b border-outline-variant">
 <th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Vendor</th>
-<th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Due Date</th>
-<th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Amount</th>
-<th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px]">Status</th>
-<th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px] text-right">Action</th>
+<th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px] text-right">Invoices</th>
+<th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px] text-right">Total Spend</th>
+<th class="px-lg py-sm font-label-md text-on-surface-variant uppercase tracking-wider text-[11px] text-right">Overdue</th>
 </tr>
 </thead>
-<tbody class="divide-y divide-outline-variant">
-<tr class="hover:bg-surface-container-lowest transition-colors group">
-<td class="px-lg py-md">
-<div class="flex items-center gap-sm">
-<div class="h-8 w-8 rounded bg-surface-dim flex items-center justify-center overflow-hidden">
-<img alt="AWS" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDK8tmCEkLT4AQYAOYKxd9eaiALE6EBCHCl7FsGdRkEvbmhOZaHBQICAJ3YH-n8Rjkr0Rh9FgPMcsbgYBxChr2ZjO-XMb_MK6OGeajPrZ80X3z7iyGuM4kTALJFWNcYJdQh3eyqUFHYUOXmXIcgOQmCH2NJ1s6ObHbBQmeDnPc7pP4es-HG776uNInuxeZabfaDIbwQfM56jZ9hXfq9KE-bQKsZTlq-DNBuIHCOWcgKbGcA2jZ4pKRvLk3ywLx6m7kPFhwIyfTYnXWK"/>
-</div>
-<span class="text-body-sm font-semibold text-on-surface">Amazon Web Services</span>
-</div>
-</td>
-<td class="px-lg py-md font-mono-data text-body-sm">Oct 24, 2024</td>
-<td class="px-lg py-md font-mono-data text-body-sm font-bold">$12,450.00</td>
-<td class="px-lg py-md">
-<span class="px-2 py-1 rounded-full bg-error-container text-on-error-container text-[11px] font-bold">DUE SOON</span>
-</td>
-<td class="px-lg py-md text-right">
-<button class="text-primary text-label-md font-bold group-hover:underline">Negotiate</button>
-</td>
-</tr>
-<tr class="hover:bg-surface-container-lowest transition-colors group">
-<td class="px-lg py-md">
-<div class="flex items-center gap-sm">
-<div class="h-8 w-8 rounded bg-surface-dim flex items-center justify-center overflow-hidden">
-<img alt="G&amp;S" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa2lZCBWeqA6pZVpqT-_XfjkjTbfThv6uQjki703lr5NFaGjN4HGHlrpRGj3tLi59_vOFir0WaExFvePQZBALPy67j6smANj0Q8Feuzb9IoOTDunRT8JPZ2duuVcOyYX6he2AtELls6NN9Fyfl8Fy9y52PvzdhIeltYhTwfS_XvTFeHZxMHUUdIOzRp6hG_HFX1SQ7CHnghY1W0f9cbV4-rG8Efp_7GiHIX8VTtQPcStFzdZ_gF8fOF3Cwx_U8xV_LmR4DzoGSh-2d"/>
-</div>
-<span class="text-body-sm font-semibold text-on-surface">G&amp;S Logistics</span>
-</div>
-</td>
-<td class="px-lg py-md font-mono-data text-body-sm">Oct 28, 2024</td>
-<td class="px-lg py-md font-mono-data text-body-sm font-bold">$4,200.00</td>
-<td class="px-lg py-md">
-<span class="px-2 py-1 rounded-full bg-secondary-container text-on-secondary-container text-[11px] font-bold">PENDING</span>
-</td>
-<td class="px-lg py-md text-right">
-<button class="text-primary text-label-md font-bold group-hover:underline">Schedule</button>
-</td>
-</tr>
+<tbody id="vendorTableBody" class="divide-y divide-outline-variant">
+<tr><td colspan="4" class="px-lg py-xl text-center text-on-surface-variant">Loading…</td></tr>
 </tbody>
 </table>
 </div>
 </div>
+
+<div class="lg:col-span-4 bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm flex flex-col gap-lg">
+<h4 class="font-label-md font-bold text-on-surface">Invoice Analytics</h4>
+<div>
+<p class="text-on-surface-variant font-label-md mb-xs">Average Invoice Value</p>
+<p id="avgInvoiceValue" class="text-headline-md font-headline-md text-on-surface">--</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-md mb-xs">Average Payment Delay</p>
+<p id="avgPaymentDelay" class="text-headline-md font-headline-md text-on-surface">--</p>
+<p id="avgPaymentDelaySub" class="text-xs text-on-surface-variant mt-xs">&nbsp;</p>
+</div>
+<div>
+<p class="text-on-surface-variant font-label-md mb-xs">Paid vs Unpaid</p>
+<p id="paidVsUnpaid" class="text-body-md text-on-surface">--</p>
+</div>
+</div>
+
+</div>
+
+<!-- Vendor Negotiation Assistant -->
+<div class="bg-surface-container-lowest p-lg rounded-xl border border-outline-variant shadow-sm">
+<div class="flex items-center justify-between mb-lg">
+<div class="flex items-center gap-md">
+<div class="h-10 w-10 rounded bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">smart_toy</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md text-on-surface">Vendor Negotiation Assistant</h4>
+<p class="text-on-surface-variant text-body-sm">AI-drafted payment extension / discount requests</p>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<div class="space-y-md">
+<div class="p-md bg-surface-container-low rounded-lg border border-outline-variant">
+<label class="text-label-md text-on-surface-variant block mb-sm">Select Unpaid Invoice</label>
+<select id="negotiationInvoiceSelect" class="w-full bg-surface-container-lowest border border-outline-variant rounded-md py-sm px-md text-body-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+<option value="">No unpaid payables yet</option>
+</select>
+</div>
+<div class="p-md bg-surface-container-low rounded-lg border border-outline-variant">
+<label class="text-label-md text-on-surface-variant block mb-sm">Negotiation Goal</label>
+<div class="flex gap-sm" id="negotiationGoalButtons">
+<button data-goal="extension" class="goal-btn flex-1 py-sm bg-surface-container-highest rounded border border-primary text-primary font-bold text-body-sm">Extension</button>
+<button data-goal="discount" class="goal-btn flex-1 py-sm bg-surface-container-lowest rounded border border-outline-variant text-on-surface-variant text-body-sm hover:border-primary">Discount</button>
+<button data-goal="installments" class="goal-btn flex-1 py-sm bg-surface-container-lowest rounded border border-outline-variant text-on-surface-variant text-body-sm hover:border-primary">Installments</button>
+</div>
+</div>
+<button id="generateDraftBtn" class="w-full py-md bg-primary text-on-primary rounded-lg font-label-md font-bold disabled:opacity-60 disabled:cursor-not-allowed">Generate Draft</button>
+</div>
+<div class="flex flex-col h-full">
+<div class="flex-1 flex flex-col bg-surface-container-lowest border border-outline-variant rounded-lg overflow-hidden">
+<div class="bg-surface-container-high px-md py-sm border-b border-outline-variant flex justify-between items-center">
+<span class="text-label-md font-bold text-on-surface">Email Draft</span>
+</div>
+<div class="p-md flex-1 overflow-y-auto max-h-[200px]">
+<div id="negotiationDraft" class="text-body-sm text-on-surface leading-relaxed whitespace-pre-line">Select an invoice and click "Generate Draft" to get an AI-written email.</div>
+</div>
+<div class="p-md bg-surface-container-lowest border-t border-outline-variant flex gap-sm">
+<button id="copyDraftBtn" class="flex-1 flex items-center justify-center gap-sm py-sm border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-[18px]">content_copy</span>
+<span class="text-label-md">Copy</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
 </div>
 <!-- Footer -->
-<footer class="w-full py-xl border-t border-outline-variant bg-surface-container-lowest mt-xl">
+<footer class="w-full py-xl border-t border-outline-variant bg-surface-container-lowest mt-xl no-print">
 <div class="max-w-container-max mx-auto px-lg flex flex-col md:flex-row justify-between items-center gap-lg">
 <div class="flex flex-col items-center md:items-start">
 <span class="font-headline-sm text-headline-sm font-bold text-on-surface">CashPilot AI</span>
-<p class="text-on-surface-variant text-body-sm mt-xs">© 2024 CashPilot AI. All rights reserved.</p>
+<p class="text-on-surface-variant text-body-sm mt-xs">© 2026 CashPilot AI. All rights reserved.</p>
 </div>
 <div class="flex gap-lg">
 <a class="text-on-surface-variant text-body-sm hover:text-primary underline transition-all" href="#">Privacy Policy</a>
@@ -603,21 +556,21 @@
 </footer>
 </main>
 <!-- Mobile Nav Anchor -->
-<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-outline-variant px-md py-sm flex justify-around items-center z-50">
-<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-outline-variant px-md py-sm flex justify-around items-center z-50 no-print">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/dashboard.html">
 <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
 <span class="text-[10px] font-bold">Home</span>
 </a>
-<a class="flex flex-col items-center gap-1 text-primary" href="#">
+<a class="flex flex-col items-center gap-1 text-primary" href="/screens/analytics.html">
 <span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
 <span class="text-[10px] font-bold">Analytics</span>
 </a>
 <div class="relative -top-6">
-<button class="h-14 w-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center">
+<a href="/screens/invoices.html" class="h-14 w-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center">
 <span class="material-symbols-outlined" data-icon="add">add</span>
-</button>
+</a>
 </div>
-<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/runway.html">
 <span class="material-symbols-outlined" data-icon="smart_toy">smart_toy</span>
 <span class="text-[10px] font-bold">CFO</span>
 </a>
@@ -626,70 +579,13 @@
 <span class="text-[10px] font-bold">Settings</span>
 </a>
 </nav>
-<script src="api.js"></script>
-<script>
-        CashPilot.initPage();
-
-        // Simple Interaction logic
-        document.querySelectorAll('select').forEach(sel => {
-            sel.addEventListener('change', (e) => {
-                const vendor = e.target.value.split(' ')[2];
-                const amount = e.target.value.split(' - ')[1];
-                const draft = document.querySelector('[contenteditable="true"]');
-                draft.innerHTML = `Subject: Extension Request for ${e.target.value.split(' ')[0]}<br><br>
-                                    Dear ${vendor} Billing Team,<br><br>
-                                    We are writing regarding invoice ${e.target.value.split(' ')[0]} for ${amount}. As a long-term partner, we've valued our collaboration. We're currently optimizing our Q3 cash cycles and would like to request a 15-day extension for this payment.<br><br>
-                                    We appreciate your flexibility and look forward to continuing our partnership.<br><br>
-                                    Best regards,<br>
-                                    CashPilot Finance Team`;
-            });
-        });
-
-        // Copy button toast simulation
-        document.querySelector('button:has(.material-symbols-outlined[data-icon="content_copy"])').addEventListener('click', function() {
-            const originalText = this.querySelector('span:not(.material-symbols-outlined)').innerText;
-            this.querySelector('span:not(.material-symbols-outlined)').innerText = 'Copied!';
-            setTimeout(() => {
-                this.querySelector('span:not(.material-symbols-outlined)').innerText = originalText;
-            }, 2000);
-        });
-
-
-        async function loadSidebarStats() {
-
-    const response =
-        await api(
-            "/dashboard"
-        );
-
-    const data =
-        await response.json();
-
-    const balance =
-        document.getElementById(
-            "sidebarBalance"
-        );
-
-    const runway =
-        document.getElementById(
-            "sidebarRunway"
-        );
-
-    if (balance) {
-        balance.innerText =
-            `₹${data.current_balance.toLocaleString()}`;
-    }
-
-    if (runway) {
-        runway.innerText =
-            `${Math.ceil(data.cash_runway)} days runway`;
-    }
-}
-
-loadSidebarStats();
-    </script>
 <div data-page-switcher>
 <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
 <a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
 </div>
-</div></body></html>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="api.js"></script>
+<script src="analytics.js"></script>
+</body></html>

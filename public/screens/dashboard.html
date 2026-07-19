@@ -128,10 +128,10 @@
         <h1 class="font-headline-sm text-headline-sm font-black text-primary">CashPilot AI</h1>
         <p class="font-label-md text-label-md text-on-surface-variant">Small Business Mode</p>
     </div>
-    <button class="w-full mb-lg flex items-center justify-center gap-sm bg-primary text-on-primary py-md rounded-xl font-label-md shadow-md hover:bg-primary-container transition-all active:scale-95">
+    <a href="/screens/invoices.html" class="w-full mb-lg flex items-center justify-center gap-sm bg-primary text-on-primary py-md rounded-xl font-label-md shadow-md hover:bg-primary-container transition-all active:scale-95">
         <span class="material-symbols-outlined">add</span>
         New Document
-    </button>
+    </a>
     <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
         <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/dashboard.html">
             <span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
@@ -153,17 +153,17 @@
             <span class="font-label-md">Analytics</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
             <span class="material-symbols-outlined group-hover:text-primary transition-colors">psychology</span>
             <span class="font-label-md">AI Recommendations</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
             <span class="material-symbols-outlined group-hover:text-primary transition-colors">priority_high</span>
             <span class="font-label-md">Payment Priorities</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
             <span class="material-symbols-outlined group-hover:text-primary transition-colors">forum</span>
             <span class="font-label-md">Vendor Negotiator</span>
         </a>
@@ -171,11 +171,11 @@
         <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
             <p class="text-xs text-on-surface-variant">Current Cash Position</p>
             <div class="mt-sm flex flex-col gap-sm">
-                <h4 id="sidebarBalance" class="font-headline-md text-primary font-bold">₹75,000</h4>
-                <input id="sidebarBalanceInput" type="number" placeholder="Enter balance" class="px-sm py-xs border border-outline-variant rounded-lg text-sm bg-surface-container-lowest">
+                <h4 id="sidebarBalance" class="font-headline-md text-primary font-bold"><span class="inline-block h-5 w-16 rounded bg-primary-fixed/40 animate-pulse"></span></h4>
+                <input id="sidebarBalanceInput" type="number" min="0" step="0.01" placeholder="Enter balance" class="px-sm py-xs border border-outline-variant rounded-lg text-sm bg-surface-container-lowest">
                 <button onclick="updateBalance()" class="px-sm py-xs bg-primary text-on-primary rounded-lg text-sm font-semibold">Update Balance</button>
             </div>
-            <p id="sidebarRunway" class="text-xs text-on-surface-variant mt-xs">18 days runway</p>
+            <p id="sidebarRunway" class="text-xs text-on-surface-variant mt-xs">Loading…</p>
         </div>
     </nav>
     <div class="pt-lg border-t border-outline-variant space-y-xs">
@@ -198,11 +198,15 @@
     <header class="flex justify-between items-center mb-xl">
         <div>
             <h2 class="font-headline-lg text-headline-lg text-on-surface">Financial Overview</h2>
-            <p class="text-on-surface-variant font-body-md">Last synchronized: 12 minutes ago</p>
+            <p id="lastSynced" class="text-on-surface-variant font-body-md">Loading…</p>
         </div>
         <div class="flex items-center gap-md">
-            <button class="p-sm text-on-surface-variant hover:text-primary transition-colors">
+            <button id="refreshBtn" class="p-sm text-on-surface-variant hover:text-primary transition-colors" title="Refresh dashboard" aria-label="Refresh dashboard">
+                <span class="material-symbols-outlined">refresh</span>
+            </button>
+            <button id="notificationsBtn" class="p-sm text-on-surface-variant hover:text-primary transition-colors relative" title="View alerts" aria-label="View alerts">
                 <span class="material-symbols-outlined">notifications</span>
+                <span id="alertBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-error border-2 border-surface-container-lowest"></span>
             </button>
             <div class="h-10 w-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold" data-user-initials></div>
         </div>
@@ -216,11 +220,11 @@
                         <span class="text-on-surface-variant font-label-md">Current Balance</span>
                         <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
                     </div>
-                    <div id="currentBalance" class="font-headline-md text-headline-md text-on-surface">₹75,000</div>
+                    <div id="currentBalance" class="font-headline-md text-headline-md text-on-surface"><span class="inline-block h-7 w-24 rounded bg-surface-container-high animate-pulse"></span></div>
                 </div>
-                <div class="mt-base flex items-center text-sm font-medium text-primary">
-                    <span class="material-symbols-outlined text-sm">trending_up</span>
-                    <span class="ml-1">+12.5% from last month</span>
+                <div id="balanceFooter" class="mt-base flex items-center text-sm font-medium text-on-surface-variant">
+                    <span class="material-symbols-outlined text-sm">schedule</span>
+                    <span class="ml-1">Calculating runway…</span>
                 </div>
             </div>
 
@@ -230,9 +234,9 @@
                         <span class="text-on-surface-variant font-label-md">Total Payables</span>
                         <span class="material-symbols-outlined text-error">payments</span>
                     </div>
-                    <div id="totalPayables" class="font-headline-md text-headline-md text-on-surface">₹0</div>
+                    <div id="totalPayables" class="font-headline-md text-headline-md text-on-surface"><span class="inline-block h-7 w-24 rounded bg-surface-container-high animate-pulse"></span></div>
                 </div>
-                <div class="mt-base text-on-surface-variant text-sm">Due in 15 days</div>
+                <div id="payablesFooter" class="mt-base text-on-surface-variant text-sm">Loading…</div>
             </div>
 
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
@@ -241,9 +245,9 @@
                         <span class="text-on-surface-variant font-label-md">Total Receivables</span>
                         <span class="material-symbols-outlined text-tertiary">request_quote</span>
                     </div>
-                    <div id="totalReceivables" class="font-headline-md text-headline-md text-on-surface">₹0</div>
+                    <div id="totalReceivables" class="font-headline-md text-headline-md text-on-surface"><span class="inline-block h-7 w-24 rounded bg-surface-container-high animate-pulse"></span></div>
                 </div>
-                <div class="mt-base text-on-surface-variant text-sm">₹12,000 overdue</div>
+                <div id="receivablesFooter" class="mt-base text-on-surface-variant text-sm">Loading…</div>
             </div>
         </div>
 
@@ -256,29 +260,25 @@
                             <p class="text-sm text-on-surface-variant mt-1">Track income, expenses and net cashflow over time</p>
                         </div>
                         <div class="flex bg-surface-container-low p-1 rounded-lg border border-outline-variant/30 self-stretch sm:self-auto justify-center">
-                            <button class="px-md py-xs rounded-md bg-white shadow-sm text-label-md font-bold text-on-surface">Cash Flow</button>
-                            <button class="px-md py-xs rounded-md text-on-surface-variant text-label-md hover:text-on-surface transition-colors">Projection</button>
+                            <button id="cashFlowTabBtn" class="px-md py-xs rounded-md bg-white shadow-sm text-label-md font-bold text-on-surface">Cash Flow</button>
+                            <button id="projectionTabBtn" class="px-md py-xs rounded-md text-on-surface-variant text-label-md hover:text-on-surface transition-colors">Projection</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Current Balance</p>
-                            <p id="overviewBalance" class="text-xl font-bold text-on-surface mt-1">₹75,000</p>
+                            <p id="overviewBalance" class="text-xl font-bold text-on-surface mt-1"><span class="inline-block h-5 w-16 rounded bg-surface-container-high animate-pulse"></span></p>
                         </div>
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Cash Runway</p>
-                            <p id="cashRunway" class="text-xl font-bold text-on-surface mt-1">18 Days</p>
+                            <p id="cashRunway" class="text-xl font-bold text-on-surface mt-1"><span class="inline-block h-5 w-16 rounded bg-surface-container-high animate-pulse"></span></p>
                         </div>
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Upcoming Bills</p>
                             <p
     id="upcomingBills"
-    class="text-xl font-bold text-on-surface mt-1">
-
-    ₹0
-
-</p>
+    class="text-xl font-bold text-on-surface mt-1"><span class="inline-block h-5 w-16 rounded bg-surface-container-high animate-pulse"></span></p>
                         </div>
                         <div class="bg-surface-container p-4 rounded-xl">
                             <p class="text-xs font-medium text-on-surface-variant">Safety Threshold</p>
@@ -287,7 +287,8 @@
                     </div>
                 </div>
 
-                <div class="h-80 w-full mt-auto">
+                <div class="h-80 w-full mt-auto relative">
+                    <p id="liquidityEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-center text-sm text-on-surface-variant px-lg">Upload or add invoices to see your projected cash flow here.</p>
                     <canvas id="liquidityChart"></canvas>
                 </div>
             </div>
@@ -306,38 +307,34 @@
                                 <circle cx="80" cy="80" r="70" fill="transparent" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="79.2" class="text-primary gauge-ring"></circle>
                             </svg>
                             <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span class="text-4xl font-extrabold text-on-surface tracking-tight">82</span>
-                                <span class="text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full mt-1">Optimal</span>
+                                <span id="healthScoreValue" class="text-4xl font-extrabold text-on-surface tracking-tight">--</span>
+                                <span id="healthScoreLabel" class="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full mt-1">Loading…</span>
                             </div>
                         </div>
                     </div>
 
-                    <p class="text-center text-sm text-on-surface-variant leading-relaxed">
-                        Your financial health is strong. Improving your A/R turnover could boost this to 90+.
+                    <p id="healthScoreDescription" class="text-center text-sm text-on-surface-variant leading-relaxed">
+                        Calculating your financial health from live cash flow data…
                     </p>
                 </div>
 
                 <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between flex-1">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-sm font-bold text-on-surface tracking-tight">Spending Breakdown</h3>
-                        <span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-md">This Month</span>
+                        <span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-md">By Category</span>
                     </div>
 
                     <div class="relative h-40 w-full my-auto flex items-center justify-center">
-                        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-1">
+                        <div id="expenseTotalWrap" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none mt-1">
                             <span class="text-[10px] text-on-surface-variant uppercase font-semibold tracking-wider">Total Spent</span>
-                            <span class="text-xl font-black text-on-surface tracking-tight mt-0.5">₹56,700</span>
+                            <span id="expenseChartTotal" class="text-xl font-black text-on-surface tracking-tight mt-0.5">₹0</span>
                         </div>
                         <canvas id="expenseChart" class="z-10"></canvas>
+                        <p id="expenseEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-center text-xs text-on-surface-variant px-lg">No spending data yet.</p>
                     </div>
 
-                    <div class="pt-3 border-t border-outline-variant/60 grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs mt-2">
-                        <div class="flex items-center justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant truncate"><span class="w-2 h-2 rounded-full flex-shrink-0 bg-[#22C55E]"></span>Rent</span><span class="font-mono-data text-on-surface font-semibold">₹15k</span></div>
-                        <div class="flex items-center justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant truncate"><span class="w-2 h-2 rounded-full flex-shrink-0 bg-[#A3E635]"></span>Utils</span><span class="font-mono-data text-on-surface font-semibold">₹4.2k</span></div>
-                        <div class="flex items-center justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant truncate"><span class="w-2 h-2 rounded-full flex-shrink-0 bg-[#FBBF24]"></span>Net</span><span class="font-mono-data text-on-surface font-semibold">₹2.5k</span></div>
-                        <div class="flex items-center justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant truncate"><span class="w-2 h-2 rounded-full flex-shrink-0 bg-[#FB923C]"></span>Vendor</span><span class="font-mono-data text-on-surface font-semibold">₹12k</span></div>
-                        <div class="flex items-center justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant truncate"><span class="w-2 h-2 rounded-full flex-shrink-0 bg-[#EF4444]"></span>Salary</span><span class="font-mono-data text-on-surface font-semibold">₹18k</span></div>
-                        <div class="flex items-center justify-between"><span class="flex items-center gap-1.5 text-on-surface-variant truncate"><span class="w-2 h-2 rounded-full flex-shrink-0 bg-[#9CA3AF]"></span>Other</span><span class="font-mono-data text-on-surface font-semibold">₹5k</span></div>
+                    <div id="expenseLegend" class="pt-3 border-t border-outline-variant/60 grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs mt-2">
+                        <p class="col-span-2 text-on-surface-variant text-center py-sm">Loading categories…</p>
                     </div>
                 </div>
             </div>
@@ -345,46 +342,33 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-stretch">
             <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-lg">
-                <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between">
+                <div id="smartAlertsCard" class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between">
                     <div class="flex items-center gap-sm mb-lg">
                         <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
                         <h3 class="font-headline-md text-headline-md text-on-surface tracking-tight">Smart Alerts</h3>
                     </div>
-                    <div class="space-y-md my-auto">
-                        <div class="flex items-start gap-md p-md bg-error-container/30 rounded-lg border-l-4 border-error">
-                            <span class="material-symbols-outlined text-error mt-xs">priority_high</span>
-                            <div>
-                                <p class="font-bold text-on-error-container">Cash Warning</p>
-                                <p class="text-body-sm text-on-surface-variant">Cash balance may reach zero in 6 days if receivables are delayed.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start gap-md p-md bg-secondary-container/30 rounded-lg border-l-4 border-secondary">
-                            <span class="material-symbols-outlined text-secondary mt-xs">schedule</span>
-                            <div>
-                                <p class="font-bold text-on-secondary-container">Tax Deadline</p>
-                                <p class="text-body-sm text-on-surface-variant">GST filing due in 4 days. Estimated liability: ₹14,200.</p>
-                            </div>
-                        </div>
+                    <div id="smartAlertsList" class="space-y-md my-auto">
+                        <p class="text-center text-sm text-on-surface-variant py-md">Loading…</p>
                     </div>
                 </div>
-                
+
                 <div class="grid grid-rows-2 gap-lg">
                     <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex items-center justify-between">
                         <div>
                             <span class="text-on-surface-variant font-label-md">Cash Runway</span>
-                            <div id="cashRunwayWidget" class="font-headline-md text-headline-md text-error tracking-tight">18 Days</div>
+                            <div id="cashRunwayWidget" class="font-headline-md text-headline-md text-on-surface-variant tracking-tight">--</div>
                         </div>
-                        <div class="w-12 h-12 bg-error-container rounded-full flex items-center justify-center">
-                            <span class="material-symbols-outlined text-error">history</span>
+                        <div id="cashRunwayIconWrap" class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-on-surface-variant">history</span>
                         </div>
                     </div>
                     <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex items-center justify-between">
                         <div>
                             <span class="text-on-surface-variant font-label-md">Risk Score</span>
-                            <div class="font-headline-md text-headline-md text-secondary tracking-tight">Medium</div>
+                            <div id="riskScoreWidget" class="font-headline-md text-headline-md text-on-surface-variant tracking-tight">--</div>
                         </div>
-                        <div class="w-12 h-12 bg-secondary-container rounded-full flex items-center justify-center">
-                            <span class="material-symbols-outlined text-secondary">security</span>
+                        <div id="riskScoreIconWrap" class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center">
+                            <span class="material-symbols-outlined text-on-surface-variant">security</span>
                         </div>
                     </div>
                 </div>
@@ -401,29 +385,16 @@
                     </div>
                 </div>
                 <div class="flex-1 overflow-y-auto p-md space-y-md bg-surface-container-low/30">
-                    <div class="flex flex-col items-start max-w-[85%]">
+                    <div id="chatEmptyState" class="flex flex-col items-start max-w-[90%]">
                         <div class="bg-white border border-outline-variant p-sm rounded-xl rounded-tl-none shadow-xs text-xs text-on-surface leading-relaxed">
-                            Good morning! I've analyzed your upcoming vendor payments. Your **cash runway** is currently **18 days**.
+                            Ask me anything about your cash flow, payables, receivables, or runway — I'll answer using your live business data.
                         </div>
-                        <span class="text-[10px] text-on-surface-variant mt-xs px-1">CFO • 09:41 AM</span>
+                        <span class="text-[10px] text-on-surface-variant mt-xs px-1">CFO</span>
                     </div>
-                    <div class="flex flex-col items-end max-w-[85%] ml-auto">
-                        <div class="bg-primary text-on-primary p-sm rounded-xl rounded-tr-none shadow-xs text-xs leading-relaxed">
-                            What can I do to extend the runway by 10 days?
-                        </div>
-                        <span class="text-[10px] text-on-surface-variant mt-xs px-1">You • 09:42 AM</span>
-                    </div>
-                    <div class="flex flex-col items-start max-w-[85%]">
-                        <div class="bg-white border border-outline-variant p-sm rounded-xl rounded-tl-none shadow-xs text-xs text-on-surface leading-relaxed">
-                            By deferring the AWS payment (₹12,000) by 5 days and accelerating the invoice for "Digital Corp" (₹8,500), you can reach 29 days.
-                        </div>
-                        <span class="text-[10px] text-on-surface-variant mt-xs px-1">CFO • 09:43 AM</span>
+                    <div id="chatMessages" class="space-y-md">
                     </div>
                 </div>
               <div class="p-sm border-t border-outline-variant bg-white">
-
-    <div id="chatMessages" class="mb-md space-y-sm">
-    </div>
 
     <div class="relative">
 
@@ -457,7 +428,7 @@
     <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
             <div class="px-lg py-md border-b border-outline-variant flex justify-between items-center">
                 <h3 class="font-headline-md text-headline-md text-on-surface tracking-tight">Upcoming Obligations</h3>
-                <button class="text-primary font-label-md hover:underline">View Calendar</button>
+                <a href="/screens/invoices.html" class="text-primary font-label-md hover:underline">View All in Invoice Hub</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -488,9 +459,9 @@
     </footer>
 </main>
 
-<button class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 md:hidden">
+<a href="/screens/invoices.html" class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 md:hidden" title="Upload an invoice" aria-label="Upload an invoice">
     <span class="material-symbols-outlined">add</span>
-</button>
+</a>
 
 <div data-page-switcher>
     <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
@@ -509,266 +480,234 @@
 <script>
     CashPilot.initPage();
 
-    // Animate Health Score Gauge
+    // ==========================================
+    // SHARED STATE
+    // Every widget derives from these two fetches instead of each doing its
+    // own redundant /dashboard or /invoices call.
+    // ==========================================
+    let lastDashboard = null;
+    let lastInvoices = null;
+    let liquidityView = "cashflow"; // "cashflow" | "projection"
+    const CATEGORY_COLORS = ['#22C55E', '#A3E635', '#FBBF24', '#FB923C', '#EF4444', '#9CA3AF', '#3B82F6', '#8B5CF6'];
+    const SAFETY_THRESHOLD = 25000; // mirrors backend's payment-plan safety threshold
+
     window.addEventListener('load', () => {
-        const circle = document.querySelector('.gauge-ring');
-        if (circle) {
-            const score = 82;
-            const radius = 70;
-            const circumference = 2 * Math.PI * radius;
-            const offset = circumference - (score / 100) * circumference;
-
-            circle.style.strokeDasharray = `${circumference}`;
-            circle.style.strokeDashoffset = `${offset}`;
-        }
-
-        loadDashboard();
-        loadLiquidityChart();
-        loadExpenseChart();
-        loadSidebarStats();
-        loadUpcomingObligations();
+        refreshAll();
+        setInterval(refreshAll, 30000);
+        setInterval(updateLastSyncedLabel, 15000);
     });
 
-    // ==========================================
-    // CORE ASYNC DASHBOARD LOAD & POLLING ENGINE
-    // ==========================================
-   async function loadDashboard() {
+    document.getElementById("refreshBtn").addEventListener("click", () => refreshAll(true));
 
-    try {
+    document.getElementById("notificationsBtn").addEventListener("click", () => {
+        document.getElementById("smartAlertsCard").scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    document.getElementById("cashFlowTabBtn").addEventListener("click", () => setLiquidityView("cashflow"));
+    document.getElementById("projectionTabBtn").addEventListener("click", () => setLiquidityView("projection"));
+
+    function setLiquidityView(view) {
+        liquidityView = view;
+
+        const cashFlowBtn = document.getElementById("cashFlowTabBtn");
+        const projectionBtn = document.getElementById("projectionTabBtn");
+
+        cashFlowBtn.classList.toggle("bg-white", view === "cashflow");
+        cashFlowBtn.classList.toggle("shadow-sm", view === "cashflow");
+        cashFlowBtn.classList.toggle("font-bold", view === "cashflow");
+        cashFlowBtn.classList.toggle("text-on-surface", view === "cashflow");
+        cashFlowBtn.classList.toggle("text-on-surface-variant", view !== "cashflow");
+
+        projectionBtn.classList.toggle("bg-white", view === "projection");
+        projectionBtn.classList.toggle("shadow-sm", view === "projection");
+        projectionBtn.classList.toggle("font-bold", view === "projection");
+        projectionBtn.classList.toggle("text-on-surface", view === "projection");
+        projectionBtn.classList.toggle("text-on-surface-variant", view !== "projection");
+
+        renderLiquidityChart();
+    }
+
+    // ==========================================
+    // ORCHESTRATOR: one entry point drives every widget from two fetches
+    // ==========================================
+    async function refreshAll(manual) {
+
+        if (manual) CashPilot.toast("Refreshing dashboard…", "info", 1500);
+
+        const results = await Promise.allSettled([
+            loadDashboard(),
+            loadInvoices(),
+            loadExpenseChart(),
+        ]);
+
+        renderHealthAndRisk();
+        renderSmartAlerts();
+        renderLiquidityChart();
+
+        lastSyncedAt = new Date();
+        updateLastSyncedLabel();
+
+        if (results.some((r) => r.status === "rejected")) {
+            CashPilot.toast("Some dashboard data couldn't be refreshed. Showing the last known values.", "error");
+        }
+    }
+
+    let lastSyncedAt = null;
+
+    function updateLastSyncedLabel() {
+
+        const el = document.getElementById("lastSynced");
+        if (!el || !lastSyncedAt) return;
+
+        const seconds = Math.round((Date.now() - lastSyncedAt.getTime()) / 1000);
+
+        let label;
+        if (seconds < 10) label = "Last synchronized: just now";
+        else if (seconds < 60) label = `Last synchronized: ${seconds} seconds ago`;
+        else {
+            const minutes = Math.round(seconds / 60);
+            label = `Last synchronized: ${minutes} minute${minutes === 1 ? "" : "s"} ago`;
+        }
+
+        el.textContent = label;
+
+    }
+
+    // ==========================================
+    // CORE DASHBOARD METRICS (single /dashboard fetch feeds every card,
+    // the sidebar balance widget, and the health/risk/runway widgets)
+    // ==========================================
+    async function loadDashboard() {
 
         const response = await api("/dashboard");
+
         if (!response.ok) {
-            throw new Error("Unauthorized");
+            throw new Error("Could not load dashboard metrics");
         }
 
         const data = await response.json();
+        lastDashboard = data;
 
-        document.getElementById("upcomingBills").innerText =
-            `₹${data.total_payables.toLocaleString()}`;
+        const fmt = CashPilot.formatCurrency;
 
-        const currentBalance =
-            document.getElementById("currentBalance");
+        setText("currentBalance", fmt(data.current_balance));
+        setText("overviewBalance", fmt(data.current_balance));
+        setText("totalPayables", fmt(data.total_payables));
+        setText("totalReceivables", fmt(data.total_receivables || 0));
+        setText("cashRunway", `${data.cash_runway} Days`);
+        setText("cashRunwayWidget", `${data.cash_runway} Days`);
+        setText("upcomingBills", fmt(data.upcoming_bills || 0));
+        setText("sidebarBalance", fmt(data.current_balance));
+        setText("sidebarRunway", `${Math.ceil(data.cash_runway)} days runway`);
 
-        const totalPayables =
-            document.getElementById("totalPayables");
-
-        const totalReceivables =
-            document.getElementById("totalReceivables");
-
-        const overviewBalance =
-            document.getElementById("overviewBalance");
-
-        const cashRunway =
-            document.getElementById("cashRunway");
-
-        const cashRunwayWidget =
-            document.getElementById("cashRunwayWidget");
-
-        if (currentBalance)
-            currentBalance.innerText =
-                `₹${data.current_balance.toLocaleString()}`;
-
-        if (overviewBalance)
-            overviewBalance.innerText =
-                `₹${data.current_balance.toLocaleString()}`;
-
-        if (totalPayables)
-            totalPayables.innerText =
-                `₹${data.total_payables.toLocaleString()}`;
-
-        if (totalReceivables)
-            totalReceivables.innerText =
-                `₹${(data.total_receivables || 0).toLocaleString()}`;
-
-        if (cashRunway)
-            cashRunway.innerText =
-                `${data.cash_runway} Days`;
-
-        if (cashRunwayWidget)
-            cashRunwayWidget.innerText =
-                `${data.cash_runway} Days`;
-
-        console.log(
-            "Dashboard Updated Successfully",
-            data
-        );
-
-    }
-
-    catch (err) {
-
-        console.error(
-            "Dashboard metric sync error:",
-            err
-        );
-
-    }
-
-}
-
-    // Set polling intervals
-    setInterval(loadDashboard, 5000);
-    setInterval(loadSidebarStats, 5000);
-    setInterval(loadUpcomingObligations, 5000);
-
-    // ==========================
-    // SIDEBAR METRIC UPDATER
-    // ==========================
-    async function loadSidebarStats() {
-        try {
-            const response = await api("/dashboard");
-            const data = await response.json();
-
-            const balance = document.getElementById("sidebarBalance");
-            const runway = document.getElementById("sidebarRunway");
-
-            if (balance) balance.innerText = `₹${data.current_balance.toLocaleString()}`;
-            if (runway) runway.innerText = `${Math.ceil(data.cash_runway)} days runway`;
-        } catch (err) {
-            console.error("Sidebar runtime error:", err);
+        const balanceFooter = document.getElementById("balanceFooter");
+        if (balanceFooter) {
+            balanceFooter.innerHTML =
+                `<span class="material-symbols-outlined text-sm">schedule</span><span class="ml-1">${data.cash_runway} day cash runway</span>`;
         }
-    }
 
-    // ==========================
-    // CASHFLOW LINE CHART ENGINE
-    // ==========================
-    async function loadLiquidityChart() {
-        try {
-            const response = await api("/dashboard");
-            const dashboard = await response.json();
-            const balance =
-    dashboard.current_balance;
-
-const payables =
-    dashboard.total_payables;
-
-const income = [
-    balance * 0.60,
-    balance * 0.70,
-    balance * 0.75,
-    balance * 0.80
-];
-
-const expenses = [
-    payables * 0.25,
-    payables * 0.50,
-    payables * 0.75,
-    payables
-];
-
-const netCashflow =
-    income.map(
-        (value, index) =>
-            value - expenses[index]
-    );
-
-            const ctx = document.getElementById("liquidityChart");
-            if (!ctx) return;
-
-            console.log("Canvas:", ctx);
-            console.log("Chart:", typeof Chart);
-
-            new Chart(ctx, {
-                type: "line",
-                data: {
-                    labels: ["Q1", "Q2", "Q3", "Q4"],
-                    datasets: [
-                        { label: "Income", data: income, borderColor: "#22C55E", backgroundColor: "#22C55E", tension: 0.4 },
-                        { label: "Expenses", data: expenses, borderColor: "#EF4444", backgroundColor: "#EF4444", tension: 0.4 },
-                        { label: "Net Cashflow", data: netCashflow, borderColor: "#3B82F6", backgroundColor: "#3B82F6", tension: 0.4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'top', align: 'start' }
-                    }
-                }
-            });
-        } catch (err) {
-            console.error("Liquidity rendering matrix error:", err);
+        const payablesFooter = document.getElementById("payablesFooter");
+        if (payablesFooter) {
+            payablesFooter.textContent = `${fmt(data.upcoming_bills || 0)} due in the next 30 days`;
         }
-    }
 
-    // ============================
-    // SPENDING BREAKDOWN DONUT
-    // ============================
-    async function loadExpenseChart() {
-        try {
-            const response = await api("/analytics");
-            const analytics = await response.json();
-
-            const labels = Object.keys(analytics.categories);
-            const values = Object.values(analytics.categories);
-
-            const expenseCtx = document.getElementById("expenseChart");
-            if (!expenseCtx) return;
-
-            new Chart(expenseCtx, {
-                type: "doughnut",
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: values,
-                        backgroundColor: ['#22C55E', '#A3E635', '#FBBF24', '#FB923C', '#EF4444', '#9CA3AF', '#3B82F6', '#8B5CF6'],
-                        borderWidth: 4,
-                        borderColor: '#ffffff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '78%',
-                    plugins: { legend: { display: false } }
-                }
-            });
-        } catch (err) {
-            console.error("Expense mapping rendering error:", err);
+        const receivablesFooter = document.getElementById("receivablesFooter");
+        if (receivablesFooter && lastInvoices) {
+            const count = lastInvoices.filter((i) => i.transaction_type === "receivable").length;
+            receivablesFooter.textContent = count === 1 ? "1 receivable invoice" : `${count} receivable invoices`;
         }
+
+        return data;
+
     }
 
-    // ==================================
-    // UPCOMING OBLIGATIONS TABLE RENDERING
-    // ==================================
-    async function loadUpcomingObligations() {
-        try {
-            const response = await api("/invoices");
-            const invoices = await response.json();
+    function setText(id, text) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = text;
+    }
 
-            const table = document.getElementById("invoiceTable");
-            if (!table) return;
-            table.innerHTML = "";
+    // ==========================================
+    // INVOICES (feeds the obligations table, the liquidity chart, and
+    // smart alerts — replaces the old loadUpcomingObligations)
+    // ==========================================
+    async function loadInvoices() {
 
-            invoices.forEach(invoice => {
-                const today = new Date();
-                const dueDate = new Date(invoice.due_date);
-                let status = "Pending";
-                let statusClass = "bg-tertiary-container text-on-tertiary-container";
+        const response = await api("/invoices");
 
-                if (!isNaN(dueDate)) {
-                    const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-                    if (diffDays < 0) {
-                        status = "Overdue";
-                        statusClass = "bg-error-container text-on-error-container";
-                    } else if (diffDays <= 3) {
-                        status = "Due Soon";
-                        statusClass = "bg-secondary-container text-on-secondary-container";
-                    }
+        if (!response.ok) {
+            throw new Error("Could not load invoices");
+        }
+
+        const invoices = await response.json();
+        lastInvoices = invoices;
+
+        renderObligationsTable(invoices);
+
+        // Balance card's receivables footer depends on invoices too; refresh
+        // it here in case loadDashboard() already resolved first.
+        const receivablesFooter = document.getElementById("receivablesFooter");
+        if (receivablesFooter) {
+            const count = invoices.filter((i) => i.transaction_type === "receivable").length;
+            receivablesFooter.textContent = count === 1 ? "1 receivable invoice" : `${count} receivable invoices`;
+        }
+
+        return invoices;
+
+    }
+
+    function renderObligationsTable(invoices) {
+
+        const table = document.getElementById("invoiceTable");
+        if (!table) return;
+
+        if (!invoices.length) {
+            table.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-lg py-xl text-center text-on-surface-variant">
+                        No upcoming obligations — upload an invoice to get started.
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        table.innerHTML = invoices.map((invoice) => {
+
+            const dueDate = CashPilot.parseBackendDate(invoice.due_date);
+            let status = "Pending";
+            let statusClass = "bg-tertiary-container text-on-tertiary-container";
+
+            if (dueDate) {
+                const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                if (diffDays < 0) {
+                    status = "Overdue";
+                    statusClass = "bg-error-container text-on-error-container";
+                } else if (diffDays <= 3) {
+                    status = "Due Soon";
+                    statusClass = "bg-secondary-container text-on-secondary-container";
                 }
+            }
 
-                table.innerHTML += `
+            const vendor = CashPilot.escapeHtml(invoice.vendor || "");
+            const initial = CashPilot.escapeHtml(invoice.vendor ? invoice.vendor.charAt(0) : "V");
+            const category = CashPilot.escapeHtml(invoice.category || "");
+            const dueDateText = CashPilot.escapeHtml(invoice.due_date || "");
+
+            return `
                 <tr class="hover:bg-surface-container-low/50 transition-colors">
                     <td class="px-lg py-md flex items-center gap-md">
                         <div class="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-xs font-bold text-slate-700">
-                            ${invoice.vendor ? invoice.vendor.charAt(0) : 'V'}
+                            ${initial}
                         </div>
-                        <span class="font-medium text-on-surface">${invoice.vendor || ''}</span>
+                        <span class="font-medium text-on-surface">${vendor}</span>
                     </td>
-                    <td class="px-lg py-md text-on-surface-variant">${invoice.category || ''}</td>
-                    <td class="px-lg py-md text-on-surface-variant">${invoice.due_date || ''}</td>
+                    <td class="px-lg py-md text-on-surface-variant">${category}</td>
+                    <td class="px-lg py-md text-on-surface-variant">${dueDateText}</td>
                     <td class="px-lg py-md text-right font-mono-data text-on-surface">
-                        ₹${Number(invoice.amount).toLocaleString()}
+                        ${CashPilot.formatCurrency(invoice.amount)}
                     </td>
                     <td class="px-lg py-md text-center">
                         <span class="${statusClass} px-sm py-xs rounded-full text-xs font-bold">
@@ -776,172 +715,490 @@ const netCashflow =
                         </span>
                     </td>
                 </tr>
-                `;
-            });
-        } catch (err) {
-            console.error("Obligations table populate exception:", err);
-        }
+            `;
+
+        }).join("");
+
     }
 
-    // ===============================
-    // UPDATE BALANCE MUTATION TRIGGER
-    // ===============================
+    // ==========================================
+    // SPENDING BREAKDOWN DONUT + LEGEND (real /analytics data)
+    // ==========================================
+    let expenseChartInstance = null;
+
+    async function loadExpenseChart() {
+
+        const response = await api("/analytics");
+
+        if (!response.ok) {
+            throw new Error("Could not load analytics");
+        }
+
+        const analytics = await response.json();
+        const categories = analytics.categories || {};
+        const entries = Object.entries(categories).filter(([, value]) => value > 0);
+
+        const total = entries.reduce((sum, [, value]) => sum + value, 0);
+        setText("expenseChartTotal", CashPilot.formatCurrency(total));
+
+        const expenseCtx = document.getElementById("expenseChart");
+        const emptyState = document.getElementById("expenseEmptyState");
+        const totalWrap = document.getElementById("expenseTotalWrap");
+        const legend = document.getElementById("expenseLegend");
+
+        if (!entries.length) {
+            if (expenseChartInstance) { expenseChartInstance.destroy(); expenseChartInstance = null; }
+            if (emptyState) emptyState.classList.remove("hidden");
+            if (totalWrap) totalWrap.classList.add("hidden");
+            if (legend) legend.innerHTML = `<p class="col-span-2 text-center text-on-surface-variant py-sm">No spending recorded yet.</p>`;
+            return;
+        }
+
+        if (emptyState) emptyState.classList.add("hidden");
+        if (totalWrap) totalWrap.classList.remove("hidden");
+
+        const labels = entries.map(([label]) => label);
+        const values = entries.map(([, value]) => value);
+
+        if (expenseChartInstance) expenseChartInstance.destroy();
+
+        expenseChartInstance = new Chart(expenseCtx, {
+            type: "doughnut",
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: CATEGORY_COLORS,
+                    borderWidth: 4,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '78%',
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        if (legend) {
+            legend.innerHTML = entries.map(([label, value], i) => `
+                <div class="flex items-center justify-between gap-2 min-w-0">
+                    <span class="flex items-center gap-1.5 text-on-surface-variant min-w-0 flex-1">
+                        <span class="w-2 h-2 rounded-full flex-shrink-0" style="background:${CATEGORY_COLORS[i % CATEGORY_COLORS.length]}"></span>
+                        <span class="truncate" title="${CashPilot.escapeHtml(label)}">${CashPilot.escapeHtml(label)}</span>
+                    </span>
+                    <span class="font-mono-data text-on-surface font-semibold flex-shrink-0">${CashPilot.formatCurrency(value)}</span>
+                </div>
+            `).join("");
+        }
+
+    }
+
+    // ==========================================
+    // LIQUIDITY / CASHFLOW CHART — built entirely from real invoices,
+    // bucketed by due-month, instead of fabricated ratios of the balance.
+    // ==========================================
+    let liquidityChartInstance = null;
+
+    function buildMonthlyBuckets(invoices, monthCount = 6) {
+
+        const now = new Date();
+        const buckets = [];
+
+        for (let i = 0; i < monthCount; i++) {
+            const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+            buckets.push({
+                label: d.toLocaleDateString(undefined, { month: "short" }),
+                year: d.getFullYear(),
+                month: d.getMonth(),
+                payables: 0,
+                receivables: 0,
+            });
+        }
+
+        (invoices || []).forEach((invoice) => {
+            const due = CashPilot.parseBackendDate(invoice.due_date);
+            if (!due) return;
+
+            const bucket = buckets.find((b) => b.year === due.getFullYear() && b.month === due.getMonth());
+            if (!bucket) return; // outside the visible window
+
+            if (invoice.transaction_type === "receivable") bucket.receivables += Number(invoice.amount) || 0;
+            else bucket.payables += Number(invoice.amount) || 0;
+        });
+
+        return buckets;
+
+    }
+
+    function renderLiquidityChart() {
+
+        const ctx = document.getElementById("liquidityChart");
+        const emptyState = document.getElementById("liquidityEmptyState");
+        if (!ctx || !lastInvoices || !lastDashboard) return;
+
+        const buckets = buildMonthlyBuckets(lastInvoices);
+        const hasData = buckets.some((b) => b.payables > 0 || b.receivables > 0);
+
+        if (!hasData) {
+            if (liquidityChartInstance) { liquidityChartInstance.destroy(); liquidityChartInstance = null; }
+            if (emptyState) emptyState.classList.remove("hidden");
+            return;
+        }
+
+        if (emptyState) emptyState.classList.add("hidden");
+        if (liquidityChartInstance) liquidityChartInstance.destroy();
+
+        const labels = buckets.map((b) => b.label);
+
+        let datasets;
+
+        if (liquidityView === "projection") {
+
+            let running = lastDashboard.current_balance;
+            const projected = buckets.map((b) => {
+                running = running + b.receivables - b.payables;
+                return running;
+            });
+
+            datasets = [
+                { label: "Projected Balance", data: projected, borderColor: "#3B82F6", backgroundColor: "#3B82F6", tension: 0.4 },
+            ];
+
+        } else {
+
+            const net = buckets.map((b) => b.receivables - b.payables);
+
+            datasets = [
+                { label: "Receivables", data: buckets.map((b) => b.receivables), borderColor: "#22C55E", backgroundColor: "#22C55E", tension: 0.4 },
+                { label: "Payables", data: buckets.map((b) => b.payables), borderColor: "#EF4444", backgroundColor: "#EF4444", tension: 0.4 },
+                { label: "Net Cashflow", data: net, borderColor: "#3B82F6", backgroundColor: "#3B82F6", tension: 0.4 },
+            ];
+
+        }
+
+        liquidityChartInstance = new Chart(ctx, {
+            type: "line",
+            data: { labels, datasets },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', align: 'start' } },
+            }
+        });
+
+    }
+
+    // ==========================================
+    // FINANCIAL HEALTH SCORE + RISK SCORE
+    // Deterministic 0-100 score from real dashboard metrics: runway,
+    // receivables-to-payables liquidity, and balance vs safety threshold.
+    // ==========================================
+    function renderHealthAndRisk() {
+
+        if (!lastDashboard) return;
+
+        const { current_balance, total_payables, total_receivables, cash_runway } = lastDashboard;
+
+        const runwayScore = Math.min(cash_runway / 90, 1) * 40;
+
+        const liquidityRatio = total_payables > 0 ? total_receivables / total_payables : (total_receivables > 0 ? 2 : 1);
+        const liquidityScore = Math.min(liquidityRatio / 1.5, 1) * 30;
+
+        const balanceScore = Math.min(Math.max(current_balance / (SAFETY_THRESHOLD * 2), 0), 1) * 30;
+
+        const score = Math.round(runwayScore + liquidityScore + balanceScore);
+
+        let label, colorClass, description;
+
+        if (score >= 80) {
+            label = "Optimal"; colorClass = "text-emerald-600 bg-emerald-50";
+            description = "Your financial health is strong across runway, liquidity, and cash reserves.";
+        } else if (score >= 60) {
+            label = "Good"; colorClass = "text-primary bg-primary-fixed/20";
+            description = "Your finances are in good shape. Keep an eye on upcoming payables to stay ahead.";
+        } else if (score >= 40) {
+            label = "Fair"; colorClass = "text-secondary bg-secondary-container/40";
+            description = "There's room to improve — consider accelerating receivables or trimming payables.";
+        } else {
+            label = "At Risk"; colorClass = "text-error bg-error-container";
+            description = "Cash position needs attention. Review upcoming payables and your runway closely.";
+        }
+
+        setText("healthScoreValue", String(score));
+
+        const labelEl = document.getElementById("healthScoreLabel");
+        if (labelEl) {
+            labelEl.className = `text-xs font-medium px-2 py-0.5 rounded-full mt-1 ${colorClass}`;
+            labelEl.textContent = label;
+        }
+
+        setText("healthScoreDescription", description);
+
+        const circle = document.querySelector('.gauge-ring');
+        if (circle) {
+            const radius = 70;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (Math.max(score, 0) / 100) * circumference;
+            circle.style.strokeDasharray = `${circumference}`;
+            circle.style.strokeDashoffset = `${offset}`;
+        }
+
+        // Risk score mirrors the same thresholds, inverted.
+        let riskLabel, riskColorClass;
+        if (score >= 80) { riskLabel = "Low"; riskColorClass = "text-emerald-600"; }
+        else if (score >= 60) { riskLabel = "Medium"; riskColorClass = "text-secondary"; }
+        else if (score >= 40) { riskLabel = "High"; riskColorClass = "text-error"; }
+        else { riskLabel = "Critical"; riskColorClass = "text-error"; }
+
+        setText("riskScoreWidget", riskLabel);
+        const riskWidget = document.getElementById("riskScoreWidget");
+        if (riskWidget) riskWidget.className = `font-headline-md text-headline-md tracking-tight ${riskColorClass}`;
+
+        // Cash runway widget: color reflects real severity instead of a
+        // hardcoded "always red" state.
+        const runwayWidget = document.getElementById("cashRunwayWidget");
+        const runwayIconWrap = document.getElementById("cashRunwayIconWrap");
+        let runwayColor, runwayBg;
+        if (cash_runway >= 60) { runwayColor = "text-emerald-600"; runwayBg = "bg-emerald-50"; }
+        else if (cash_runway >= 30) { runwayColor = "text-secondary"; runwayBg = "bg-secondary-container"; }
+        else { runwayColor = "text-error"; runwayBg = "bg-error-container"; }
+
+        if (runwayWidget) runwayWidget.className = `font-headline-md text-headline-md tracking-tight ${runwayColor}`;
+        if (runwayIconWrap) {
+            runwayIconWrap.className = `w-12 h-12 rounded-full flex items-center justify-center ${runwayBg}`;
+            const icon = runwayIconWrap.querySelector(".material-symbols-outlined");
+            if (icon) icon.className = `material-symbols-outlined ${runwayColor}`;
+        }
+
+    }
+
+    // ==========================================
+    // SMART ALERTS — derived from real runway + invoice due dates
+    // ==========================================
+    function renderSmartAlerts() {
+
+        const list = document.getElementById("smartAlertsList");
+        const badge = document.getElementById("alertBadge");
+        if (!list || !lastDashboard || !lastInvoices) return;
+
+        const alerts = [];
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        if (lastDashboard.cash_runway <= 14) {
+            alerts.push({
+                icon: "priority_high", title: "Cash Warning", severity: "error",
+                message: `At your current burn rate, your cash runway is only ${lastDashboard.cash_runway} days.`,
+            });
+        }
+
+        const overdue = lastInvoices.filter((i) => {
+            const d = CashPilot.parseBackendDate(i.due_date);
+            return d && d < today && i.transaction_type === "payable";
+        });
+
+        if (overdue.length) {
+            const total = overdue.reduce((sum, i) => sum + Number(i.amount), 0);
+            alerts.push({
+                icon: "warning", title: "Overdue Payables", severity: "error",
+                message: `${overdue.length} payable${overdue.length === 1 ? " is" : "s are"} overdue, totaling ${CashPilot.formatCurrency(total)}.`,
+            });
+        }
+
+        const dueSoon = lastInvoices.filter((i) => {
+            const d = CashPilot.parseBackendDate(i.due_date);
+            if (!d) return false;
+            const diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
+            return diffDays >= 0 && diffDays <= 3 && i.transaction_type === "payable";
+        });
+
+        if (dueSoon.length) {
+            const total = dueSoon.reduce((sum, i) => sum + Number(i.amount), 0);
+            alerts.push({
+                icon: "schedule", title: "Payments Due Soon", severity: "secondary",
+                message: `${dueSoon.length} payable${dueSoon.length === 1 ? "" : "s"} due within 3 days, totaling ${CashPilot.formatCurrency(total)}.`,
+            });
+        }
+
+        if (lastDashboard.current_balance < SAFETY_THRESHOLD) {
+            alerts.push({
+                icon: "account_balance_wallet", title: "Below Safety Threshold", severity: "secondary",
+                message: `Current balance is below your ${CashPilot.formatCurrency(SAFETY_THRESHOLD)} safety threshold.`,
+            });
+        }
+
+        if (badge) badge.classList.toggle("hidden", alerts.length === 0);
+
+        if (!alerts.length) {
+            list.innerHTML = `
+                <div class="flex flex-col items-center justify-center text-center py-lg gap-sm">
+                    <span class="material-symbols-outlined text-emerald-600 text-3xl">check_circle</span>
+                    <p class="font-bold text-on-surface">You're all caught up</p>
+                    <p class="text-body-sm text-on-surface-variant">No urgent alerts right now.</p>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = alerts.map((a) => `
+            <div class="flex items-start gap-md p-md bg-${a.severity === "error" ? "error-container/30" : "secondary-container/30"} rounded-lg border-l-4 border-${a.severity}">
+                <span class="material-symbols-outlined text-${a.severity} mt-xs">${a.icon}</span>
+                <div>
+                    <p class="font-bold text-on-${a.severity === "error" ? "error" : "secondary"}-container">${CashPilot.escapeHtml(a.title)}</p>
+                    <p class="text-body-sm text-on-surface-variant">${CashPilot.escapeHtml(a.message)}</p>
+                </div>
+            </div>
+        `).join("");
+
+    }
+
+    // ==========================================
+    // UPDATE BALANCE (sidebar widget)
+    // ==========================================
     async function updateBalance() {
+
         const inputEl = document.getElementById("sidebarBalanceInput");
         if (!inputEl) return;
-        
+
         const balance = Number(inputEl.value);
-        if (!balance) return;
+
+        if (!inputEl.value.trim() || Number.isNaN(balance) || balance < 0) {
+            CashPilot.toast("Enter a valid, non-negative balance.", "error");
+            return;
+        }
 
         try {
-            await api(
-             "/update-balance",{
+
+            const response = await api("/update-balance", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ balance: balance })
+                body: JSON.stringify({ balance }),
             });
 
-            const sidebarBal = document.getElementById("sidebarBalance");
-            if (sidebarBal) sidebarBal.innerText = `₹${balance.toLocaleString()}`;
-            location.reload();
+            if (!response.ok) throw new Error("Could not update balance");
+
+            inputEl.value = "";
+            CashPilot.toast("Balance updated.", "success");
+            await refreshAll();
+
         } catch (err) {
             console.error("Balance synchronization failed:", err);
-        }
-    }
-</script>
-
-<script>
-
-document
-.getElementById(
-    "sendChatBtn"
-)
-.addEventListener(
-    "click",
-    sendMessage
-);
-
-document
-.getElementById(
-    "chatInput"
-)
-.addEventListener(
-    "keypress",
-    function(e){
-
-        if(e.key === "Enter"){
-
-            sendMessage();
-
+            CashPilot.toast("Couldn't update your balance. Please try again.", "error");
         }
 
     }
-);
 
-async function sendMessage(){
+    // ==========================================
+    // AI CFO CHAT
+    // ==========================================
+    document.getElementById("sendChatBtn").addEventListener("click", sendMessage);
 
-    const question =
-        document
-        .getElementById(
-            "chatInput"
-        )
-        .value;
+    document.getElementById("chatInput").addEventListener("keypress", (e) => {
+        if (e.key === "Enter") sendMessage();
+    });
 
-    if(!question.trim()){
+    let chatBusy = false;
 
-        return;
+    async function sendMessage() {
+
+        if (chatBusy) return;
+
+        const input = document.getElementById("chatInput");
+        const question = input.value;
+
+        if (!question.trim()) return;
+
+        document.getElementById("chatEmptyState")?.classList.add("hidden");
+
+        addUserMessage(question);
+        input.value = "";
+
+        chatBusy = true;
+        const typingEl = addTypingIndicator();
+
+        try {
+
+            const response = await api("/cfo-chat", {
+                method: "POST",
+                body: JSON.stringify({ question }),
+            });
+
+            const data = await response.json();
+
+            typingEl.remove();
+
+            if (!response.ok) {
+                addBotMessage(data.detail || "Something went wrong. Please try again.");
+            } else if (data.error) {
+                addBotMessage(data.error);
+            } else {
+                addBotMessage(data.answer);
+            }
+
+        } catch (err) {
+            typingEl.remove();
+            addBotMessage("I couldn't reach the server. Please check your connection and try again.");
+        } finally {
+            chatBusy = false;
+        }
 
     }
 
-    addUserMessage(
-        question
-    );
+    function scrollChatToBottom() {
+        const scrollArea = document.querySelector("#chatMessages")?.parentElement;
+        if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
+    }
 
-    document
-    .getElementById(
-        "chatInput"
-    )
-    .value = "";
+    function addUserMessage(text) {
 
-    const response =
-    await api(
-    "/cfo-chat",
-        {
-            method: "POST",
+        const chat = document.getElementById("chatMessages");
 
-            headers: {
-                "Content-Type":
-                    "application/json"
-            },
-
-            body: JSON.stringify({
-
-                question:
-                    question
-
-            })
-
-        }
-    );
-
-    const data =
-        await response.json();
-
-    addBotMessage(
-        data.answer
-    );
-
-}
-
-function addUserMessage(text){
-
-    const chat =
-        document.getElementById(
-            "chatMessages"
-        );
-
-    chat.innerHTML += `
-
-        <div class="flex justify-end">
-
-            <div class="bg-primary text-white px-md py-sm rounded-xl max-w-xs">
-
-                ${text}
-
+        chat.insertAdjacentHTML("beforeend", `
+            <div class="flex justify-end">
+                <div class="bg-primary text-white px-md py-sm rounded-xl max-w-xs">
+                    ${CashPilot.escapeHtml(text)}
+                </div>
             </div>
+        `);
 
-        </div>
+        scrollChatToBottom();
 
-    `;
+    }
 
-}
+    function addBotMessage(text) {
 
-function addBotMessage(text){
+        const chat = document.getElementById("chatMessages");
 
-    const chat =
-        document.getElementById(
-            "chatMessages"
-        );
-
-    chat.innerHTML += `
-
-        <div class="flex justify-start">
-
-            <div class="bg-surface-container-low px-md py-sm rounded-xl max-w-md">
-
-                ${text}
-
+        chat.insertAdjacentHTML("beforeend", `
+            <div class="flex justify-start">
+                <div class="bg-surface-container-low px-md py-sm rounded-xl max-w-md">
+                    ${CashPilot.escapeHtml(text)}
+                </div>
             </div>
+        `);
 
-        </div>
+        scrollChatToBottom();
 
-    `;
+    }
 
-    chat.scrollTop =
-        chat.scrollHeight;
+    function addTypingIndicator() {
 
-}
+        const chat = document.getElementById("chatMessages");
 
+        chat.insertAdjacentHTML("beforeend", `
+            <div class="flex justify-start" data-typing-indicator>
+                <div class="bg-surface-container-low px-md py-sm rounded-xl max-w-md text-on-surface-variant animate-pulse">
+                    Thinking…
+                </div>
+            </div>
+        `);
+
+        scrollChatToBottom();
+
+        return chat.querySelector("[data-typing-indicator]");
+
+    }
 </script>
 
 

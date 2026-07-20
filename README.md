@@ -215,15 +215,13 @@ Interactive OpenAPI docs are also available at `http://127.0.0.1:8000/docs` whil
 
 ## Screenshots
 
-> Screenshots aren't checked in yet. Replace each placeholder path below (`docs/screenshots/*.png`) with a real capture of that screen — this is the single highest-impact thing left to make the project scannable on GitHub.
-
 ### Landing Page
 ![Landing page](docs/screenshots/landing.png)
 The marketing/entry screen (`/`) — value proposition headline and feature overview. Gives a visitor a first impression of the product before they see any data.
 
 ### Dashboard + AI CFO Chat
 ![Dashboard](docs/screenshots/dashboard.png)
-The `/dashboard` screen with cash balance, total payables/receivables, cash runway, upcoming bills, and the AI CFO chat panel open with a sample question answered. This is the single best screen for showing the core value prop — real numbers plus an AI assistant reasoning about them — in one frame.
+The `/dashboard` screen with cash balance, total payables/receivables, cash runway, smart alerts, and the AI CFO chat panel open with a live question answered from real account data. This is the single best screen for showing the core value prop — real numbers plus an AI assistant reasoning about them — in one frame.
 
 ### Invoice Hub — AI Priority Scoring
 ![Invoice Hub](docs/screenshots/invoices.png)
@@ -231,15 +229,15 @@ The `/invoices` list view with several payables/receivables showing their AI Pri
 
 ### AI Invoice Extraction
 ![Invoice upload and extraction](docs/screenshots/invoice-extraction.png)
-The invoice upload modal on `/invoices` right after a PDF/image is processed, showing the Gemini-extracted fields (vendor, amount, due date, GST, etc.) awaiting user review. Highlights the AI document-parsing feature, which is the most technically distinctive part of the project.
+The "Review Extracted Invoice" modal right after a real invoice PDF is uploaded, showing the Gemini-extracted fields (vendor, amount, due date, GST, payment terms, etc.) awaiting user confirmation before anything is saved. Highlights the AI document-parsing feature, which is the most technically distinctive part of the project.
 
 ### Cash Runway & Scenario Simulator
 ![Cash runway and scenario simulator](docs/screenshots/runway.png)
-The `/runway` screen with the runway chart plus a simulated scenario (e.g. a large hypothetical expense) showing the projected balance, projected runway, and risk level. Shows the "what-if" planning feature that differentiates this from a plain expense tracker.
+The `/runway` screen after running a simulated scenario (a hypothetical expense), showing the projected balance, projected runway, and risk level. Shows the "what-if" planning feature that differentiates this from a plain expense tracker.
 
-### Analytics & Vendor Negotiation
+### Analytics Dashboard
 ![Analytics dashboard](docs/screenshots/analytics.png)
-The `/analytics` screen with the category-wise expense breakdown chart, AI-generated key insight/risks/recommendations, and the vendor negotiation email generator. Covers the two remaining AI features (financial analytics and negotiation drafting) in a single shot.
+The `/analytics` screen with income/expense/net-cash-flow summary cards, a cash flow trend chart, and a category-wise expense breakdown. Shows the financial-analytics feature that sits behind the AI insights and recommendations.
 
 | Screen | File |
 | --- | --- |
@@ -248,7 +246,7 @@ The `/analytics` screen with the category-wise expense breakdown chart, AI-gener
 | Invoice Hub | `docs/screenshots/invoices.png` |
 | AI Invoice Extraction | `docs/screenshots/invoice-extraction.png` |
 | Cash Runway & Scenario Simulator | `docs/screenshots/runway.png` |
-| Analytics & Vendor Negotiation | `docs/screenshots/analytics.png` |
+| Analytics Dashboard | `docs/screenshots/analytics.png` |
 
 ---
 

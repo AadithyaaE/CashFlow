@@ -7,7 +7,7 @@
     // else (Vercel production + preview deployments).
     const IS_LOCAL_HOST = ["localhost", "127.0.0.1"].includes(window.location.hostname);
     const API_URL = window.__CASHPILOT_API_URL__
-        || (IS_LOCAL_HOST ? "http://127.0.0.1:8000" : "https://cashpilot-backend.onrender.com");
+        || (IS_LOCAL_HOST ? "http://127.0.0.1:8000" :"https://cashflow-zp3u.onrender.com");
 
 // Session token lives in localStorage when "Remember me" was checked
 // (persists across browser restarts) or sessionStorage otherwise (cleared

@@ -1,0 +1,44 @@
+# Render Blueprint for the CashPilot AI FastAPI backend.
+# Deploy: render.com/deploy or "New +" -> "Blueprint" -> point at this repo.
+#
+# Persistence note: SQLite lives on the service's local disk. On Render's
+# Free plan that disk is ephemeral, so the database resets on every deploy
+# and periodically on restart. For real data retention, switch `plan` to
+# `starter` (or higher) and uncomment the `disk` block below, which mounts
+# a persistent volume and points DATABASE_URL at a file on it.
+services:
+  - type: web
+    name: cashpilot-backend
+    runtime: python
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      # Google Gemini key for AI features (extraction, insights, chat,
+      # negotiation copy). Set this in the Render dashboard — it's a
+      # secret and intentionally not stored in this file.
+      - key: GOOGLE_API_KEY
+        sync: false
+      # Comma-separated list of allowed frontend origins for CORS.
+      # Set this to your Vercel production URL (and any custom domain).
+      - key: CORS_ORIGINS
+        value: https://cashpilot-ai.vercel.app
+      # Used to build the password-reset link sent to users.
+      - key: FRONTEND_URL
+        value: https://cashpilot-ai.vercel.app
+      # Uncomment along with the `disk` block below to persist SQLite
+      # across deploys/restarts (requires `plan: starter` or higher):
+      # - key: DATABASE_URL
+      #   value: sqlite:////var/data/cashpilot.db
+    # disk:
+    #   name: cashpilot-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

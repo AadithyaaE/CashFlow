@@ -355,7 +355,9 @@ else:
     print("WARNING: Gemini API key not found. AI features disabled.")
 
 _cors_origins_env = os.getenv("CORS_ORIGINS", "")
-CORS_ORIGINS = [
+_env_origins = [origin.strip() for origin in _cors_origins_env.split(",") if origin.strip()]
+
+_default_dev_origins = [
     "http://localhost:8080",
     "http://localhost:8081",
     "http://localhost:8082",
@@ -369,6 +371,14 @@ CORS_ORIGINS = [
     "http://127.0.0.1:8084",
     "http://127.0.0.1:8085",
 ]
+
+# CORS_ORIGINS (comma-separated) drives which origins may call this API.
+# Previously this env var was parsed but never actually used, so every
+# deployment silently fell back to the localhost dev list — the browser
+# would block every request from a real frontend domain. Set CORS_ORIGINS
+# in production (e.g. to the Vercel deployment URL); the localhost entries
+# stay allowed too so local frontend dev keeps working against a deployed API.
+CORS_ORIGINS = _env_origins + _default_dev_origins if _env_origins else _default_dev_origins
 
 app.add_middleware(
     CORSMiddleware,

@@ -1,7 +1,13 @@
 // Shared API client + session/UI helpers used by every screen in public/screens/*.html.
 // Loaded via <script src="api.js"></script> before each page's own inline script.
 
-    const API_URL = window.__CASHPILOT_API_URL__ || "http://127.0.0.1:8000";
+    // window.__CASHPILOT_API_URL__ always wins when set (see README). Otherwise,
+    // pick the backend by where this page itself is being served from: the local
+    // FastAPI dev server on localhost, or the deployed Render backend everywhere
+    // else (Vercel production + preview deployments).
+    const IS_LOCAL_HOST = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+    const API_URL = window.__CASHPILOT_API_URL__
+        || (IS_LOCAL_HOST ? "http://127.0.0.1:8000" : "https://cashpilot-backend.onrender.com");
 
 // Session token lives in localStorage when "Remember me" was checked
 // (persists across browser restarts) or sessionStorage otherwise (cleared

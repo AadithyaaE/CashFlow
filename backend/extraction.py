@@ -21,6 +21,8 @@ from datetime import datetime
 import fitz
 from langchain_core.messages import HumanMessage
 
+import ai_errors
+
 
 # A digital PDF page with real invoice content typically yields well over a
 # few hundred characters of selectable text. Anything under this is treated
@@ -108,7 +110,7 @@ def ocr_image_with_gemini(llm, image_bytes: bytes, mime_type: str) -> str:
         },
     ])
 
-    response = llm.invoke([message])
+    response = ai_errors.call_gemini(llm, [message])
     return (response.content or "").strip()
 
 
@@ -202,7 +204,7 @@ def _call_gemini_for_fields(llm, text: str) -> dict:
     trimmed = text[:12000]
 
     prompt = EXTRACTION_PROMPT.format(text=trimmed)
-    response = llm.invoke(prompt)
+    response = ai_errors.call_gemini(llm, prompt)
     raw = response.content or ""
 
     try:

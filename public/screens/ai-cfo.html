@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>CashPilot AI | AI CFO</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800;900&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "primary-fixed": "#e1e0ff",
+                        "on-primary-fixed-variant": "#2f2ebe",
+                        "inverse-surface": "#2d3133",
+                        "surface-tint": "#494bd6",
+                        "on-error": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-primary-fixed": "#07006c",
+                        "tertiary-fixed": "#d3e4fe",
+                        "on-background": "#191c1e",
+                        "secondary-fixed": "#dae2fd",
+                        "on-secondary-fixed": "#131b2e",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-fixed-dim": "#bec6e0",
+                        "on-secondary-container": "#5c647a",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed-dim": "#b7c8e1",
+                        "tertiary-container": "#68788f",
+                        "on-primary-container": "#fffbff",
+                        "tertiary": "#4f5f76",
+                        "secondary": "#565e74",
+                        "primary-container": "#6063ee",
+                        "error-container": "#ffdad6",
+                        "background": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary": "#4648d4",
+                        "on-tertiary-container": "#000510",
+                        "on-surface": "#191c1e",
+                        "secondary-container": "#dae2fd",
+                        "on-error-container": "#93000a",
+                        "on-secondary": "#ffffff",
+                        "outline": "#767586",
+                        "surface-container": "#eceef0",
+                        "surface": "#f7f9fb",
+                        "on-tertiary-fixed": "#0b1c30",
+                        "on-surface-variant": "#464554",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-high": "#e6e8ea",
+                        "on-tertiary-fixed-variant": "#38485d",
+                        "on-secondary-fixed-variant": "#3f465c",
+                        "inverse-primary": "#c0c1ff",
+                        "surface-container-low": "#f2f4f6",
+                        "outline-variant": "#c7c4d7",
+                        "on-primary": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "gutter": "24px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "mono-data": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "headline-xl": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "label-md": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "mono-data": ["14px", {"lineHeight": "1.4", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .gauge-ring {
+            transition: stroke-dashoffset 0.5s ease-out;
+        }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e0e3e5; border-radius: 10px; }
+        .skeleton { background: linear-gradient(90deg, #eceef0 25%, #e0e3e5 37%, #eceef0 63%); background-size: 400% 100%; animation: skeleton-loading 1.4s ease infinite; }
+        @keyframes skeleton-loading { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+    </style>
+</head>
+<body class="font-body-md text-body-md overflow-x-hidden">
+
+<aside class="h-screen w-64 flex-col fixed left-0 top-0 bg-surface-container-low border-r border-outline-variant z-40 hidden md:flex py-lg px-md space-y-base">
+    <div class="mb-xl px-sm">
+        <h1 class="font-headline-sm text-headline-sm font-black text-primary">CashPilot AI</h1>
+        <p class="font-label-md text-label-md text-on-surface-variant">Small Business Mode</p>
+    </div>
+    <a href="/screens/invoices.html" class="w-full mb-lg flex items-center justify-center gap-sm bg-primary text-on-primary py-md rounded-xl font-label-md shadow-md hover:bg-primary-container transition-all active:scale-95">
+        <span class="material-symbols-outlined">add</span>
+        New Document
+    </a>
+    <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/dashboard.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+            <span class="font-label-md">Dashboard</span>
+        </a>
+
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/invoices.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">upload_file</span>
+            <span class="font-label-md">Invoice Hub</span>
+        </a>
+
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">timeline</span>
+            <span class="font-label-md">Cash Runway</span>
+        </a>
+
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
+            <span class="font-label-md">Analytics</span>
+        </a>
+
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="/screens/ai-cfo.html">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">psychology</span>
+            <span class="font-label-md">AI CFO</span>
+        </a>
+
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">priority_high</span>
+            <span class="font-label-md">Payment Priorities</span>
+        </a>
+
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">forum</span>
+            <span class="font-label-md">Vendor Negotiator</span>
+        </a>
+
+        <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
+            <p class="text-xs text-on-surface-variant">Current Cash Position</p>
+            <div class="mt-sm flex flex-col gap-sm">
+                <h4 id="sidebarBalance" class="font-headline-md text-primary font-bold"><span class="inline-block h-5 w-16 rounded bg-primary-fixed/40 animate-pulse"></span></h4>
+            </div>
+            <p id="sidebarRunway" class="text-xs text-on-surface-variant mt-xs">Loading…</p>
+        </div>
+    </nav>
+    <div class="pt-lg border-t border-outline-variant space-y-xs">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 cursor-pointer" href="#" data-action="logout">
+            <span class="material-symbols-outlined">logout</span>
+            Log Out
+        </a>
+    </div>
+</aside>
+
+<main class="md:ml-64 p-lg md:p-xl bg-background min-h-screen">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-xl gap-lg">
+        <div>
+            <h2 class="font-headline-lg text-headline-lg text-on-surface flex items-center gap-sm">
+                <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">psychology</span>
+                AI CFO
+            </h2>
+            <p class="font-body-md text-on-surface-variant">Your financial health, forecast, and recommendations — every number calculated from your real data.</p>
+        </div>
+        <div class="flex items-center gap-sm">
+            <div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold text-label-md" data-user-initials></div>
+            <button id="refreshBtn" class="flex items-center gap-xs px-md py-sm rounded-lg border border-outline-variant bg-surface-container-lowest hover:bg-surface-container-high font-label-md text-on-surface-variant transition-all">
+                <span class="material-symbols-outlined text-sm">refresh</span>
+                Refresh
+            </button>
+        </div>
+    </header>
+
+    <!-- Top-level error banner -->
+    <div id="overviewError" class="hidden mb-lg p-lg rounded-xl border border-error bg-error-container/40 flex items-center justify-between gap-md">
+        <div class="flex items-center gap-sm text-error">
+            <span class="material-symbols-outlined">error</span>
+            <span id="overviewErrorMessage" class="font-label-md">Could not load your AI CFO data.</span>
+        </div>
+        <button id="retryOverviewBtn" class="px-md py-xs rounded-lg bg-error text-on-error font-label-md">Retry</button>
+    </div>
+
+    <div id="cfoContent">
+
+        <!-- Health Score + Forecast -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg mb-lg">
+
+            <!-- Financial Health Score -->
+            <div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-md">
+                    <h3 class="font-headline-md text-on-surface">Financial Health Score</h3>
+                    <span class="material-symbols-outlined text-primary">insights</span>
+                </div>
+                <div class="flex justify-center items-center py-2">
+                    <div class="relative w-36 h-36">
+                        <svg class="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
+                            <circle cx="80" cy="80" r="70" fill="transparent" stroke="currentColor" stroke-width="12" class="text-surface-container"></circle>
+                            <circle id="healthGaugeRing" cx="80" cy="80" r="70" fill="transparent" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="440" class="text-primary gauge-ring"></circle>
+                        </svg>
+                        <div class="absolute inset-0 flex flex-col items-center justify-center">
+                            <span id="healthScoreValue" class="text-4xl font-extrabold text-on-surface tracking-tight">--</span>
+                            <span id="healthScoreLabel" class="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full mt-1">Loading…</span>
+                        </div>
+                    </div>
+                </div>
+                <p id="healthScoreExplanation" class="text-sm text-on-surface-variant leading-relaxed mt-sm">
+                    Calculating your financial health from live cash flow data…
+                </p>
+                <div id="healthBreakdown" class="mt-md space-y-sm"></div>
+            </div>
+
+            <!-- Cash Flow Forecast -->
+            <div class="lg:col-span-8 bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col">
+                <div class="flex items-center justify-between mb-md">
+                    <h3 class="font-headline-md text-on-surface">Cash Flow Forecast</h3>
+                    <span class="material-symbols-outlined text-secondary">show_chart</span>
+                </div>
+                <div style="height:240px" class="relative">
+                    <p id="forecastEmptyState" class="hidden absolute inset-0 flex items-center justify-center text-center text-sm text-on-surface-variant px-lg">No upcoming invoices to forecast yet.</p>
+                    <canvas id="forecastChart"></canvas>
+                </div>
+                <div class="overflow-x-auto mt-md">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-on-surface-variant font-label-md uppercase tracking-wider text-xs">
+                            <tr>
+                                <th class="py-sm pr-md font-medium">Checkpoint</th>
+                                <th class="py-sm pr-md font-medium text-right">Opening</th>
+                                <th class="py-sm pr-md font-medium text-right">Incoming</th>
+                                <th class="py-sm pr-md font-medium text-right">Outgoing</th>
+                                <th class="py-sm pr-md font-medium text-right">Closing</th>
+                            </tr>
+                        </thead>
+                        <tbody id="forecastTableBody" class="divide-y divide-outline-variant"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Smart Payment / Receivable Recommendations -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg mb-lg">
+
+            <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+                <div class="flex items-center gap-sm mb-md">
+                    <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">payments</span>
+                    <h3 class="font-headline-md text-on-surface">Smart Payment Recommendations</h3>
+                </div>
+                <div id="paymentRecsList" class="space-y-sm"></div>
+                <p id="paymentRecsEmpty" class="hidden text-center text-sm text-on-surface-variant py-lg">No outstanding payables — nothing to prioritize right now.</p>
+            </div>
+
+            <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+                <div class="flex items-center gap-sm mb-md">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">request_quote</span>
+                    <h3 class="font-headline-md text-on-surface">Smart Receivable Recommendations</h3>
+                </div>
+                <div id="receivableRecsList" class="space-y-sm"></div>
+                <p id="receivableRecsEmpty" class="hidden text-center text-sm text-on-surface-variant py-lg">No outstanding receivables to follow up on.</p>
+            </div>
+        </div>
+
+        <!-- Business Risk Analysis + AI CFO Recommendations -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg mb-lg">
+
+            <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+                <div class="flex items-center gap-sm mb-md">
+                    <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">warning</span>
+                    <h3 class="font-headline-md text-on-surface">Business Risk Analysis</h3>
+                </div>
+                <div id="risksList" class="space-y-sm"></div>
+                <p id="risksEmpty" class="hidden text-center text-sm text-on-surface-variant py-lg">No risks detected — your finances look healthy.</p>
+            </div>
+
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden flex flex-col">
+                <div class="bg-primary p-md flex items-center gap-md">
+                    <div class="bg-white/20 p-xs rounded-lg">
+                        <span class="material-symbols-outlined text-white" style="font-variation-settings:'FILL' 1;">smart_toy</span>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold leading-none text-base">AI CFO Recommendations</h3>
+                        <p class="text-white/80 text-xs mt-1">Narrated by Gemini from the numbers above</p>
+                    </div>
+                </div>
+                <div id="aiRecsContent" class="p-lg space-y-md">
+                    <div class="flex items-center gap-sm text-on-surface-variant text-sm">
+                        <span class="material-symbols-outlined animate-spin text-base">progress_activity</span>
+                        Generating recommendations…
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenario Simulator -->
+        <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+            <div class="flex items-center gap-sm mb-lg">
+                <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">science</span>
+                <h3 class="font-headline-md text-on-surface">Scenario Simulator</h3>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+                <form id="scenarioForm" class="space-y-md">
+                    <div>
+                        <label class="font-label-md text-on-surface-variant block mb-xs">What if…</label>
+                        <select id="scenarioType" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest">
+                            <option value="delay_payable">I delay a payable by N days</option>
+                            <option value="accelerate_receivable">A customer pays a receivable N days early</option>
+                            <option value="expense_increase">My expenses increase by X%</option>
+                        </select>
+                    </div>
+
+                    <div id="scenarioInvoiceField">
+                        <label class="font-label-md text-on-surface-variant block mb-xs">Invoice</label>
+                        <select id="scenarioInvoiceId" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest">
+                            <option value="">Loading invoices…</option>
+                        </select>
+                    </div>
+
+                    <div id="scenarioDaysField">
+                        <label class="font-label-md text-on-surface-variant block mb-xs">Days</label>
+                        <input id="scenarioDays" type="number" min="1" value="10" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest" />
+                    </div>
+
+                    <div id="scenarioPercentField" class="hidden">
+                        <label class="font-label-md text-on-surface-variant block mb-xs">Percent increase</label>
+                        <input id="scenarioPercent" type="number" min="1" value="20" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest" />
+                    </div>
+
+                    <button type="submit" id="scenarioSubmitBtn" class="w-full px-md py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm hover:bg-primary-container transition-all">
+                        Run Scenario
+                    </button>
+                </form>
+
+                <div id="scenarioResult" class="p-md rounded-xl border border-outline-variant bg-primary-fixed/10">
+                    <p class="text-sm text-on-surface-variant text-center py-xl">Run a scenario to see its projected impact on balance, runway, health score, and risk level.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Loading skeleton (shown until the first /cfo/overview response arrives) -->
+    <div id="cfoLoading" class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+        <div class="lg:col-span-4 h-96 rounded-xl skeleton"></div>
+        <div class="lg:col-span-8 h-96 rounded-xl skeleton"></div>
+        <div class="lg:col-span-6 h-64 rounded-xl skeleton"></div>
+        <div class="lg:col-span-6 h-64 rounded-xl skeleton"></div>
+    </div>
+
+    <footer class="mt-xl py-lg border-t border-outline-variant flex flex-col md:flex-row justify-between items-center text-on-surface-variant font-body-sm">
+        <p>© 2026 CashPilot AI. All rights reserved.</p>
+    </footer>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="api.js"></script>
+<script src="ai-cfo.js"></script>
+</body>
+</html>

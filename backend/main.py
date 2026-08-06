@@ -17,6 +17,9 @@ from pydantic import BaseModel, field_validator
 from langchain_google_genai import ChatGoogleGenerativeAI
 from models import ScenarioRequest, ChatRequest, UpdateBalanceRequest
 from extraction import get_document_text, extract_invoice_fields, ExtractionError
+from scoring import priority_score, is_valid_due_date
+import cfo
+import ai_errors
 import bcrypt
 from jose import jwt, JWTError
 from models import User
@@ -238,107 +241,6 @@ with engine.connect() as _conn:
 
 app = FastAPI()
 
-def priority_score(invoice):
-
-        try:
-
-            transaction_bonus = 0
-
-            if invoice.transaction_type == "receivable":
-
-                transaction_bonus = 15
-
-            due_date = datetime.strptime(
-                invoice.due_date,
-                "%d-%m-%Y"
-            )
-
-            days_left = (
-                due_date -
-                datetime.today()
-            ).days
-
-            if days_left <= 0:
-
-                due_score = 50
-
-            elif days_left <= 3:
-
-                due_score = 45
-
-            elif days_left <= 7:
-
-                due_score = 35
-
-            elif days_left <= 15:
-
-                due_score = 20
-
-            else:
-
-                due_score = 10
-
-        except:
-
-            due_score = 10
-
-        amount_score = min(
-            invoice.amount / 1000,
-            30
-        )
-
-        category = (
-            invoice.category or ""
-        ).lower()
-
-        if "rent" in category:
-
-            category_score = 20
-
-        elif "salary" in category:
-
-            category_score = 20
-
-        elif (
-            "utility" in category or
-            "utilities" in category
-        ):
-
-            category_score = 15
-
-        else:
-
-            category_score = 5
-
-        score = (
-
-    (due_score / 50) * 0.50 +
-
-    (amount_score / 30) * 0.30 +
-
-    (category_score / 20) * 0.20
-
-) * 100
-
-        score += transaction_bonus
-
-        return min(
-            round(score),
-            100
-        )
-
-
-def is_valid_due_date(value):
-    # Mirrors the "%d-%m-%Y" format every other part of this file expects
-    # (priority_score, /dashboard, etc.) so invoices created here don't
-    # silently fail to score/sort/alert correctly later.
-    try:
-        datetime.strptime(value, "%d-%m-%Y")
-        return True
-    except (TypeError, ValueError):
-        return False
-
-
 GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY")
 
 llm = None
@@ -449,6 +351,12 @@ async def upload_invoice(
         fields = extract_invoice_fields(llm, text)
     except ExtractionError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
+    except HTTPException:
+        # Already normalized by ai_errors.call_gemini() (e.g. 429 quota
+        # exhausted, 503 AI outage) inside get_document_text/
+        # extract_invoice_fields — pass it through as-is instead of letting
+        # the generic handler below flatten it back to a plain 502.
+        raise
     except Exception:
         raise HTTPException(
             status_code=502,
@@ -763,7 +671,7 @@ fences, no extra text outside the JSON object. Do not invent data beyond
 what was given.
 """
 
-    response = llm.invoke(prompt)
+    response = ai_errors.call_gemini(llm, prompt)
     raw = (response.content or "").strip()
 
     match = re.search(r"```(?:json)?\s*(\{.*\})\s*```", raw, re.DOTALL)
@@ -1386,9 +1294,7 @@ Do not use code blocks.
 Return only HTML.
 """
 
-    response = llm.invoke(
-            prompt
-        )
+    response = ai_errors.call_gemini(llm, prompt)
 
     return {
             "recommendation":
@@ -1508,7 +1414,7 @@ Rules:
 4. Keep the answer under 120 words.
 """
 
-    response = llm.invoke(prompt)
+    response = ai_errors.call_gemini(llm, prompt)
 
     db.close()
 
@@ -1794,8 +1700,199 @@ Return ONLY the email body as plain text. No subject line, no markdown, no
 code blocks, no HTML tags.
 """
 
-    response = llm.invoke(prompt)
+    response = ai_errors.call_gemini(llm, prompt)
 
     return {
         "message": response.content
+    }
+
+
+# =============================================================================
+# AI CFO — Financial Health Score, Cash Flow Forecast, Smart Recommendations,
+# Business Risk Analysis, and the Scenario Simulator.
+#
+# Every number below comes from cfo.py's pure calculation functions, run
+# against the user's real Invoice/User rows. Gemini (in /cfo/ai-recommendations
+# only) is given the *results* of those calculations as text and asked to
+# narrate them — it is never the source of a financial number.
+# =============================================================================
+
+def _load_simple_invoices(current_user: User):
+    """Fetches the user's invoices and snapshots them into plain objects
+    before closing the DB session, so the pure cfo.py functions never touch
+    a SQLAlchemy session."""
+    db = SessionLocal()
+    invoices = db.query(Invoice).filter(Invoice.user_id == current_user.id).all()
+    simple = [cfo.to_simple(i) for i in invoices]
+    db.close()
+    return simple
+
+
+@app.get("/cfo/overview")
+def cfo_overview(current_user: User = Depends(get_current_user)):
+
+    invoices = _load_simple_invoices(current_user)
+    balance = current_user.current_balance
+
+    forecast = cfo.compute_cash_flow_forecast(invoices, balance)
+    health = cfo.compute_financial_health(invoices, balance, forecast=forecast)
+    payment_recommendations = cfo.rank_payment_recommendations(invoices, balance)
+    receivable_recommendations = cfo.rank_receivable_recommendations(invoices)
+    risks = cfo.compute_business_risks(invoices, balance, health, forecast)
+
+    return {
+        "health_score": health,
+        "forecast": forecast,
+        "payment_recommendations": payment_recommendations,
+        "receivable_recommendations": receivable_recommendations,
+        "risks": risks,
+    }
+
+
+@app.get("/cfo/ai-recommendations")
+def cfo_ai_recommendations(current_user: User = Depends(get_current_user)):
+    """Gemini-narrated actionable recommendations, grounded in the same
+    server-computed numbers as /cfo/overview. Split into its own endpoint so
+    the rest of the AI CFO page can render immediately without waiting on
+    this (slower, AI-backed) call — same pattern as analytics.html loading
+    /analytics-insights separately from /analytics-summary.
+    """
+
+    if llm is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI features are not configured. Set GOOGLE_API_KEY on the server.",
+        )
+
+    invoices = _load_simple_invoices(current_user)
+    balance = current_user.current_balance
+
+    forecast = cfo.compute_cash_flow_forecast(invoices, balance)
+    health = cfo.compute_financial_health(invoices, balance, forecast=forecast)
+    payment_recommendations = cfo.rank_payment_recommendations(invoices, balance)
+    receivable_recommendations = cfo.rank_receivable_recommendations(invoices)
+    risks = cfo.compute_business_risks(invoices, balance, health, forecast)
+
+    top_payables = ", ".join(
+        f"{r['vendor']} ({cfo.fmt_currency(r['amount'])}, {r['priority']}, due {r['due_date']})"
+        for r in payment_recommendations[:5]
+    ) or "None"
+
+    top_receivables = ", ".join(
+        f"{r['vendor']} ({cfo.fmt_currency(r['amount'])}, {r['priority']}, due {r['due_date']})"
+        for r in receivable_recommendations[:5]
+    ) or "None"
+
+    risk_summary = "; ".join(f"{r['title']}: {r['message']}" for r in risks) or "None identified"
+
+    summary = f"""
+Financial Health Score: {health['score']}/100 ({health['rating']})
+Cash Runway: {health['metrics']['runway_days']} days
+Current Balance: {cfo.fmt_currency(balance)}
+Outstanding Payables: {cfo.fmt_currency(health['metrics']['total_outstanding_payables'])}
+Outstanding Receivables: {cfo.fmt_currency(health['metrics']['total_outstanding_receivables'])}
+Overdue Payables: {health['metrics']['overdue_payables_count']} totaling {cfo.fmt_currency(health['metrics']['overdue_payables_amount'])}
+Top Payment Priorities: {top_payables}
+Top Receivable Follow-ups: {top_receivables}
+Identified Risks: {risk_summary}
+"""
+
+    prompt = f"""
+You are CashPilot AI, an expert CFO assistant. Below is this business's real,
+already-calculated financial position. Do not invent or alter any numbers —
+only reference the figures given.
+
+{summary}
+
+Return ONLY a single valid JSON object with exactly this shape:
+{{
+  "summary": "one or two sentence overall assessment",
+  "recommendations": [
+    {{"title": "short action title", "detail": "one to two sentence explanation referencing the real numbers above"}}
+  ]
+}}
+
+Provide 3 to 5 recommendations (e.g. delaying a specific low-urgency payable,
+collecting a specific overdue receivable, reducing discretionary spending,
+raising the minimum cash reserve) grounded strictly in the data above. No
+markdown, no code fences, no extra text outside the JSON object.
+"""
+
+    response = ai_errors.call_gemini(llm, prompt)
+
+    raw = (response.content or "").strip()
+
+    match = re.search(r"```(?:json)?\s*(\{.*\})\s*```", raw, re.DOTALL)
+    if not match:
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+    json_text = match.group(1) if (match and match.lastindex) else (match.group(0) if match else raw)
+
+    try:
+        parsed = json.loads(json_text)
+    except (json.JSONDecodeError, TypeError):
+        raise HTTPException(status_code=502, detail="AI recommendations could not be generated. Please try again.")
+
+    return {
+        "summary": str(parsed.get("summary") or ""),
+        "recommendations": [
+            {"title": str(r.get("title") or ""), "detail": str(r.get("detail") or "")}
+            for r in (parsed.get("recommendations") or [])
+            if isinstance(r, dict)
+        ],
+    }
+
+
+class CfoScenarioRequest(BaseModel):
+    scenario_type: str  # "delay_payable" | "accelerate_receivable" | "expense_increase"
+    invoice_id: int | None = None
+    days: int | None = None
+    percent: float | None = None
+
+
+@app.post("/cfo/scenario")
+def cfo_scenario(
+    data: CfoScenarioRequest,
+    current_user: User = Depends(get_current_user),
+):
+
+    if data.scenario_type not in ("delay_payable", "accelerate_receivable", "expense_increase"):
+        raise HTTPException(
+            status_code=400,
+            detail="scenario_type must be 'delay_payable', 'accelerate_receivable', or 'expense_increase'",
+        )
+
+    if data.scenario_type in ("delay_payable", "accelerate_receivable") and not data.invoice_id:
+        raise HTTPException(status_code=400, detail="invoice_id is required for this scenario_type")
+
+    invoices = _load_simple_invoices(current_user)
+    balance = current_user.current_balance
+
+    scenario = data.model_dump()
+
+    baseline_forecast = cfo.compute_cash_flow_forecast(invoices, balance)
+    baseline_health = cfo.compute_financial_health(invoices, balance, forecast=baseline_forecast)
+
+    try:
+        projected_invoices = cfo.apply_scenario(invoices, scenario)
+    except cfo.ScenarioError as exc:
+        raise HTTPException(status_code=400, detail=str(exc))
+
+    projected_forecast = cfo.compute_cash_flow_forecast(projected_invoices, balance)
+    projected_health = cfo.compute_financial_health(projected_invoices, balance, forecast=projected_forecast)
+
+    return {
+        "description": cfo.describe_scenario(scenario, invoices),
+        "baseline": {
+            "balance": balance,
+            "runway_days": baseline_health["metrics"]["runway_days"],
+            "health_score": baseline_health["score"],
+            "risk_level": cfo.risk_level_from_score(baseline_health["score"]),
+        },
+        "projected": {
+            "balance": balance,
+            "runway_days": projected_health["metrics"]["runway_days"],
+            "health_score": projected_health["score"],
+            "risk_level": cfo.risk_level_from_score(projected_health["score"]),
+        },
+        "forecast": projected_forecast,
     }

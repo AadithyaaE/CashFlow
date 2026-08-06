@@ -166,6 +166,7 @@ const CashPilot = {
         clearToken();
         localStorage.removeItem("user");
         sessionStorage.removeItem("user");
+        sessionStorage.removeItem("cashpilot_copilot_history");
         window.location.href = "/screens/index.html";
     },
 
@@ -394,6 +395,79 @@ const CashPilot = {
             });
 
         });
+
+    },
+
+    // --- Empty states -------------------------------------------------------
+    // One shared empty-state component (icon + title + description + optional
+    // action) reused everywhere a list/chart has nothing to show, instead of
+    // every screen inventing its own "No data" markup.
+    emptyState({ icon = "inbox", title = "Nothing here yet", description = "", actionLabel = "", actionHref = "", actionOnClick = "" } = {}) {
+
+        const action = actionLabel
+            ? (actionHref
+                ? `<a href="${this.escapeHtml(actionHref)}" class="inline-flex items-center gap-xs mt-md px-md py-xs rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary-container transition-all">${this.escapeHtml(actionLabel)}</a>`
+                : `<button type="button" ${actionOnClick ? `onclick="${actionOnClick}"` : ""} class="inline-flex items-center gap-xs mt-md px-md py-xs rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary-container transition-all">${this.escapeHtml(actionLabel)}</button>`)
+            : "";
+
+        return `
+            <div class="flex flex-col items-center justify-center text-center py-xl px-lg gap-sm">
+                <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-surface-variant text-2xl">${this.escapeHtml(icon)}</span>
+                </div>
+                <p class="font-bold text-on-surface text-sm">${this.escapeHtml(title)}</p>
+                ${description ? `<p class="text-xs text-on-surface-variant max-w-xs">${this.escapeHtml(description)}</p>` : ""}
+                ${action}
+            </div>
+        `;
+
+    },
+
+    // --- Page identity for the global AI Copilot widget ---------------------
+    // Frontend-only framing (placeholder text, suggested questions, welcome
+    // message) — never sent to the backend, which still only ever sees the
+    // user's own question text.
+    currentPageInfo() {
+
+        const path = window.location.pathname;
+
+        const pages = {
+            "dashboard.html": {
+                label: "Dashboard", icon: "dashboard",
+                greeting: "Ask me to explain any of your dashboard metrics.",
+                suggestions: ["What does my cash runway mean?", "Which invoices are due soon?", "How healthy is my business?"],
+            },
+            "invoices.html": {
+                label: "Invoice Hub", icon: "upload_file",
+                greeting: "Ask me about your invoices, payables, or receivables.",
+                suggestions: ["Which invoices are overdue?", "Which vendor should I pay first?", "Which customers should I follow up with?"],
+            },
+            "analytics.html": {
+                label: "Analytics", icon: "analytics",
+                greeting: "Ask me to explain your charts and spending trends.",
+                suggestions: ["What is my biggest expense?", "How much cash leaves this month?", "What happened last month?"],
+            },
+            "ai-cfo.html": {
+                label: "AI CFO", icon: "psychology",
+                greeting: "Ask me anything about financial planning — I can run real scenarios.",
+                suggestions: ["How can I improve my runway?", "Why is my Health Score what it is?", "Can I delay a payment by 5 days?"],
+            },
+            "settings.html": {
+                label: "Settings", icon: "settings",
+                greeting: "Ask me anything about your business finances.",
+                suggestions: ["Which vendor should I pay first?", "How healthy is my business?", "Show my overdue invoices"],
+            },
+        };
+
+        for (const [file, info] of Object.entries(pages)) {
+            if (path.endsWith(file)) return { file, ...info };
+        }
+
+        return {
+            file: null, label: "CashPilot", icon: "psychology",
+            greeting: "Ask me anything about your business finances.",
+            suggestions: ["Which vendor should I pay first?", "How healthy is my business?"],
+        };
 
     },
 

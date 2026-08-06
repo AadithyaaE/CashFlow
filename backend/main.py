@@ -5,9 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, UploadFile, File
 
-from database import SessionLocal, engine
+from database import SessionLocal
 from models import (
-    Base,
     Invoice,
     ManualExpenseRequest,
     InvoiceUpdateRequest,
@@ -213,31 +212,8 @@ def get_current_user(
     return user
 
 
-Base.metadata.create_all(bind=engine)
-
-# Lightweight migration: add columns introduced after the table was first
-# created, since create_all() only creates missing tables, not columns.
-with engine.connect() as _conn:
-    from sqlalchemy import text as _text
-
-    _existing_cols = {
-        row[1] for row in _conn.execute(_text("PRAGMA table_info(users)"))
-    }
-    if "company_name" not in _existing_cols:
-        _conn.execute(_text("ALTER TABLE users ADD COLUMN company_name VARCHAR"))
-        _conn.commit()
-
-    _existing_invoice_cols = {
-        row[1] for row in _conn.execute(_text("PRAGMA table_info(invoices)"))
-    }
-    if "is_paid" not in _existing_invoice_cols:
-        _conn.execute(_text("ALTER TABLE invoices ADD COLUMN is_paid BOOLEAN DEFAULT 0"))
-        _conn.commit()
-
-    for _col in ("invoice_number", "invoice_date", "gst", "payment_terms", "description", "paid_at"):
-        if _col not in _existing_invoice_cols:
-            _conn.execute(_text(f"ALTER TABLE invoices ADD COLUMN {_col} VARCHAR"))
-            _conn.commit()
+# Schema is owned entirely by Alembic now (see backend/alembic/) — run
+# `alembic upgrade head` before starting the app. No create-on-import here.
 
 app = FastAPI()
 
@@ -1662,6 +1638,39 @@ def reset_password(data: ResetPasswordRequest):
     return {"message": "Password reset successfully. You can now log in with your new password."}
 
 
+def _generate_vendor_negotiation_email(llm, vendor, amount, due_date, category, goal) -> str:
+    """Shared by the /vendor-negotiation route and the AI Copilot's
+    vendor_negotiation intent, so there's exactly one negotiation prompt in
+    the codebase instead of two copies drifting apart.
+    """
+
+    goal_text = {
+        "extension": "requesting a payment extension",
+        "discount": "requesting an early-payment discount",
+        "installments": "requesting to split the payment into installments",
+    }.get(goal, "requesting a payment extension")
+
+    prompt = f"""
+You are CashPilot AI, an expert CFO assistant helping a business negotiate with a vendor.
+
+Vendor: {vendor}
+Amount Due: ₹{amount}
+Due Date: {due_date}
+Category: {category or "General"}
+Negotiation Goal: {goal_text}
+
+Write a short, professional email to this vendor {goal_text}, preserving the
+business relationship while protecting the company's liquidity. Be specific
+and courteous. Do not invent numbers beyond what's provided.
+
+Return ONLY the email body as plain text. No subject line, no markdown, no
+code blocks, no HTML tags.
+"""
+
+    response = ai_errors.call_gemini(llm, prompt)
+    return response.content
+
+
 @app.post("/vendor-negotiation")
 def vendor_negotiation(
     data: VendorNegotiationRequest,
@@ -1677,33 +1686,12 @@ def vendor_negotiation(
     if data.amount <= 0:
         raise HTTPException(status_code=400, detail="Amount must be greater than 0")
 
-    goal_text = {
-        "extension": "requesting a payment extension",
-        "discount": "requesting an early-payment discount",
-        "installments": "requesting to split the payment into installments",
-    }.get(data.goal, "requesting a payment extension")
-
-    prompt = f"""
-You are CashPilot AI, an expert CFO assistant helping a business negotiate with a vendor.
-
-Vendor: {data.vendor}
-Amount Due: ₹{data.amount}
-Due Date: {data.due_date}
-Category: {data.category or "General"}
-Negotiation Goal: {goal_text}
-
-Write a short, professional email to this vendor {goal_text}, preserving the
-business relationship while protecting the company's liquidity. Be specific
-and courteous. Do not invent numbers beyond what's provided.
-
-Return ONLY the email body as plain text. No subject line, no markdown, no
-code blocks, no HTML tags.
-"""
-
-    response = ai_errors.call_gemini(llm, prompt)
+    message = _generate_vendor_negotiation_email(
+        llm, data.vendor, data.amount, data.due_date, data.category, data.goal
+    )
 
     return {
-        "message": response.content
+        "message": message
     }
 
 
@@ -1726,6 +1714,17 @@ def _load_simple_invoices(current_user: User):
     simple = [cfo.to_simple(i) for i in invoices]
     db.close()
     return simple
+
+
+def _serialize_invoice(inv) -> dict:
+    return {
+        "id": inv.id,
+        "vendor": inv.vendor,
+        "amount": inv.amount,
+        "due_date": inv.due_date,
+        "category": inv.category,
+        "transaction_type": inv.transaction_type,
+    }
 
 
 @app.get("/cfo/overview")
@@ -1808,14 +1807,20 @@ Return ONLY a single valid JSON object with exactly this shape:
 {{
   "summary": "one or two sentence overall assessment",
   "recommendations": [
-    {{"title": "short action title", "detail": "one to two sentence explanation referencing the real numbers above"}}
+    {{
+      "priority": "Critical" | "High" | "Medium" | "Low",
+      "title": "short action title",
+      "reason": "one to two sentence explanation referencing the real numbers above",
+      "action": "short imperative next step, e.g. 'Delay this payment' or 'Follow up today'"
+    }}
   ]
 }}
 
 Provide 3 to 5 recommendations (e.g. delaying a specific low-urgency payable,
 collecting a specific overdue receivable, reducing discretionary spending,
-raising the minimum cash reserve) grounded strictly in the data above. No
-markdown, no code fences, no extra text outside the JSON object.
+raising the minimum cash reserve) grounded strictly in the data above, ranked
+most important first. No markdown, no code fences, no extra text outside the
+JSON object.
 """
 
     response = ai_errors.call_gemini(llm, prompt)
@@ -1832,10 +1837,17 @@ markdown, no code fences, no extra text outside the JSON object.
     except (json.JSONDecodeError, TypeError):
         raise HTTPException(status_code=502, detail="AI recommendations could not be generated. Please try again.")
 
+    valid_priorities = {"Critical", "High", "Medium", "Low"}
+
     return {
         "summary": str(parsed.get("summary") or ""),
         "recommendations": [
-            {"title": str(r.get("title") or ""), "detail": str(r.get("detail") or "")}
+            {
+                "priority": r.get("priority") if r.get("priority") in valid_priorities else "Medium",
+                "title": str(r.get("title") or ""),
+                "reason": str(r.get("reason") or ""),
+                "action": str(r.get("action") or ""),
+            }
             for r in (parsed.get("recommendations") or [])
             if isinstance(r, dict)
         ],
@@ -1895,4 +1907,350 @@ def cfo_scenario(
             "risk_level": cfo.risk_level_from_score(projected_health["score"]),
         },
         "forecast": projected_forecast,
+    }
+
+
+# =============================================================================
+# AI Financial Copilot — natural-language questions answered by classifying
+# intent with Gemini, then dispatching to the SAME deterministic cfo.py
+# functions every other AI CFO feature already uses (rank_payment_
+# recommendations, compute_financial_health, apply_scenario, etc.). Gemini
+# only classifies the question and, for the two open-ended intents, narrates
+# already-computed real numbers — it is never the source of a financial
+# figure, matching the rest of the app's AI design.
+# =============================================================================
+
+COPILOT_INTENTS = [
+    "payment_priority",
+    "receivable_followup",
+    "overdue_invoices",
+    "health_score",
+    "improve_runway",
+    "biggest_expense",
+    "cash_this_month",
+    "scenario_delay_payable",
+    "scenario_accelerate_receivable",
+    "scenario_expense_increase",
+    "vendor_negotiation",
+    "general",
+]
+
+DEFAULT_SCENARIO_DAYS = 5
+DEFAULT_SCENARIO_PERCENT = 10
+
+
+def _classify_copilot_question(llm, question: str) -> dict:
+    prompt = f"""
+You are an intent classifier for a small-business finance copilot. Read the
+user's question and classify it into exactly one of these intents:
+
+- payment_priority: which vendor/payable to pay first, payment priorities
+- receivable_followup: which customer/receivable to follow up or collect from
+- overdue_invoices: show/list overdue invoices or bills
+- health_score: financial health score, why it is what it is, "how healthy is my business"
+- improve_runway: how to extend/improve cash runway
+- biggest_expense: biggest expense, top spending category
+- cash_this_month: how much cash goes out/comes in this month
+- scenario_delay_payable: "what if I delay paying X", "can I delay vendor X by N days"
+- scenario_accelerate_receivable: "what if client/customer X pays early/sooner"
+- scenario_expense_increase: "what if expenses increase by X%"
+- vendor_negotiation: generate/draft a negotiation or payment-extension email to a vendor
+- general: anything else finance-related, or anything not covered above (including non-finance questions)
+
+User question: "{question}"
+
+Return ONLY a single valid JSON object with exactly these keys:
+{{
+  "intent": one of the intent names above (as a plain string),
+  "vendor_name": the vendor or customer name mentioned in the question, or null,
+  "days": the number of days mentioned, as a plain number, or null,
+  "percent": the percentage mentioned, as a plain number, or null
+}}
+
+No markdown, no code fences, no extra text outside the JSON object.
+"""
+    response = ai_errors.call_gemini(llm, prompt)
+    raw = (response.content or "").strip()
+
+    match = re.search(r"```(?:json)?\s*(\{.*\})\s*```", raw, re.DOTALL)
+    if not match:
+        match = re.search(r"\{.*\}", raw, re.DOTALL)
+    json_text = match.group(1) if (match and match.lastindex) else (match.group(0) if match else raw)
+
+    try:
+        parsed = json.loads(json_text)
+    except (json.JSONDecodeError, TypeError):
+        parsed = {}
+
+    intent = parsed.get("intent")
+    if intent not in COPILOT_INTENTS:
+        intent = "general"
+
+    def _to_number(value):
+        try:
+            return float(value) if value is not None else None
+        except (TypeError, ValueError):
+            return None
+
+    days_raw = _to_number(parsed.get("days"))
+    percent_raw = _to_number(parsed.get("percent"))
+
+    return {
+        "intent": intent,
+        "vendor_name": (parsed.get("vendor_name") or None) if isinstance(parsed.get("vendor_name"), str) else None,
+        "days": int(round(days_raw)) if days_raw is not None else None,
+        "percent": percent_raw,
+    }
+
+
+def _copilot_grounding_summary(balance, health, extra: str = "") -> str:
+    return f"""
+Financial Health Score: {health['score']}/100 ({health['rating']})
+Cash Runway: {health['metrics']['runway_days']} days
+Current Balance: {cfo.fmt_currency(balance)}
+Outstanding Payables: {cfo.fmt_currency(health['metrics']['total_outstanding_payables'])}
+Outstanding Receivables: {cfo.fmt_currency(health['metrics']['total_outstanding_receivables'])}
+Overdue Payables: {health['metrics']['overdue_payables_count']} totaling {cfo.fmt_currency(health['metrics']['overdue_payables_amount'])}
+Vendor Concentration: {(health['metrics']['top_vendor'] or 'None')} at {health['metrics']['top_vendor_share'] * 100:.0f}% of payables
+{extra}
+"""
+
+
+def _narrate_copilot_answer(llm, question, intent, invoices, balance, health, forecast) -> str:
+    """The only two intents that get real AI narration — everything else is
+    answered directly from deterministic text already produced by cfo.py."""
+
+    extra = ""
+    if intent == "improve_runway":
+        payment_recs = cfo.rank_payment_recommendations(invoices, balance)[:3]
+        risks = cfo.compute_business_risks(invoices, balance, health, forecast)
+        top_recs = ", ".join(
+            f"{r['vendor']} ({r['priority']}, {cfo.fmt_currency(r['amount'])})" for r in payment_recs
+        ) or "None"
+        risk_lines = "; ".join(r["message"] for r in risks) or "None identified"
+        extra = f"Top payables by priority: {top_recs}\nIdentified risks: {risk_lines}"
+
+    summary = _copilot_grounding_summary(balance, health, extra)
+
+    prompt = f"""
+You are CashPilot AI, an AI CFO copilot embedded in a small-business finance
+app. You ONLY answer questions about this business's cash flow, runway,
+payables, receivables, vendors, or expenses, using ONLY the real data below.
+Never invent a number that is not given here.
+
+If the question is not about business finance, reply exactly:
+I can only answer questions about your business finances.
+
+Business Data:
+{summary}
+
+User Question: {question}
+
+Keep the answer under 120 words, specific, and grounded in the numbers above.
+"""
+
+    response = ai_errors.call_gemini(llm, prompt)
+    return (response.content or "").strip()
+
+
+def _run_copilot_scenario(intent, vendor_name, days, percent, invoices, balance, baseline_health):
+    scenario_type = {
+        "scenario_delay_payable": "delay_payable",
+        "scenario_accelerate_receivable": "accelerate_receivable",
+        "scenario_expense_increase": "expense_increase",
+    }[intent]
+
+    actions = [{"label": "Open Scenario Simulator", "type": "scroll_to_section", "section": "scenario-simulator"}]
+
+    if scenario_type == "expense_increase":
+        scenario = {
+            "scenario_type": scenario_type,
+            "percent": percent if percent is not None else DEFAULT_SCENARIO_PERCENT,
+        }
+    else:
+        transaction_type = "payable" if scenario_type == "delay_payable" else "receivable"
+        target = cfo.find_invoice_by_vendor(invoices, vendor_name, transaction_type=transaction_type)
+        if target is None:
+            who = "vendor" if transaction_type == "payable" else "customer"
+            name_part = f' for "{vendor_name}"' if vendor_name else ""
+            answer = (
+                f"I couldn't find a matching unpaid {who} invoice{name_part}. "
+                "Check the exact name in Invoice Hub and try again."
+            )
+            return answer, {"matched": False}, []
+        scenario = {
+            "scenario_type": scenario_type,
+            "invoice_id": target.id,
+            "days": days if days is not None else DEFAULT_SCENARIO_DAYS,
+        }
+
+    try:
+        projected_invoices = cfo.apply_scenario(invoices, scenario)
+    except cfo.ScenarioError as exc:
+        return f"Couldn't run that scenario: {exc}", {"matched": False}, []
+
+    projected_forecast = cfo.compute_cash_flow_forecast(projected_invoices, balance)
+    projected_health = cfo.compute_financial_health(projected_invoices, balance, forecast=projected_forecast)
+
+    description = cfo.describe_scenario(scenario, invoices)
+    score_delta = projected_health["score"] - baseline_health["score"]
+    runway_delta = projected_health["metrics"]["runway_days"] - baseline_health["metrics"]["runway_days"]
+
+    answer = (
+        f"{description}: your Health Score would go from {baseline_health['score']} to "
+        f"{projected_health['score']} ({'+' if score_delta >= 0 else ''}{score_delta}), and runway from "
+        f"{baseline_health['metrics']['runway_days']} to {projected_health['metrics']['runway_days']} days "
+        f"({'+' if runway_delta >= 0 else ''}{runway_delta}). "
+        f"Projected risk level: {cfo.risk_level_from_score(projected_health['score'])}."
+    )
+
+    data = {
+        "matched": True,
+        "description": description,
+        "baseline": {
+            "balance": balance,
+            "runway_days": baseline_health["metrics"]["runway_days"],
+            "health_score": baseline_health["score"],
+            "risk_level": cfo.risk_level_from_score(baseline_health["score"]),
+        },
+        "projected": {
+            "balance": balance,
+            "runway_days": projected_health["metrics"]["runway_days"],
+            "health_score": projected_health["score"],
+            "risk_level": cfo.risk_level_from_score(projected_health["score"]),
+        },
+        "forecast": projected_forecast,
+    }
+
+    return answer, data, actions
+
+
+def _run_copilot_negotiation(llm, vendor_name, invoices):
+    target = cfo.find_invoice_by_vendor(invoices, vendor_name, transaction_type="payable")
+    if target is None:
+        name_part = f' for "{vendor_name}"' if vendor_name else ""
+        answer = (
+            f"I couldn't find a matching unpaid payable{name_part} to draft a negotiation email for. "
+            "Check the vendor name in Invoice Hub and try again."
+        )
+        return answer, {"matched": False}
+
+    email = _generate_vendor_negotiation_email(
+        llm, target.vendor, target.amount, target.due_date, target.category, "extension"
+    )
+    return email, {"matched": True, "vendor": target.vendor, "invoice_id": target.id, "email": email}
+
+
+class CopilotRequest(BaseModel):
+    question: str
+
+
+@app.post("/cfo/copilot")
+def cfo_copilot(
+    data: CopilotRequest,
+    current_user: User = Depends(get_current_user),
+):
+
+    if llm is None:
+        raise HTTPException(
+            status_code=503,
+            detail="AI features are not configured. Set GOOGLE_API_KEY on the server.",
+        )
+
+    if not data.question or not data.question.strip():
+        raise HTTPException(status_code=400, detail="Question is required")
+
+    invoices = _load_simple_invoices(current_user)
+    balance = current_user.current_balance
+
+    classification = _classify_copilot_question(llm, data.question)
+    intent = classification["intent"]
+    vendor_name = classification["vendor_name"]
+    days = classification["days"]
+    percent = classification["percent"]
+
+    forecast = cfo.compute_cash_flow_forecast(invoices, balance)
+    health = cfo.compute_financial_health(invoices, balance, forecast=forecast)
+
+    payload = None
+    actions = []
+
+    if intent == "payment_priority":
+        recs = cfo.rank_payment_recommendations(invoices, balance)
+        if recs:
+            top = recs[0]
+            answer = f"Pay {top['vendor']} first — {top['why']}"
+            payload = {"recommendations": recs[:5]}
+            actions = [
+                {"label": "View Invoice", "type": "view_invoice", "invoice_id": top["id"]},
+                {"label": "Generate Payment Plan", "type": "generate_payment_plan"},
+            ]
+        else:
+            answer = "You don't have any outstanding payables right now."
+            payload = {"recommendations": []}
+
+    elif intent == "receivable_followup":
+        recs = cfo.rank_receivable_recommendations(invoices)
+        if recs:
+            top = recs[0]
+            answer = f"Follow up with {top['vendor']} first — {top['why']}"
+            payload = {"recommendations": recs[:5]}
+            actions = [{"label": "View Invoice", "type": "view_invoice", "invoice_id": top["id"]}]
+        else:
+            answer = "You don't have any outstanding receivables right now."
+            payload = {"recommendations": []}
+
+    elif intent == "overdue_invoices":
+        today = datetime.today().date()
+        overdue = [
+            _serialize_invoice(i) for i in invoices
+            if not i.is_paid and (cfo.parse_due_date(i.due_date) or today) < today
+        ]
+        if overdue:
+            total = sum(i["amount"] for i in overdue)
+            answer = f"You have {len(overdue)} overdue invoice(s) totaling {cfo.fmt_currency(total)}."
+        else:
+            answer = "You have no overdue invoices right now."
+        payload = {"invoices": overdue}
+
+    elif intent == "health_score":
+        answer = health["explanation"]
+        payload = {"health_score": health}
+        actions = [{"label": "View Full Breakdown", "type": "scroll_to_section", "section": "financial-overview"}]
+
+    elif intent == "biggest_expense":
+        breakdown = cfo.category_breakdown([i for i in invoices if i.transaction_type == "payable"])
+        if breakdown:
+            top = breakdown[0]
+            answer = f"Your biggest expense category is {top['category']} at {cfo.fmt_currency(top['amount'])}."
+        else:
+            answer = "You don't have any payables recorded yet to break down by category."
+        payload = {"categories": breakdown}
+
+    elif intent == "cash_this_month":
+        bucket_30 = next((b for b in forecast if b["days"] == 30), None)
+        if bucket_30:
+            answer = (
+                f"Based on invoices due within 30 days, {cfo.fmt_currency(bucket_30['outgoing'])} is projected to "
+                f"go out and {cfo.fmt_currency(bucket_30['incoming'])} is projected to come in, for a projected "
+                f"balance of {cfo.fmt_currency(bucket_30['closing_balance'])}."
+            )
+        else:
+            answer = "No upcoming invoices are due within the next 30 days."
+        payload = {"forecast": forecast}
+
+    elif intent in ("scenario_delay_payable", "scenario_accelerate_receivable", "scenario_expense_increase"):
+        answer, payload, actions = _run_copilot_scenario(intent, vendor_name, days, percent, invoices, balance, health)
+
+    elif intent == "vendor_negotiation":
+        answer, payload = _run_copilot_negotiation(llm, vendor_name, invoices)
+
+    else:  # "improve_runway" and "general" — genuine open-ended AI narration
+        answer = _narrate_copilot_answer(llm, data.question, intent, invoices, balance, health, forecast)
+
+    return {
+        "answer": answer,
+        "intent": intent,
+        "data": payload,
+        "actions": actions,
     }

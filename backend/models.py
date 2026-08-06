@@ -15,20 +15,22 @@ class Invoice(Base):
 
     user_id = Column(
         Integer,
-        ForeignKey("users.id")
+        ForeignKey("users.id"),
+        index=True
     )
 
     vendor = Column(String)
 
     amount = Column(Float)
 
-    due_date = Column(String)
+    due_date = Column(String, index=True)
 
     category = Column(String)
 
     transaction_type = Column(
         String,
-        default="payable"
+        default="payable",
+        index=True
     )
 
     currency = Column(
@@ -36,7 +38,7 @@ class Invoice(Base):
     default="INR"
 )
 
-    is_paid = Column(Boolean, default=False)
+    is_paid = Column(Boolean, default=False, index=True)
 
     invoice_number = Column(String, nullable=True)
 
@@ -132,7 +134,8 @@ class User(Base):
 
     email = Column(
         String,
-        unique=True
+        unique=True,
+        index=True
     )
 
     password = Column(String)

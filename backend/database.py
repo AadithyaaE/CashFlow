@@ -1,11 +1,14 @@
 import os
 
 from sqlalchemy import create_engine
+from dotenv import load_dotenv
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# Overridable so a persistent disk path can be used in production (SQLite's
-# file otherwise lives on the app server's ephemeral filesystem and is lost
-# on every redeploy/restart).
+
+load_dotenv()
+# Production points this at Postgres (Neon) via the DATABASE_URL env var —
+# see backend/.env.example. Falls back to a local SQLite file so the app and
+# `alembic upgrade head` both still work out of the box with zero setup.
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./cashpilot.db")
 
 connect_args = (

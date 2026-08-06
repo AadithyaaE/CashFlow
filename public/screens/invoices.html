@@ -156,7 +156,7 @@
     </a>
 
     <!-- Invoice Hub -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all"
+    <a class="flex items-center gap-md px-md py-sm rounded-lg bg-primary text-on-primary font-bold transition-all"
        href="/screens/invoices.html">
 
         <span class="material-symbols-outlined"
@@ -166,20 +166,6 @@
 
         <span class="font-label-md">
             Invoice Hub
-        </span>
-
-    </a>
-
-    <!-- Cash Runway -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="/screens/runway.html">
-
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            timeline
-        </span>
-
-        <span class="font-label-md">
-            Cash Runway
         </span>
 
     </a>
@@ -212,30 +198,16 @@
 
     </a>
 
-    <!-- Payment Priorities -->
+    <!-- Settings -->
     <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="#">
+       href="/screens/settings.html">
 
         <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            priority_high
+            settings
         </span>
 
         <span class="font-label-md">
-            Payment Priorities
-        </span>
-
-    </a>
-
-    <!-- Vendor Negotiator -->
-    <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group"
-       href="#">
-
-        <span class="material-symbols-outlined group-hover:text-primary transition-colors">
-            forum
-        </span>
-
-        <span class="font-label-md">
-            Vendor Negotiator
+            Settings
         </span>
 
     </a>
@@ -243,7 +215,8 @@
     <!-- Sidebar KPI Card -->
     <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
 
-        <p class="text-xs text-on-surface-variant">
+        <p class="text-xs text-on-surface-variant flex items-center gap-xs">
+            <span class="material-symbols-outlined text-sm">account_balance_wallet</span>
             Current Cash Position
         </p>
 
@@ -261,14 +234,6 @@
 
 </nav>
 <div class="pt-lg border-t border-outline-variant space-y-xs">
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
-<span class="font-label-md">Settings</span>
-</a>
-<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="#">
-<span class="material-symbols-outlined group-hover:text-primary transition-colors">help</span>
-<span class="font-label-md">Support</span>
-</a>
 <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group cursor-pointer" href="#" data-action="logout">
 <span class="material-symbols-outlined group-hover:text-primary transition-colors">logout</span>
 <span class="font-label-md">Log Out</span>
@@ -551,6 +516,32 @@
 </div>
 </footer>
 </main>
+
+<!-- Mobile Nav Anchor -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-outline-variant px-md py-sm flex justify-around items-center z-50 no-print">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/analytics.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-[10px] font-bold">Analytics</span>
+</a>
+<div class="relative -top-6">
+<a href="/screens/invoices.html" class="h-14 w-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">upload_file</span>
+</a>
+</div>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/ai-cfo.html">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-[10px] font-bold">CFO</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/settings.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</a>
+</nav>
+
 <!-- Side Panel / Detail Drawer -->
 <div class="fixed inset-0 bg-black/20 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300" id="drawer-overlay" onclick="closeDrawer()"></div>
 <aside class="fixed top-0 right-0 h-screen w-full max-w-lg bg-surface-container-lowest shadow-2xl z-50 translate-x-full drawer-transition flex flex-col border-l border-outline-variant" id="invoice-drawer">
@@ -751,6 +742,7 @@
 </div>
 
 <script src="api.js"></script>
+<script src="copilot-widget.js"></script>
 <script>
         CashPilot.initPage();
 
@@ -1748,6 +1740,6 @@
     </script>
 <div data-page-switcher>
 <div style="position:fixed;bottom:16px;right:16px;z-index:9999;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.1);padding:8px;display:flex;gap:4px;font-family:Inter,sans-serif;font-size:12px;">
-<a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
+<a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a><a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a><a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a><a href="/screens/ai-cfo.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">AI CFO</a><a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
 </div>
 </div></body></html>

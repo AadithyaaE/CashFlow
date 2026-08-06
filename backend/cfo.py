@@ -78,6 +78,48 @@ def compute_runway_days(invoices, balance, today=None) -> int:
     return 365
 
 
+def category_breakdown(invoices) -> list[dict]:
+    """Total spend per category, largest first. Used by the AI Copilot to
+    answer "what's my biggest expense" from real totals, not a guess."""
+    totals: dict[str, float] = {}
+    for i in invoices:
+        category = i.category or "Uncategorized"
+        totals[category] = totals.get(category, 0) + i.amount
+    return [
+        {"category": category, "amount": round(amount, 2)}
+        for category, amount in sorted(totals.items(), key=lambda kv: kv[1], reverse=True)
+    ]
+
+
+def find_invoice_by_vendor(invoices, vendor_name, transaction_type=None):
+    """Resolves a free-text vendor name (as extracted by Gemini from a
+    question) to a real invoice. Gemini can name a vendor but never knows a
+    real invoice ID, so this is the deterministic bridge between "the user
+    said 'Vendor ABC'" and an actual SimpleInvoice the scenario simulator or
+    negotiation flow can act on. Prefers unpaid invoices and exact-name
+    matches over partial ones; case-insensitive throughout.
+    """
+    if not vendor_name:
+        return None
+
+    candidates = [
+        i for i in invoices
+        if not i.is_paid and (transaction_type is None or i.transaction_type == transaction_type)
+    ]
+
+    needle = vendor_name.strip().lower()
+
+    exact = [i for i in candidates if i.vendor.strip().lower() == needle]
+    if exact:
+        return exact[0]
+
+    partial = [i for i in candidates if needle in i.vendor.strip().lower() or i.vendor.strip().lower() in needle]
+    if partial:
+        return partial[0]
+
+    return None
+
+
 # ---------------------------------------------------------------------------
 # 1. Cash Flow Forecast — pure arithmetic, no AI involved.
 # ---------------------------------------------------------------------------

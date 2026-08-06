@@ -113,9 +113,6 @@
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
-        .gauge-ring {
-            transition: stroke-dashoffset 0.5s ease-out;
-        }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #e0e3e5; border-radius: 10px; }
@@ -133,19 +130,14 @@
         New Document
     </a>
     <nav class="flex-1 space-y-xs overflow-y-auto custom-scrollbar">
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/dashboard.html">
-            <span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg bg-primary text-on-primary font-bold transition-all" href="/screens/dashboard.html">
+            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">dashboard</span>
             <span class="font-label-md">Dashboard</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="/screens/invoices.html">
-            <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">upload_file</span>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/invoices.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">upload_file</span>
             <span class="font-label-md">Invoice Hub</span>
-        </a>
-
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
-            <span class="material-symbols-outlined group-hover:text-primary transition-colors">timeline</span>
-            <span class="font-label-md">Cash Runway</span>
         </a>
 
         <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
@@ -158,18 +150,13 @@
             <span class="font-label-md">AI CFO</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
-            <span class="material-symbols-outlined group-hover:text-primary transition-colors">priority_high</span>
-            <span class="font-label-md">Payment Priorities</span>
-        </a>
-
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
-            <span class="material-symbols-outlined group-hover:text-primary transition-colors">forum</span>
-            <span class="font-label-md">Vendor Negotiator</span>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/settings.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+            <span class="font-label-md">Settings</span>
         </a>
 
         <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
-            <p class="text-xs text-on-surface-variant">Current Cash Position</p>
+            <p class="text-xs text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-sm">account_balance_wallet</span>Current Cash Position</p>
             <div class="mt-sm flex flex-col gap-sm">
                 <h4 id="sidebarBalance" class="font-headline-md text-primary font-bold"><span class="inline-block h-5 w-16 rounded bg-primary-fixed/40 animate-pulse"></span></h4>
                 <input id="sidebarBalanceInput" type="number" min="0" step="0.01" placeholder="Enter balance" class="px-sm py-xs border border-outline-variant rounded-lg text-sm bg-surface-container-lowest">
@@ -179,14 +166,6 @@
         </div>
     </nav>
     <div class="pt-lg border-t border-outline-variant space-y-xs">
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200" href="#">
-            <span class="material-symbols-outlined">settings</span>
-            Settings
-        </a>
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200" href="#">
-            <span class="material-symbols-outlined">help</span>
-            Support
-        </a>
         <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high duration-200 cursor-pointer" href="#" data-action="logout">
             <span class="material-symbols-outlined">logout</span>
             Log Out
@@ -204,10 +183,6 @@
             <button id="refreshBtn" class="p-sm text-on-surface-variant hover:text-primary transition-colors" title="Refresh dashboard" aria-label="Refresh dashboard">
                 <span class="material-symbols-outlined">refresh</span>
             </button>
-            <button id="notificationsBtn" class="p-sm text-on-surface-variant hover:text-primary transition-colors relative" title="View alerts" aria-label="View alerts">
-                <span class="material-symbols-outlined">notifications</span>
-                <span id="alertBadge" class="hidden absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-error border-2 border-surface-container-lowest"></span>
-            </button>
             <div class="h-10 w-10 rounded-full bg-primary-fixed flex items-center justify-center text-primary font-bold" data-user-initials></div>
         </div>
     </header>
@@ -216,13 +191,15 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-lg">
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                 <div>
-                    <div class="flex justify-between items-start mb-sm">
-                        <span class="text-on-surface-variant font-label-md">Current Balance</span>
-                        <span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+                    <div class="flex justify-between items-start mb-md">
+                        <span class="text-on-surface-variant font-label-md uppercase tracking-wide text-xs">Current Balance</span>
+                        <div class="w-9 h-9 rounded-full bg-primary-fixed/30 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-primary text-lg">account_balance_wallet</span>
+                        </div>
                     </div>
-                    <div id="currentBalance" class="font-headline-md text-headline-md text-on-surface"><span class="inline-block h-7 w-24 rounded bg-surface-container-high animate-pulse"></span></div>
+                    <div id="currentBalance" class="font-headline-lg text-headline-lg text-on-surface tracking-tight"><span class="inline-block h-8 w-28 rounded bg-surface-container-high animate-pulse"></span></div>
                 </div>
-                <div id="balanceFooter" class="mt-base flex items-center text-sm font-medium text-on-surface-variant">
+                <div id="balanceFooter" class="mt-md pt-md border-t border-outline-variant/60 flex items-center text-sm font-medium text-on-surface-variant">
                     <span class="material-symbols-outlined text-sm">schedule</span>
                     <span class="ml-1">Calculating runway…</span>
                 </div>
@@ -230,24 +207,28 @@
 
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                 <div>
-                    <div class="flex justify-between items-start mb-sm">
-                        <span class="text-on-surface-variant font-label-md">Total Payables</span>
-                        <span class="material-symbols-outlined text-error">payments</span>
+                    <div class="flex justify-between items-start mb-md">
+                        <span class="text-on-surface-variant font-label-md uppercase tracking-wide text-xs">Total Payables</span>
+                        <div class="w-9 h-9 rounded-full bg-error-container/60 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-error text-lg">payments</span>
+                        </div>
                     </div>
-                    <div id="totalPayables" class="font-headline-md text-headline-md text-on-surface"><span class="inline-block h-7 w-24 rounded bg-surface-container-high animate-pulse"></span></div>
+                    <div id="totalPayables" class="font-headline-lg text-headline-lg text-on-surface tracking-tight"><span class="inline-block h-8 w-28 rounded bg-surface-container-high animate-pulse"></span></div>
                 </div>
-                <div id="payablesFooter" class="mt-base text-on-surface-variant text-sm">Loading…</div>
+                <div id="payablesFooter" class="mt-md pt-md border-t border-outline-variant/60 text-on-surface-variant text-sm">Loading…</div>
             </div>
 
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between">
                 <div>
-                    <div class="flex justify-between items-start mb-sm">
-                        <span class="text-on-surface-variant font-label-md">Total Receivables</span>
-                        <span class="material-symbols-outlined text-tertiary">request_quote</span>
+                    <div class="flex justify-between items-start mb-md">
+                        <span class="text-on-surface-variant font-label-md uppercase tracking-wide text-xs">Total Receivables</span>
+                        <div class="w-9 h-9 rounded-full bg-tertiary-fixed/40 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-tertiary text-lg">request_quote</span>
+                        </div>
                     </div>
-                    <div id="totalReceivables" class="font-headline-md text-headline-md text-on-surface"><span class="inline-block h-7 w-24 rounded bg-surface-container-high animate-pulse"></span></div>
+                    <div id="totalReceivables" class="font-headline-lg text-headline-lg text-on-surface tracking-tight"><span class="inline-block h-8 w-28 rounded bg-surface-container-high animate-pulse"></span></div>
                 </div>
-                <div id="receivablesFooter" class="mt-base text-on-surface-variant text-sm">Loading…</div>
+                <div id="receivablesFooter" class="mt-md pt-md border-t border-outline-variant/60 text-on-surface-variant text-sm">Loading…</div>
             </div>
         </div>
 
@@ -295,30 +276,6 @@
 
             <div class="lg:col-span-4 flex flex-col gap-lg justify-between">
                 <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between flex-1">
-                    <div class="flex justify-between items-center mb-2">
-                        <h4 class="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Health Score</h4>
-                        <span class="material-symbols-outlined text-primary text-xl">insights</span>
-                    </div>
-
-                    <div class="flex justify-center items-center my-auto py-2">
-                        <div class="relative w-36 h-36">
-                            <svg class="w-full h-full transform -rotate-90" viewBox="0 0 160 160">
-                                <circle cx="80" cy="80" r="70" fill="transparent" stroke="currentColor" stroke-width="12" class="text-surface-container"></circle>
-                                <circle cx="80" cy="80" r="70" fill="transparent" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="79.2" class="text-primary gauge-ring"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                <span id="healthScoreValue" class="text-4xl font-extrabold text-on-surface tracking-tight">--</span>
-                                <span id="healthScoreLabel" class="text-xs font-medium text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full mt-1">Loading…</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <p id="healthScoreDescription" class="text-center text-sm text-on-surface-variant leading-relaxed">
-                        Calculating your financial health from live cash flow data…
-                    </p>
-                </div>
-
-                <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between flex-1">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="text-sm font-bold text-on-surface tracking-tight">Spending Breakdown</h3>
                         <span class="text-xs font-medium text-on-surface-variant bg-surface-container px-2.5 py-1 rounded-md">By Category</span>
@@ -340,88 +297,18 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-stretch">
-            <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-lg">
-                <div id="smartAlertsCard" class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex flex-col justify-between">
-                    <div class="flex items-center gap-sm mb-lg">
-                        <span class="material-symbols-outlined text-error" style="font-variation-settings: 'FILL' 1;">warning</span>
-                        <h3 class="font-headline-md text-headline-md text-on-surface tracking-tight">Smart Alerts</h3>
-                    </div>
-                    <div id="smartAlertsList" class="space-y-md my-auto">
-                        <p class="text-center text-sm text-on-surface-variant py-md">Loading…</p>
-                    </div>
+        <div class="grid grid-cols-1 gap-lg">
+            <div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden">
+                <div class="px-lg py-md border-b border-outline-variant flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary">history</span>
+                    <h3 class="font-headline-md text-headline-md text-on-surface tracking-tight">Recent Activity</h3>
                 </div>
-
-                <div class="grid grid-rows-2 gap-lg">
-                    <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex items-center justify-between">
-                        <div>
-                            <span class="text-on-surface-variant font-label-md">Cash Runway</span>
-                            <div id="cashRunwayWidget" class="font-headline-md text-headline-md text-on-surface-variant tracking-tight">--</div>
-                        </div>
-                        <div id="cashRunwayIconWrap" class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center">
-                            <span class="material-symbols-outlined text-on-surface-variant">history</span>
-                        </div>
-                    </div>
-                    <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm flex items-center justify-between">
-                        <div>
-                            <span class="text-on-surface-variant font-label-md">Risk Score</span>
-                            <div id="riskScoreWidget" class="font-headline-md text-headline-md text-on-surface-variant tracking-tight">--</div>
-                        </div>
-                        <div id="riskScoreIconWrap" class="w-12 h-12 bg-surface-container rounded-full flex items-center justify-center">
-                            <span class="material-symbols-outlined text-on-surface-variant">security</span>
-                        </div>
-                    </div>
+                <div id="recentActivityList" class="divide-y divide-outline-variant">
+                    <p class="text-center text-sm text-on-surface-variant py-lg">Loading…</p>
                 </div>
             </div>
-
-            <div class="lg:col-span-4 flex flex-col bg-surface-container-lowest border border-outline-variant rounded-xl shadow-sm overflow-hidden h-[450px] lg:h-auto">
-                <div class="bg-primary p-md flex items-center gap-md">
-                    <div class="bg-white/20 p-xs rounded-lg">
-                        <span class="material-symbols-outlined text-white" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold leading-none text-base">AI CFO</h3>
-                        <p class="text-white/80 text-xs mt-1">Active &amp; Analyzing Data</p>
-                    </div>
-                </div>
-                <div class="flex-1 overflow-y-auto p-md space-y-md bg-surface-container-low/30">
-                    <div id="chatEmptyState" class="flex flex-col items-start max-w-[90%]">
-                        <div class="bg-white border border-outline-variant p-sm rounded-xl rounded-tl-none shadow-xs text-xs text-on-surface leading-relaxed">
-                            Ask me anything about your cash flow, payables, receivables, or runway — I'll answer using your live business data.
-                        </div>
-                        <span class="text-[10px] text-on-surface-variant mt-xs px-1">CFO</span>
-                    </div>
-                    <div id="chatMessages" class="space-y-md">
-                    </div>
-                </div>
-              <div class="p-sm border-t border-outline-variant bg-white">
-
-    <div class="relative">
-
-        <input
-            id="chatInput"
-            class="w-full bg-surface-container-low border-none rounded-xl pr-10 text-xs focus:ring-1 focus:ring-primary py-2.5"
-            placeholder="Ask about runway..."
-            type="text"
-        />
-
-        <button
-            id="sendChatBtn"
-            class="absolute right-1 top-1/2 -translate-y-1/2 text-primary p-xs hover:scale-105 transition-transform">
-
-            <span class="material-symbols-outlined text-md">
-                send
-            </span>
-
-        </button>
-
-    </div>
-
-</div>
-</div> <!-- End AI CFO Card -->
-</div> <!-- End Right Column -->
-
-</div> <!-- End Top Dashboard Grid -->
+        </div>
+        </div> <!-- End Top Dashboard Grid (closes the space-y-lg wrapper) -->
 
 <div class="grid grid-cols-1 gap-lg mt-lg">
 
@@ -459,6 +346,31 @@
     </footer>
 </main>
 
+<!-- Mobile Nav Anchor -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-outline-variant px-md py-sm flex justify-around items-center z-50 no-print">
+<a class="flex flex-col items-center gap-1 text-primary" href="/screens/dashboard.html">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">dashboard</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/analytics.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-[10px] font-bold">Analytics</span>
+</a>
+<div class="relative -top-6">
+<a href="/screens/invoices.html" class="h-14 w-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined">add</span>
+</a>
+</div>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/ai-cfo.html">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-[10px] font-bold">CFO</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/settings.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</a>
+</nav>
+
 <a href="/screens/invoices.html" class="fixed bottom-8 right-8 w-14 h-14 bg-primary text-on-primary rounded-full shadow-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-50 md:hidden" title="Upload an invoice" aria-label="Upload an invoice">
     <span class="material-symbols-outlined">add</span>
 </a>
@@ -468,13 +380,14 @@
         <a href="/screens/index.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Landing</a>
         <a href="/screens/dashboard.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Dashboard</a>
         <a href="/screens/invoices.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Invoices</a>
-        <a href="/screens/runway.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Runway</a>
+        <a href="/screens/ai-cfo.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">AI CFO</a>
         <a href="/screens/analytics.html" style="padding:6px 10px;border-radius:8px;color:#4648d4;text-decoration:none;font-weight:600;">Analytics</a>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="api.js"></script>
+<script src="copilot-widget.js"></script>
 
 
 <script>
@@ -489,7 +402,6 @@
     let lastInvoices = null;
     let liquidityView = "cashflow"; // "cashflow" | "projection"
     const CATEGORY_COLORS = ['#22C55E', '#A3E635', '#FBBF24', '#FB923C', '#EF4444', '#9CA3AF', '#3B82F6', '#8B5CF6'];
-    const SAFETY_THRESHOLD = 25000; // mirrors backend's payment-plan safety threshold
 
     window.addEventListener('load', () => {
         refreshAll();
@@ -498,10 +410,6 @@
     });
 
     document.getElementById("refreshBtn").addEventListener("click", () => refreshAll(true));
-
-    document.getElementById("notificationsBtn").addEventListener("click", () => {
-        document.getElementById("smartAlertsCard").scrollIntoView({ behavior: "smooth", block: "center" });
-    });
 
     document.getElementById("cashFlowTabBtn").addEventListener("click", () => setLiquidityView("cashflow"));
     document.getElementById("projectionTabBtn").addEventListener("click", () => setLiquidityView("projection"));
@@ -540,8 +448,7 @@
             loadExpenseChart(),
         ]);
 
-        renderHealthAndRisk();
-        renderSmartAlerts();
+        renderRecentActivity();
         renderLiquidityChart();
 
         lastSyncedAt = new Date();
@@ -595,7 +502,6 @@
         setText("totalPayables", fmt(data.total_payables));
         setText("totalReceivables", fmt(data.total_receivables || 0));
         setText("cashRunway", `${data.cash_runway} Days`);
-        setText("cashRunwayWidget", `${data.cash_runway} Days`);
         setText("upcomingBills", fmt(data.upcoming_bills || 0));
         setText("sidebarBalance", fmt(data.current_balance));
         setText("sidebarRunway", `${Math.ceil(data.cash_runway)} days runway`);
@@ -891,164 +797,47 @@
     }
 
     // ==========================================
-    // FINANCIAL HEALTH SCORE + RISK SCORE
-    // Deterministic 0-100 score from real dashboard metrics: runway,
-    // receivables-to-payables liquidity, and balance vs safety threshold.
+    // RECENT ACTIVITY — a simple feed built entirely from the already-loaded
+    // invoice list (no extra API call): recently-added invoices (by id,
+    // the only reliable recency signal since there's no created_at column)
+    // merged with recently-paid ones (by the existing paid_at field).
     // ==========================================
-    function renderHealthAndRisk() {
+    function renderRecentActivity() {
 
-        if (!lastDashboard) return;
+        const list = document.getElementById("recentActivityList");
+        if (!list || !lastInvoices) return;
 
-        const { current_balance, total_payables, total_receivables, cash_runway } = lastDashboard;
+        const added = [...lastInvoices]
+            .sort((a, b) => b.id - a.id)
+            .slice(0, 5)
+            .map((i) => ({
+                icon: i.transaction_type === "receivable" ? "request_quote" : "upload_file",
+                text: `${i.transaction_type === "receivable" ? "Receivable" : "Payable"} added — ${i.vendor} (${CashPilot.formatCurrency(i.amount)})`,
+                sortKey: i.id,
+            }));
 
-        const runwayScore = Math.min(cash_runway / 90, 1) * 40;
+        const paid = lastInvoices
+            .filter((i) => i.is_paid && i.paid_at)
+            .map((i) => ({
+                icon: "check_circle",
+                text: `Marked paid — ${i.vendor} (${CashPilot.formatCurrency(i.amount)})`,
+                sortKey: i.id,
+                paidAt: i.paid_at,
+            }));
 
-        const liquidityRatio = total_payables > 0 ? total_receivables / total_payables : (total_receivables > 0 ? 2 : 1);
-        const liquidityScore = Math.min(liquidityRatio / 1.5, 1) * 30;
+        const activity = [...added, ...paid]
+            .sort((a, b) => b.sortKey - a.sortKey)
+            .slice(0, 8);
 
-        const balanceScore = Math.min(Math.max(current_balance / (SAFETY_THRESHOLD * 2), 0), 1) * 30;
-
-        const score = Math.round(runwayScore + liquidityScore + balanceScore);
-
-        let label, colorClass, description;
-
-        if (score >= 80) {
-            label = "Optimal"; colorClass = "text-emerald-600 bg-emerald-50";
-            description = "Your financial health is strong across runway, liquidity, and cash reserves.";
-        } else if (score >= 60) {
-            label = "Good"; colorClass = "text-primary bg-primary-fixed/20";
-            description = "Your finances are in good shape. Keep an eye on upcoming payables to stay ahead.";
-        } else if (score >= 40) {
-            label = "Fair"; colorClass = "text-secondary bg-secondary-container/40";
-            description = "There's room to improve — consider accelerating receivables or trimming payables.";
-        } else {
-            label = "At Risk"; colorClass = "text-error bg-error-container";
-            description = "Cash position needs attention. Review upcoming payables and your runway closely.";
-        }
-
-        setText("healthScoreValue", String(score));
-
-        const labelEl = document.getElementById("healthScoreLabel");
-        if (labelEl) {
-            labelEl.className = `text-xs font-medium px-2 py-0.5 rounded-full mt-1 ${colorClass}`;
-            labelEl.textContent = label;
-        }
-
-        setText("healthScoreDescription", description);
-
-        const circle = document.querySelector('.gauge-ring');
-        if (circle) {
-            const radius = 70;
-            const circumference = 2 * Math.PI * radius;
-            const offset = circumference - (Math.max(score, 0) / 100) * circumference;
-            circle.style.strokeDasharray = `${circumference}`;
-            circle.style.strokeDashoffset = `${offset}`;
-        }
-
-        // Risk score mirrors the same thresholds, inverted.
-        let riskLabel, riskColorClass;
-        if (score >= 80) { riskLabel = "Low"; riskColorClass = "text-emerald-600"; }
-        else if (score >= 60) { riskLabel = "Medium"; riskColorClass = "text-secondary"; }
-        else if (score >= 40) { riskLabel = "High"; riskColorClass = "text-error"; }
-        else { riskLabel = "Critical"; riskColorClass = "text-error"; }
-
-        setText("riskScoreWidget", riskLabel);
-        const riskWidget = document.getElementById("riskScoreWidget");
-        if (riskWidget) riskWidget.className = `font-headline-md text-headline-md tracking-tight ${riskColorClass}`;
-
-        // Cash runway widget: color reflects real severity instead of a
-        // hardcoded "always red" state.
-        const runwayWidget = document.getElementById("cashRunwayWidget");
-        const runwayIconWrap = document.getElementById("cashRunwayIconWrap");
-        let runwayColor, runwayBg;
-        if (cash_runway >= 60) { runwayColor = "text-emerald-600"; runwayBg = "bg-emerald-50"; }
-        else if (cash_runway >= 30) { runwayColor = "text-secondary"; runwayBg = "bg-secondary-container"; }
-        else { runwayColor = "text-error"; runwayBg = "bg-error-container"; }
-
-        if (runwayWidget) runwayWidget.className = `font-headline-md text-headline-md tracking-tight ${runwayColor}`;
-        if (runwayIconWrap) {
-            runwayIconWrap.className = `w-12 h-12 rounded-full flex items-center justify-center ${runwayBg}`;
-            const icon = runwayIconWrap.querySelector(".material-symbols-outlined");
-            if (icon) icon.className = `material-symbols-outlined ${runwayColor}`;
-        }
-
-    }
-
-    // ==========================================
-    // SMART ALERTS — derived from real runway + invoice due dates
-    // ==========================================
-    function renderSmartAlerts() {
-
-        const list = document.getElementById("smartAlertsList");
-        const badge = document.getElementById("alertBadge");
-        if (!list || !lastDashboard || !lastInvoices) return;
-
-        const alerts = [];
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        if (lastDashboard.cash_runway <= 14) {
-            alerts.push({
-                icon: "priority_high", title: "Cash Warning", severity: "error",
-                message: `At your current burn rate, your cash runway is only ${lastDashboard.cash_runway} days.`,
-            });
-        }
-
-        const overdue = lastInvoices.filter((i) => {
-            const d = CashPilot.parseBackendDate(i.due_date);
-            return d && d < today && i.transaction_type === "payable";
-        });
-
-        if (overdue.length) {
-            const total = overdue.reduce((sum, i) => sum + Number(i.amount), 0);
-            alerts.push({
-                icon: "warning", title: "Overdue Payables", severity: "error",
-                message: `${overdue.length} payable${overdue.length === 1 ? " is" : "s are"} overdue, totaling ${CashPilot.formatCurrency(total)}.`,
-            });
-        }
-
-        const dueSoon = lastInvoices.filter((i) => {
-            const d = CashPilot.parseBackendDate(i.due_date);
-            if (!d) return false;
-            const diffDays = Math.ceil((d - today) / (1000 * 60 * 60 * 24));
-            return diffDays >= 0 && diffDays <= 3 && i.transaction_type === "payable";
-        });
-
-        if (dueSoon.length) {
-            const total = dueSoon.reduce((sum, i) => sum + Number(i.amount), 0);
-            alerts.push({
-                icon: "schedule", title: "Payments Due Soon", severity: "secondary",
-                message: `${dueSoon.length} payable${dueSoon.length === 1 ? "" : "s"} due within 3 days, totaling ${CashPilot.formatCurrency(total)}.`,
-            });
-        }
-
-        if (lastDashboard.current_balance < SAFETY_THRESHOLD) {
-            alerts.push({
-                icon: "account_balance_wallet", title: "Below Safety Threshold", severity: "secondary",
-                message: `Current balance is below your ${CashPilot.formatCurrency(SAFETY_THRESHOLD)} safety threshold.`,
-            });
-        }
-
-        if (badge) badge.classList.toggle("hidden", alerts.length === 0);
-
-        if (!alerts.length) {
-            list.innerHTML = `
-                <div class="flex flex-col items-center justify-center text-center py-lg gap-sm">
-                    <span class="material-symbols-outlined text-emerald-600 text-3xl">check_circle</span>
-                    <p class="font-bold text-on-surface">You're all caught up</p>
-                    <p class="text-body-sm text-on-surface-variant">No urgent alerts right now.</p>
-                </div>
-            `;
+        if (!activity.length) {
+            list.innerHTML = `<p class="text-center text-sm text-on-surface-variant py-lg">No activity yet — add or upload an invoice to get started.</p>`;
             return;
         }
 
-        list.innerHTML = alerts.map((a) => `
-            <div class="flex items-start gap-md p-md bg-${a.severity === "error" ? "error-container/30" : "secondary-container/30"} rounded-lg border-l-4 border-${a.severity}">
-                <span class="material-symbols-outlined text-${a.severity} mt-xs">${a.icon}</span>
-                <div>
-                    <p class="font-bold text-on-${a.severity === "error" ? "error" : "secondary"}-container">${CashPilot.escapeHtml(a.title)}</p>
-                    <p class="text-body-sm text-on-surface-variant">${CashPilot.escapeHtml(a.message)}</p>
-                </div>
+        list.innerHTML = activity.map((a) => `
+            <div class="flex items-center gap-md px-lg py-md">
+                <span class="material-symbols-outlined text-on-surface-variant">${a.icon}</span>
+                <p class="text-sm text-on-surface flex-1">${CashPilot.escapeHtml(a.text)}</p>
             </div>
         `).join("");
 
@@ -1089,116 +878,6 @@
 
     }
 
-    // ==========================================
-    // AI CFO CHAT
-    // ==========================================
-    document.getElementById("sendChatBtn").addEventListener("click", sendMessage);
-
-    document.getElementById("chatInput").addEventListener("keypress", (e) => {
-        if (e.key === "Enter") sendMessage();
-    });
-
-    let chatBusy = false;
-
-    async function sendMessage() {
-
-        if (chatBusy) return;
-
-        const input = document.getElementById("chatInput");
-        const question = input.value;
-
-        if (!question.trim()) return;
-
-        document.getElementById("chatEmptyState")?.classList.add("hidden");
-
-        addUserMessage(question);
-        input.value = "";
-
-        chatBusy = true;
-        const typingEl = addTypingIndicator();
-
-        try {
-
-            const response = await api("/cfo-chat", {
-                method: "POST",
-                body: JSON.stringify({ question }),
-            });
-
-            const data = await response.json();
-
-            typingEl.remove();
-
-            if (!response.ok) {
-                addBotMessage(data.detail || "Something went wrong. Please try again.");
-            } else if (data.error) {
-                addBotMessage(data.error);
-            } else {
-                addBotMessage(data.answer);
-            }
-
-        } catch (err) {
-            typingEl.remove();
-            addBotMessage("I couldn't reach the server. Please check your connection and try again.");
-        } finally {
-            chatBusy = false;
-        }
-
-    }
-
-    function scrollChatToBottom() {
-        const scrollArea = document.querySelector("#chatMessages")?.parentElement;
-        if (scrollArea) scrollArea.scrollTop = scrollArea.scrollHeight;
-    }
-
-    function addUserMessage(text) {
-
-        const chat = document.getElementById("chatMessages");
-
-        chat.insertAdjacentHTML("beforeend", `
-            <div class="flex justify-end">
-                <div class="bg-primary text-white px-md py-sm rounded-xl max-w-xs">
-                    ${CashPilot.escapeHtml(text)}
-                </div>
-            </div>
-        `);
-
-        scrollChatToBottom();
-
-    }
-
-    function addBotMessage(text) {
-
-        const chat = document.getElementById("chatMessages");
-
-        chat.insertAdjacentHTML("beforeend", `
-            <div class="flex justify-start">
-                <div class="bg-surface-container-low px-md py-sm rounded-xl max-w-md">
-                    ${CashPilot.escapeHtml(text)}
-                </div>
-            </div>
-        `);
-
-        scrollChatToBottom();
-
-    }
-
-    function addTypingIndicator() {
-
-        const chat = document.getElementById("chatMessages");
-
-        chat.insertAdjacentHTML("beforeend", `
-            <div class="flex justify-start" data-typing-indicator>
-                <div class="bg-surface-container-low px-md py-sm rounded-xl max-w-md text-on-surface-variant animate-pulse">
-                    Thinking…
-                </div>
-            </div>
-        `);
-
-        scrollChatToBottom();
-
-        return chat.querySelector("[data-typing-indicator]");
-
-    }
 </script>
 
 

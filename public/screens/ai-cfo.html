@@ -145,33 +145,23 @@
             <span class="font-label-md">Invoice Hub</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
-            <span class="material-symbols-outlined group-hover:text-primary transition-colors">timeline</span>
-            <span class="font-label-md">Cash Runway</span>
-        </a>
-
         <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
             <span class="material-symbols-outlined group-hover:text-primary transition-colors">analytics</span>
             <span class="font-label-md">Analytics</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-primary bg-primary-fixed/20 font-bold transition-all" href="/screens/ai-cfo.html">
+        <a class="flex items-center gap-md px-md py-sm rounded-lg bg-primary text-on-primary font-bold transition-all" href="/screens/ai-cfo.html">
             <span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">psychology</span>
             <span class="font-label-md">AI CFO</span>
         </a>
 
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/runway.html">
-            <span class="material-symbols-outlined group-hover:text-primary transition-colors">priority_high</span>
-            <span class="font-label-md">Payment Priorities</span>
-        </a>
-
-        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/analytics.html">
-            <span class="material-symbols-outlined group-hover:text-primary transition-colors">forum</span>
-            <span class="font-label-md">Vendor Negotiator</span>
+        <a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all group" href="/screens/settings.html">
+            <span class="material-symbols-outlined group-hover:text-primary transition-colors">settings</span>
+            <span class="font-label-md">Settings</span>
         </a>
 
         <div class="mt-lg p-md bg-primary-fixed/10 rounded-xl border border-outline-variant">
-            <p class="text-xs text-on-surface-variant">Current Cash Position</p>
+            <p class="text-xs text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-sm">account_balance_wallet</span>Current Cash Position</p>
             <div class="mt-sm flex flex-col gap-sm">
                 <h4 id="sidebarBalance" class="font-headline-md text-primary font-bold"><span class="inline-block h-5 w-16 rounded bg-primary-fixed/40 animate-pulse"></span></h4>
             </div>
@@ -214,6 +204,37 @@
     </div>
 
     <div id="cfoContent">
+
+        <!-- Financial Overview -->
+        <div id="financial-overview">
+
+        <div class="flex items-center gap-sm mb-md">
+            <span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;">dashboard</span>
+            <h3 class="font-headline-md text-on-surface">Financial Overview</h3>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-md mb-lg">
+            <div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <p class="text-xs text-on-surface-variant uppercase tracking-wide">Current Balance</p>
+                <p id="overviewCurrentBalance" class="text-xl font-bold text-on-surface mt-xs tracking-tight">--</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <p class="text-xs text-on-surface-variant uppercase tracking-wide">Cash Runway</p>
+                <p id="overviewRunway" class="text-xl font-bold text-on-surface mt-xs tracking-tight">--</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <p class="text-xs text-on-surface-variant uppercase tracking-wide">Outstanding Payables</p>
+                <p id="overviewPayables" class="text-xl font-bold text-on-surface mt-xs tracking-tight">--</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <p class="text-xs text-on-surface-variant uppercase tracking-wide">Outstanding Receivables</p>
+                <p id="overviewReceivables" class="text-xl font-bold text-on-surface mt-xs tracking-tight">--</p>
+            </div>
+            <div class="bg-surface-container-lowest border border-outline-variant p-md rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <p class="text-xs text-on-surface-variant uppercase tracking-wide">Critical Payments</p>
+                <p id="overviewCriticalPayments" class="text-xl font-bold text-error mt-xs tracking-tight">--</p>
+            </div>
+        </div>
 
         <!-- Health Score + Forecast -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-lg mb-lg">
@@ -269,16 +290,24 @@
             </div>
         </div>
 
-        <!-- Smart Payment / Receivable Recommendations -->
+        </div> <!-- End Financial Overview (incl. Cash Flow Forecast) -->
+
+        <!-- Payment Planning + Receivable Follow-ups -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg mb-lg">
 
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
-                <div class="flex items-center gap-sm mb-md">
-                    <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">payments</span>
-                    <h3 class="font-headline-md text-on-surface">Smart Payment Recommendations</h3>
+                <div class="flex items-center justify-between gap-sm mb-md">
+                    <div class="flex items-center gap-sm">
+                        <span class="material-symbols-outlined text-error" style="font-variation-settings:'FILL' 1;">payments</span>
+                        <h3 class="font-headline-md text-on-surface">Payment Planning</h3>
+                    </div>
+                    <button id="generatePaymentPlanBtn" class="px-md py-xs rounded-lg border border-outline-variant text-xs font-label-md font-bold text-primary hover:bg-primary-fixed/10 transition-all disabled:opacity-60">
+                        Generate Payment Plan
+                    </button>
                 </div>
                 <div id="paymentRecsList" class="space-y-sm"></div>
                 <p id="paymentRecsEmpty" class="hidden text-center text-sm text-on-surface-variant py-lg">No outstanding payables — nothing to prioritize right now.</p>
+                <div id="paymentPlanResult" class="hidden mt-md pt-md border-t border-outline-variant"></div>
             </div>
 
             <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
@@ -322,8 +351,49 @@
             </div>
         </div>
 
+        <!-- Vendor Negotiation -->
+        <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm mb-lg">
+            <div class="flex items-center gap-sm mb-lg">
+                <span class="material-symbols-outlined text-tertiary" style="font-variation-settings:'FILL' 1;">forum</span>
+                <h3 class="font-headline-md text-on-surface">Vendor Negotiation</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+                <div class="space-y-md">
+                    <div>
+                        <label class="font-label-md text-on-surface-variant block mb-xs">Select Unpaid Invoice</label>
+                        <select id="negotiationInvoiceSelect" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest">
+                            <option value="">No unpaid payables yet</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="font-label-md text-on-surface-variant block mb-xs">Negotiation Goal</label>
+                        <div class="flex gap-sm" id="negotiationGoalButtons">
+                            <button type="button" data-goal="extension" class="goal-btn flex-1 py-sm bg-surface-container-highest rounded-lg border border-primary text-primary font-bold text-xs">Extension</button>
+                            <button type="button" data-goal="discount" class="goal-btn flex-1 py-sm bg-surface-container-lowest rounded-lg border border-outline-variant text-on-surface-variant text-xs hover:border-primary">Discount</button>
+                            <button type="button" data-goal="installments" class="goal-btn flex-1 py-sm bg-surface-container-lowest rounded-lg border border-outline-variant text-on-surface-variant text-xs hover:border-primary">Installments</button>
+                        </div>
+                    </div>
+                    <button id="generateDraftBtn" class="w-full py-sm bg-primary text-on-primary rounded-lg font-label-md font-bold disabled:opacity-60">Generate Draft</button>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex-1 flex flex-col bg-surface-container-low border border-outline-variant rounded-lg overflow-hidden">
+                        <div class="bg-surface-container-high px-md py-sm border-b border-outline-variant text-xs font-bold text-on-surface">Email Draft</div>
+                        <div class="p-md flex-1 overflow-y-auto max-h-[180px]">
+                            <div id="negotiationDraft" class="text-sm text-on-surface leading-relaxed whitespace-pre-line">Select an invoice and click "Generate Draft" to get an AI-written email.</div>
+                        </div>
+                        <div class="p-sm border-t border-outline-variant">
+                            <button id="copyDraftBtn" class="w-full flex items-center justify-center gap-sm py-xs border border-outline-variant rounded-lg text-on-surface hover:bg-surface-container-lowest transition-all text-xs">
+                                <span class="material-symbols-outlined text-[16px]">content_copy</span>
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Scenario Simulator -->
-        <div class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
+        <div id="scenario-simulator" class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
             <div class="flex items-center gap-sm mb-lg">
                 <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">science</span>
                 <h3 class="font-headline-md text-on-surface">Scenario Simulator</h3>
@@ -362,8 +432,12 @@
                     </button>
                 </form>
 
-                <div id="scenarioResult" class="p-md rounded-xl border border-outline-variant bg-primary-fixed/10">
-                    <p class="text-sm text-on-surface-variant text-center py-xl">Run a scenario to see its projected impact on balance, runway, health score, and risk level.</p>
+                <div id="scenarioResult" class="p-lg rounded-xl border border-dashed border-outline-variant bg-surface-container-low/50 flex flex-col items-center justify-center text-center gap-sm min-h-[220px]">
+                    <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center">
+                        <span class="material-symbols-outlined text-on-surface-variant text-2xl">science</span>
+                    </div>
+                    <p class="font-bold text-on-surface text-sm">Run a scenario to see the impact</p>
+                    <p class="text-xs text-on-surface-variant max-w-[240px]">Projected Health Score, Cash Balance, Runway, and Risk Level will appear here.</p>
                 </div>
             </div>
         </div>
@@ -383,8 +457,34 @@
     </footer>
 </main>
 
+<!-- Mobile Nav Anchor -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-md border-t border-outline-variant px-md py-sm flex justify-around items-center z-50 no-print">
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/dashboard.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-[10px] font-bold">Home</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/analytics.html">
+<span class="material-symbols-outlined">bar_chart</span>
+<span class="text-[10px] font-bold">Analytics</span>
+</a>
+<div class="relative -top-6">
+<a href="/screens/invoices.html" class="h-14 w-14 rounded-full bg-primary text-on-primary shadow-lg flex items-center justify-center">
+<span class="material-symbols-outlined">add</span>
+</a>
+</div>
+<a class="flex flex-col items-center gap-1 text-primary" href="/screens/ai-cfo.html">
+<span class="material-symbols-outlined" style="font-variation-settings:'FILL' 1;">smart_toy</span>
+<span class="text-[10px] font-bold">CFO</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="/screens/settings.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</a>
+</nav>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="api.js"></script>
+<script src="copilot-widget.js"></script>
 <script src="ai-cfo.js"></script>
 </body>
 </html>

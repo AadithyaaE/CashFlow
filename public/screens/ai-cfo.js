@@ -6,6 +6,7 @@
 CashPilot.initPage();
 
 let lastOverview = null;
+let lastDashboardData = null;
 let forecastChartInstance = null;
 
 const PRIORITY_COLOR = {
@@ -51,11 +52,32 @@ document.getElementById("retryOverviewBtn").addEventListener("click", () => {
 async function loadSidebar() {
     try {
         const data = await CashPilot.apiJson("/dashboard");
+        lastDashboardData = data;
         setText("sidebarBalance", CashPilot.formatCurrency(data.current_balance));
         setText("sidebarRunway", `${Math.ceil(data.cash_runway)} days runway`);
+        renderFinancialOverviewStats();
     } catch (_) {
         // Non-critical widget — the rest of the page still works without it.
     }
+}
+
+// Financial Overview stat tiles reuse data already fetched for the sidebar
+// (/dashboard) and the main overview (/cfo/overview) — no extra API calls.
+function renderFinancialOverviewStats() {
+    if (!lastDashboardData || !lastOverview) return;
+
+    const metrics = lastOverview.health_score.metrics;
+    const criticalPayables = lastOverview.payment_recommendations.filter((r) => r.priority === "Critical");
+    const criticalTotal = criticalPayables.reduce((sum, r) => sum + r.amount, 0);
+
+    setText("overviewCurrentBalance", CashPilot.formatCurrency(lastDashboardData.current_balance));
+    setText("overviewRunway", `${metrics.runway_days} days`);
+    setText("overviewPayables", CashPilot.formatCurrency(metrics.total_outstanding_payables));
+    setText("overviewReceivables", CashPilot.formatCurrency(metrics.total_outstanding_receivables));
+    setText(
+        "overviewCriticalPayments",
+        criticalPayables.length ? `${criticalPayables.length} (${CashPilot.formatCurrency(criticalTotal)})` : "None"
+    );
 }
 
 // ---------------------------------------------------------------------------
@@ -77,6 +99,8 @@ async function loadOverview() {
         renderReceivableRecs(data.receivable_recommendations);
         renderRisks(data.risks);
         populateScenarioInvoiceOptions();
+        renderFinancialOverviewStats();
+        populateNegotiationInvoiceOptions();
 
         document.getElementById("cfoLoading").classList.add("hidden");
         document.getElementById("cfoContent").classList.remove("hidden");
@@ -225,6 +249,125 @@ function renderRisks(risks) {
 }
 
 // ---------------------------------------------------------------------------
+// Payment Plan generation (reuses the existing GET /payment-plan endpoint —
+// the pay-now/delay grouping already built for the old runway.html page)
+// ---------------------------------------------------------------------------
+
+document.getElementById("generatePaymentPlanBtn").addEventListener("click", async () => {
+    const btn = document.getElementById("generatePaymentPlanBtn");
+    const resultEl = document.getElementById("paymentPlanResult");
+
+    btn.disabled = true;
+    resultEl.classList.remove("hidden");
+    resultEl.innerHTML = `<p class="text-xs text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined animate-spin text-sm">progress_activity</span> Generating plan…</p>`;
+
+    try {
+        const plan = await CashPilot.apiJson("/payment-plan");
+
+        const renderGroup = (title, items, colorClass) => `
+            <p class="text-xs font-bold uppercase tracking-wider ${colorClass} mb-xs">${title} (${items.length})</p>
+            ${items.length
+                ? `<ul class="space-y-1 mb-md">${items.map((i) => `<li class="text-xs text-on-surface-variant flex justify-between"><span>${CashPilot.escapeHtml(i.vendor)}</span><span class="font-mono-data">${CashPilot.formatCurrency(i.amount)}</span></li>`).join("")}</ul>`
+                : `<p class="text-xs text-on-surface-variant mb-md">None</p>`}
+        `;
+
+        resultEl.innerHTML = `
+            <p class="text-xs text-on-surface-variant mb-md">Remaining balance after paying now: <span class="font-bold text-on-surface">${CashPilot.formatCurrency(plan.remaining_balance)}</span></p>
+            ${renderGroup("Pay Now", plan.pay_now, "text-error")}
+            ${renderGroup("Delay", plan.delay, "text-secondary")}
+        `;
+    } catch (err) {
+        resultEl.innerHTML = `<p class="text-xs text-error">${CashPilot.escapeHtml(err.message || "Could not generate a payment plan.")}</p>`;
+    } finally {
+        btn.disabled = false;
+    }
+});
+
+// ---------------------------------------------------------------------------
+// Vendor Negotiation (reuses the existing POST /vendor-negotiation endpoint
+// and the payables already loaded for Payment Planning — no extra fetch)
+// ---------------------------------------------------------------------------
+
+let negotiationGoal = "extension";
+
+function populateNegotiationInvoiceOptions() {
+    const select = document.getElementById("negotiationInvoiceSelect");
+    const unpaidPayables = (lastOverview && lastOverview.payment_recommendations) || [];
+
+    if (!unpaidPayables.length) {
+        select.innerHTML = '<option value="">No unpaid payables yet</option>';
+        return;
+    }
+
+    select.innerHTML = unpaidPayables
+        .map((inv) => `<option value="${inv.id}">${CashPilot.escapeHtml(inv.vendor)} — ${CashPilot.formatCurrency(inv.amount)} (due ${CashPilot.escapeHtml(inv.due_date || "Unknown")})</option>`)
+        .join("");
+}
+
+document.getElementById("negotiationGoalButtons").addEventListener("click", (e) => {
+    const btn = e.target.closest(".goal-btn");
+    if (!btn) return;
+    negotiationGoal = btn.dataset.goal;
+    document.querySelectorAll("#negotiationGoalButtons .goal-btn").forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle("border-primary", active);
+        b.classList.toggle("text-primary", active);
+        b.classList.toggle("bg-surface-container-highest", active);
+        b.classList.toggle("border-outline-variant", !active);
+        b.classList.toggle("text-on-surface-variant", !active);
+        b.classList.toggle("bg-surface-container-lowest", !active);
+    });
+});
+
+document.getElementById("generateDraftBtn").addEventListener("click", async () => {
+    const select = document.getElementById("negotiationInvoiceSelect");
+    const invoiceId = Number(select.value);
+    const draftEl = document.getElementById("negotiationDraft");
+    const btn = document.getElementById("generateDraftBtn");
+
+    if (!invoiceId) {
+        CashPilot.toast("Select an unpaid invoice first.", "error");
+        return;
+    }
+
+    const invoice = (lastOverview.payment_recommendations || []).find((i) => i.id === invoiceId);
+    if (!invoice) return;
+
+    btn.disabled = true;
+    draftEl.textContent = "Generating…";
+
+    try {
+        const data = await CashPilot.apiJson("/vendor-negotiation", {
+            method: "POST",
+            body: JSON.stringify({
+                vendor: invoice.vendor,
+                amount: invoice.amount,
+                due_date: invoice.due_date,
+                category: invoice.category,
+                goal: negotiationGoal,
+            }),
+        });
+        draftEl.textContent = data.message;
+    } catch (err) {
+        draftEl.textContent = "";
+        CashPilot.toast(err.message || "Could not generate a draft right now.", "error");
+    } finally {
+        btn.disabled = false;
+    }
+});
+
+document.getElementById("copyDraftBtn").addEventListener("click", async () => {
+    const text = document.getElementById("negotiationDraft").textContent;
+    if (!text || !text.trim()) return;
+    try {
+        await navigator.clipboard.writeText(text);
+        CashPilot.toast("Copied to clipboard.", "success");
+    } catch (err) {
+        CashPilot.toast("Could not copy to clipboard.", "error");
+    }
+});
+
+// ---------------------------------------------------------------------------
 // AI CFO Recommendations (Gemini narrative, loaded independently)
 // ---------------------------------------------------------------------------
 
@@ -242,8 +385,12 @@ async function loadAiRecommendations() {
 
         const recsHtml = data.recommendations.map((r) => `
             <div class="p-md rounded-xl border border-outline-variant bg-surface-container-low">
-                <p class="font-semibold text-on-surface text-sm">${CashPilot.escapeHtml(r.title)}</p>
-                <p class="text-sm text-on-surface-variant mt-1 leading-relaxed">${CashPilot.escapeHtml(r.detail)}</p>
+                <div class="flex justify-between items-start gap-sm">
+                    <p class="font-semibold text-on-surface text-sm">${CashPilot.escapeHtml(r.title)}</p>
+                    <span class="px-sm py-xs rounded-lg font-label-md text-xs shrink-0 ${PRIORITY_BADGE[r.priority] || PRIORITY_BADGE.Medium}">${r.priority}</span>
+                </div>
+                <p class="text-sm text-on-surface-variant mt-1 leading-relaxed">${CashPilot.escapeHtml(r.reason)}</p>
+                <p class="text-xs font-semibold text-primary mt-sm">${CashPilot.escapeHtml(r.action)}</p>
             </div>
         `).join("");
 
@@ -345,7 +492,16 @@ document.getElementById("scenarioForm").addEventListener("submit", async (e) => 
 function renderScenarioResult(result) {
     const { baseline, projected, description } = result;
 
-    const delta = (a, b) => (b - a >= 0 ? "+" : "") + Math.round(b - a);
+    const delta = (a, b) => Math.round(b - a);
+    const deltaPill = (value, higherIsBetter = true) => {
+        if (value === 0) {
+            return `<span class="text-[10px] font-semibold text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded-full">No change</span>`;
+        }
+        const good = higherIsBetter ? value > 0 : value < 0;
+        const arrow = value > 0 ? "▲" : "▼";
+        const cls = good ? "text-emerald-700 bg-emerald-50" : "text-red-700 bg-red-50";
+        return `<span class="text-[10px] font-semibold ${cls} px-1.5 py-0.5 rounded-full">${arrow} ${Math.abs(value)}</span>`;
+    };
     const riskColor = {
         Low: "text-emerald-600",
         Medium: "text-secondary",
@@ -353,24 +509,32 @@ function renderScenarioResult(result) {
         Critical: "text-error",
     };
 
-    document.getElementById("scenarioResult").innerHTML = `
-        <p class="font-semibold text-on-surface mb-md">${CashPilot.escapeHtml(description)}</p>
+    const resultEl = document.getElementById("scenarioResult");
+    // Swap out of the dashed empty-state look now that there's a real result.
+    resultEl.className = "p-lg rounded-xl border border-outline-variant bg-primary-fixed/10";
+    resultEl.innerHTML = `
+        <div class="flex items-center gap-sm mb-lg pb-md border-b border-outline-variant/60">
+            <span class="material-symbols-outlined text-primary">auto_awesome</span>
+            <p class="font-semibold text-on-surface text-sm">${CashPilot.escapeHtml(description)}</p>
+        </div>
         <div class="grid grid-cols-2 gap-md">
-            <div class="p-sm rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant">Cash Runway</p>
-                <p class="font-bold text-on-surface">${projected.runway_days} days <span class="text-xs font-normal text-on-surface-variant">(${delta(baseline.runway_days, projected.runway_days)}d)</span></p>
+            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
+                <p class="text-xs text-on-surface-variant mb-xs">Cash Runway</p>
+                <p class="text-2xl font-bold text-on-surface">${projected.runway_days}<span class="text-xs font-normal text-on-surface-variant ml-1">days</span></p>
+                <div class="mt-xs">${deltaPill(delta(baseline.runway_days, projected.runway_days), true)}</div>
             </div>
-            <div class="p-sm rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant">Health Score</p>
-                <p class="font-bold text-on-surface">${projected.health_score}/100 <span class="text-xs font-normal text-on-surface-variant">(${delta(baseline.health_score, projected.health_score)})</span></p>
+            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
+                <p class="text-xs text-on-surface-variant mb-xs">Health Score</p>
+                <p class="text-2xl font-bold text-on-surface">${projected.health_score}<span class="text-xs font-normal text-on-surface-variant ml-1">/100</span></p>
+                <div class="mt-xs">${deltaPill(delta(baseline.health_score, projected.health_score), true)}</div>
             </div>
-            <div class="p-sm rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant">Cash Balance</p>
-                <p class="font-bold text-on-surface">${CashPilot.formatCurrency(projected.balance)}</p>
+            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
+                <p class="text-xs text-on-surface-variant mb-xs">Cash Balance</p>
+                <p class="text-2xl font-bold text-on-surface">${CashPilot.formatCurrency(projected.balance)}</p>
             </div>
-            <div class="p-sm rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant">Risk Level</p>
-                <p class="font-bold ${riskColor[projected.risk_level] || ""}">${projected.risk_level}</p>
+            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
+                <p class="text-xs text-on-surface-variant mb-xs">Risk Level</p>
+                <p class="text-2xl font-bold ${riskColor[projected.risk_level] || ""}">${projected.risk_level}</p>
             </div>
         </div>
     `;

@@ -183,7 +183,6 @@ function renderAll() {
     renderInvoiceStatus(allInvoices);
     renderVendorTable(allInvoices);
     renderInvoiceAnalytics(allInvoices);
-    renderNegotiationOptions();
 
     // Time-series only — these are the sole consumers of the date range.
     renderCashFlowTrend(timeSeriesInvoices, from, to);
@@ -289,6 +288,13 @@ function renderCashFlowTrend(invoices, from, to) {
     if (charts.trend) { charts.trend.destroy(); charts.trend = null; }
 
     if (!invoices.length || !hasData) {
+        emptyState.innerHTML = CashPilot.emptyState({
+            icon: 'show_chart',
+            title: 'No cash flow data yet',
+            description: 'Add invoices with due dates to see your cash flow trend.',
+            actionLabel: 'Add Invoice',
+            actionHref: '/screens/invoices.html',
+        });
         emptyState.classList.remove('hidden');
         return;
     }
@@ -333,6 +339,13 @@ function renderExpenseCategories(invoices) {
     if (charts.category) { charts.category.destroy(); charts.category = null; }
 
     if (!entries.length) {
+        emptyState.innerHTML = CashPilot.emptyState({
+            icon: 'donut_small',
+            title: 'No expenses yet',
+            description: 'Add payable invoices to see spend by category.',
+            actionLabel: 'Add Invoice',
+            actionHref: '/screens/invoices.html',
+        });
         emptyState.classList.remove('hidden');
         legend.innerHTML = '';
         return;
@@ -371,6 +384,13 @@ function renderIncomeExpensesBar(invoices, from, to) {
     if (charts.bar) { charts.bar.destroy(); charts.bar = null; }
 
     if (!invoices.length || !hasData) {
+        emptyState.innerHTML = CashPilot.emptyState({
+            icon: 'bar_chart',
+            title: 'No data in this range',
+            description: 'Try a different date range, or add some invoices.',
+            actionLabel: 'Add Invoice',
+            actionHref: '/screens/invoices.html',
+        });
         emptyState.classList.remove('hidden');
         return;
     }
@@ -406,6 +426,13 @@ function renderInvoiceStatus(invoices) {
     if (charts.status) { charts.status.destroy(); charts.status = null; }
 
     if (!invoices.length || !entries.length) {
+        emptyState.innerHTML = CashPilot.emptyState({
+            icon: 'receipt_long',
+            title: 'No invoices yet',
+            description: 'Upload or add your first invoice to see status breakdown.',
+            actionLabel: 'Add Invoice',
+            actionHref: '/screens/invoices.html',
+        });
         emptyState.classList.remove('hidden');
         legend.innerHTML = '';
         return;
@@ -452,7 +479,13 @@ function renderVendorTable(invoices) {
     const rows = Object.entries(vendors).sort((a, b) => b[1].total - a[1].total).slice(0, 8);
 
     if (!rows.length) {
-        tbody.innerHTML = `<tr><td colspan="4" class="px-lg py-xl text-center text-on-surface-variant">No payable invoices yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4">${CashPilot.emptyState({
+            icon: 'storefront',
+            title: 'No vendors yet',
+            description: 'Add payable invoices to see vendor spend and overdue totals.',
+            actionLabel: 'Add Invoice',
+            actionHref: '/screens/invoices.html',
+        })}</td></tr>`;
         return;
     }
 
@@ -507,130 +540,6 @@ function renderInvoiceAnalytics(invoices) {
     const unpaidCount = invoices.length - paidCount;
     setText('paidVsUnpaid', invoices.length ? `${paidCount} paid / ${unpaidCount} unpaid` : '--');
 }
-
-// ==========================================
-// AI INSIGHTS
-// ==========================================
-document.getElementById('generateInsightsBtn').addEventListener('click', async () => {
-    const btn = document.getElementById('generateInsightsBtn');
-    const body = document.getElementById('insightsBody');
-
-    btn.disabled = true;
-    body.innerHTML = `<p class="text-body-sm text-on-surface-variant flex items-center gap-sm"><span class="material-symbols-outlined animate-spin text-[18px]">progress_activity</span> Analyzing your cash flow…</p>`;
-
-    try {
-        const data = await CashPilot.apiJson('/analytics-insights');
-
-        const riskItems = (data.risks || []).map((r) => `<li>${CashPilot.escapeHtml(r)}</li>`).join('');
-        const recItems = (data.recommendations || []).map((r) => `<li>${CashPilot.escapeHtml(r)}</li>`).join('');
-
-        body.innerHTML = `
-            <div class="space-y-md">
-                <div>
-                    <h5 class="font-label-md font-bold uppercase tracking-wider text-primary mb-xs">Key Insight</h5>
-                    <p class="text-body-sm text-on-surface">${CashPilot.escapeHtml(data.key_insight || '')}</p>
-                </div>
-                ${riskItems ? `<div>
-                    <h5 class="font-label-md font-bold uppercase tracking-wider text-error mb-xs">Risks to Watch</h5>
-                    <ul class="list-disc list-inside text-body-sm text-on-surface space-y-1">${riskItems}</ul>
-                </div>` : ''}
-                ${recItems ? `<div>
-                    <h5 class="font-label-md font-bold uppercase tracking-wider text-emerald-600 mb-xs">Recommendations</h5>
-                    <ul class="list-disc list-inside text-body-sm text-on-surface space-y-1">${recItems}</ul>
-                </div>` : ''}
-            </div>
-        `;
-    } catch (err) {
-        body.innerHTML = `<p class="text-body-sm text-error">${CashPilot.escapeHtml(err.message || 'Could not generate insights right now.')}</p>`;
-    } finally {
-        btn.disabled = false;
-    }
-});
-
-// ==========================================
-// VENDOR NEGOTIATION (real data, real Gemini draft)
-// ==========================================
-let selectedGoal = 'extension';
-
-function renderNegotiationOptions() {
-    const select = document.getElementById('negotiationInvoiceSelect');
-    const unpaidPayables = allInvoices.filter((i) => i.transaction_type === 'payable' && !i.is_paid);
-
-    if (!unpaidPayables.length) {
-        select.innerHTML = `<option value="">No unpaid payables yet</option>`;
-        return;
-    }
-
-    select.innerHTML = unpaidPayables
-        .map((inv) => `<option value="${inv.id}">${CashPilot.escapeHtml(inv.vendor)} — ${CashPilot.formatCurrency(inv.amount)} (due ${CashPilot.escapeHtml(inv.due_date)})</option>`)
-        .join('');
-}
-
-document.getElementById('negotiationGoalButtons').addEventListener('click', (e) => {
-    const btn = e.target.closest('.goal-btn');
-    if (!btn) return;
-    selectedGoal = btn.dataset.goal;
-    document.querySelectorAll('.goal-btn').forEach((b) => {
-        const active = b === btn;
-        b.classList.toggle('border-primary', active);
-        b.classList.toggle('text-primary', active);
-        b.classList.toggle('bg-surface-container-highest', active);
-        b.classList.toggle('border-outline-variant', !active);
-        b.classList.toggle('text-on-surface-variant', !active);
-        b.classList.toggle('bg-surface-container-lowest', !active);
-    });
-});
-
-document.getElementById('generateDraftBtn').addEventListener('click', async () => {
-    const select = document.getElementById('negotiationInvoiceSelect');
-    const invoiceId = Number(select.value);
-    const draftEl = document.getElementById('negotiationDraft');
-    const btn = document.getElementById('generateDraftBtn');
-
-    if (!invoiceId) {
-        CashPilot.toast('Select an unpaid invoice first.', 'error');
-        return;
-    }
-
-    const invoice = allInvoices.find((i) => i.id === invoiceId);
-    if (!invoice) return;
-
-    btn.disabled = true;
-    draftEl.textContent = 'Generating…';
-
-    try {
-        const data = await CashPilot.apiJson('/vendor-negotiation', {
-            method: 'POST',
-            body: JSON.stringify({
-                vendor: invoice.vendor,
-                amount: invoice.amount,
-                due_date: invoice.due_date,
-                category: invoice.category,
-                goal: selectedGoal,
-            }),
-        });
-        draftEl.textContent = data.message;
-    } catch (err) {
-        draftEl.textContent = '';
-        CashPilot.toast(err.message || 'Could not generate a draft right now.', 'error');
-    } finally {
-        btn.disabled = false;
-    }
-});
-
-document.getElementById('copyDraftBtn').addEventListener('click', async () => {
-    const text = document.getElementById('negotiationDraft').textContent;
-    if (!text || !text.trim()) return;
-    try {
-        await navigator.clipboard.writeText(text);
-        const label = document.querySelector('#copyDraftBtn .text-label-md');
-        const original = label.textContent;
-        label.textContent = 'Copied!';
-        setTimeout(() => { label.textContent = original; }, 2000);
-    } catch (err) {
-        CashPilot.toast('Could not copy to clipboard.', 'error');
-    }
-});
 
 // ==========================================
 // EXPORT MENU

@@ -1,11 +1,12 @@
 # Render Blueprint for the CashPilot AI FastAPI backend.
 # Deploy: render.com/deploy or "New +" -> "Blueprint" -> point at this repo.
 #
-# Persistence note: SQLite lives on the service's local disk. On Render's
-# Free plan that disk is ephemeral, so the database resets on every deploy
-# and periodically on restart. For real data retention, switch `plan` to
-# `starter` (or higher) and uncomment the `disk` block below, which mounts
-# a persistent volume and points DATABASE_URL at a file on it.
+# Persistence: the backend runs on Postgres (Neon) via DATABASE_URL, so data
+# survives deploys/restarts on any Render plan — no persistent disk needed.
+# Create a Neon project (neon.tech), copy its connection string, and set it
+# as DATABASE_URL below in the Render dashboard. The build step runs Alembic
+# migrations before starting the app, so a fresh Neon database gets its
+# schema created automatically on first deploy.
 services:
   - type: web
     name: cashpilot-backend
@@ -13,7 +14,7 @@ services:
     plan: free
     region: oregon
     rootDir: backend
-    buildCommand: pip install -r requirements.txt
+    buildCommand: pip install -r requirements.txt && alembic upgrade head
     startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /
     autoDeploy: true
@@ -34,11 +35,10 @@ services:
       # Used to build the password-reset link sent to users.
       - key: FRONTEND_URL
         value: https://cashpilot-ai.vercel.app
-      # Uncomment along with the `disk` block below to persist SQLite
-      # across deploys/restarts (requires `plan: starter` or higher):
-      # - key: DATABASE_URL
-      #   value: sqlite:////var/data/cashpilot.db
-    # disk:
-    #   name: cashpilot-data
-    #   mountPath: /var/data
-    #   sizeGB: 1
+      # Your Neon Postgres connection string, e.g.:
+      #   postgresql://<user>:<password>@<host>/<db>?sslmode=require
+      # Set this in the Render dashboard — it's a secret and intentionally
+      # not stored in this file. Falls back to a local SQLite file if unset,
+      # which is only useful for local development, never production.
+      - key: DATABASE_URL
+        sync: false

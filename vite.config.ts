@@ -6,18 +6,26 @@
 // You can pass additional config via defineConfig({ vite: { ... }, etc... }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
+// Vercel remains the default target (untouched). Docker's build sets
+// NITRO_PRESET=node so the same `vite build` instead emits a standalone
+// Node server under .output/ — Vercel's Build Output API layout isn't
+// something a plain container can run directly.
+const isNodeBuild = process.env.NITRO_PRESET === "node";
+
 export default defineConfig({
-  nitro: {
-    preset: "vercel",
-    // Emit straight into Vercel's Build Output API v3 layout so a plain
-    // `vite build` on Vercel's own build machines (no Nitro deploy step)
-    // is already a valid deployment — no separate `vercel build` needed.
-    output: {
-      dir: ".vercel/output",
-      serverDir: ".vercel/output/functions/__server.func",
-      publicDir: ".vercel/output/static",
-    },
-  },
+  nitro: isNodeBuild
+    ? { preset: "node" }
+    : {
+        preset: "vercel",
+        // Emit straight into Vercel's Build Output API v3 layout so a plain
+        // `vite build` on Vercel's own build machines (no Nitro deploy step)
+        // is already a valid deployment — no separate `vercel build` needed.
+        output: {
+          dir: ".vercel/output",
+          serverDir: ".vercel/output/functions/__server.func",
+          publicDir: ".vercel/output/static",
+        },
+      },
   tanstackStart: {
     // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
     // nitro/vite builds from this

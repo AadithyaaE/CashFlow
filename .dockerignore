@@ -1,0 +1,30 @@
+# Frontend Docker build context exclusions (repo root is the build context —
+# the backend has its own separate backend/.dockerignore).
+
+node_modules/
+dist/
+.output/
+.vinxi/
+.vercel/
+
+# Git
+.git/
+.gitignore
+
+# Secrets — the frontend build needs none, but exclude on principle.
+.env
+.env.*
+
+# Backend (irrelevant to the frontend image; has its own Dockerfile/context)
+backend/
+
+# Editor / OS cruft
+.vscode/
+.DS_Store
+*.log
+
+# Misc repo artifacts not needed for the frontend build
+docs/
+*.patch
+image.png
+sampleinvoice.pdf

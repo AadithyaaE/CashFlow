@@ -1,0 +1,11 @@
+# Local development convenience only — NOT used for production deployment
+# (Render builds the backend/Dockerfile directly). Neon Postgres stays
+# external; no database service is defined here.
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env

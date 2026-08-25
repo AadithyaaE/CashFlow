@@ -1,0 +1,25 @@
+# Python
+venv/
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+
+# Secrets — never baked into the image; injected at runtime as env vars.
+.env
+.env.*
+
+# Git
+.git/
+.gitignore
+
+# Local SQLite (dev-only fallback; production uses Neon via DATABASE_URL)
+cashpilot.db
+
+# Local upload artifacts (superseded by S3; never needed in the image)
+uploads/
+
+# Editor / OS cruft
+.vscode/
+.DS_Store
+*.log

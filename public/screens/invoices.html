@@ -1550,7 +1550,7 @@
                         progressLabel.textContent = "Uploading invoice…";
                     }, 400);
 
-                    openExtractionPreview(result.extracted, result.needs_review);
+                    openExtractionPreview(result.extracted, result.needs_review, result.s3_key);
 
                 } else if (xhr.status === 401) {
 
@@ -1590,8 +1590,11 @@
         // extraction step itself never writes to the database.
         // ==========================================
         let extractionSaving = false;
+        let extractionS3Key = null;
 
-        function openExtractionPreview(extracted, needsReview) {
+        function openExtractionPreview(extracted, needsReview, s3Key) {
+
+            extractionS3Key = s3Key || null;
 
             document.getElementById("extract-vendor").value = extracted.vendor || "";
             document.getElementById("extract-invoice-number").value = extracted.invoice_number || "";
@@ -1652,6 +1655,7 @@
                         gst: document.getElementById("extract-gst").value.trim() || null,
                         payment_terms: document.getElementById("extract-payment-terms").value.trim() || null,
                         description: document.getElementById("extract-description").value.trim() || null,
+                        s3_key: extractionS3Key,
                     }),
                 });
 

@@ -1,6 +1,7 @@
 import os
 import re
 import json
+import tempfile
 from fastapi.middleware.cors import CORSMiddleware
 
 from fastapi import FastAPI, UploadFile, File
@@ -19,6 +20,7 @@ from extraction import get_document_text, extract_invoice_fields, ExtractionErro
 from scoring import priority_score, is_valid_due_date
 import cfo
 import ai_errors
+import storage.s3_service as s3_service
 import bcrypt
 from jose import jwt, JWTError
 from models import User
@@ -266,11 +268,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_FOLDER = "uploads"
-
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-
 @app.get("/")
 def home():
     return {"message": "CashPilot Backend Running"}
@@ -278,6 +275,16 @@ def home():
 
 MAX_UPLOAD_BYTES = 10 * 1024 * 1024  # 10 MB
 SUPPORTED_UPLOAD_EXTENSIONS = {"pdf", "jpg", "jpeg", "png"}
+
+
+def _cleanup_orphaned_s3_object(key: str) -> None:
+    """Best-effort delete after a failed extraction. Never raises — a cleanup
+    failure here must not mask the real extraction error the client is about
+    to receive."""
+    try:
+        s3_service.delete_file(key)
+    except s3_service.S3StorageError as exc:
+        print(f"Failed to clean up orphaned S3 object {key}: {exc}")
 
 
 @app.post("/upload-invoice")
@@ -292,6 +299,9 @@ async def upload_invoice(
     extracted fields in a preview and only persists them once the user
     confirms, via the existing POST /manual-expense endpoint.
     """
+
+    if not s3_service.is_configured():
+        raise HTTPException(status_code=503, detail="File storage is not configured on the server.")
 
     original_name = os.path.basename(file.filename or "")
     extension = original_name.rsplit(".", 1)[-1].lower() if "." in original_name else ""
@@ -310,39 +320,46 @@ async def upload_invoice(
     if len(contents) == 0:
         raise HTTPException(status_code=400, detail="Uploaded file is empty")
 
-    import uuid
-
-    safe_name = f"{current_user.id}_{uuid.uuid4().hex}_{re.sub(r'[^A-Za-z0-9._-]', '_', original_name)}"
-
-    filepath = os.path.join(
-        UPLOAD_FOLDER,
-        safe_name
-    )
-
-    with open(filepath, "wb") as f:
-        f.write(contents)
+    s3_key = s3_service.build_object_key(current_user.id, original_name)
 
     try:
+        s3_service.upload_file(contents, s3_key, content_type=file.content_type)
+    except s3_service.S3StorageError:
+        raise HTTPException(status_code=502, detail="Could not upload the file. Please try again.")
+
+    # extraction.py needs a real filesystem path (PyMuPDF), so the S3 upload
+    # is mirrored into a temp file for the duration of the extraction call.
+    tmp_fd, filepath = tempfile.mkstemp(suffix=f".{extension}")
+    try:
+        with os.fdopen(tmp_fd, "wb") as f:
+            f.write(contents)
+
         text = get_document_text(llm, filepath, extension)
         fields = extract_invoice_fields(llm, text)
     except ExtractionError as exc:
+        _cleanup_orphaned_s3_object(s3_key)
         raise HTTPException(status_code=400, detail=str(exc))
     except HTTPException:
         # Already normalized by ai_errors.call_gemini() (e.g. 429 quota
         # exhausted, 503 AI outage) inside get_document_text/
         # extract_invoice_fields — pass it through as-is instead of letting
         # the generic handler below flatten it back to a plain 502.
+        _cleanup_orphaned_s3_object(s3_key)
         raise
     except Exception:
+        _cleanup_orphaned_s3_object(s3_key)
         raise HTTPException(
             status_code=502,
             detail="Extraction failed unexpectedly. Please try again or enter the invoice manually.",
         )
+    finally:
+        os.remove(filepath)
 
     return {
         "message": "Invoice extracted successfully",
         "needs_review": fields["needs_review"],
         "extracted": fields,
+        "s3_key": s3_key,
     }
 
 
@@ -688,6 +705,8 @@ def delete_invoice(
         db.close()
         raise HTTPException(status_code=404, detail="Invoice not found")
 
+    _cleanup_orphaned_s3_object(invoice.s3_key)
+
     db.delete(invoice)
 
     db.commit()
@@ -697,6 +716,36 @@ def delete_invoice(
     return {
         "message": "Invoice deleted"
     }
+
+
+@app.get("/invoice/{invoice_id}/download-url")
+def get_invoice_download_url(
+    invoice_id: int,
+    current_user: User = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    invoice = (
+        db.query(Invoice)
+        .filter(
+            Invoice.id == invoice_id,
+            Invoice.user_id == current_user.id
+        )
+        .first()
+    )
+
+    db.close()
+
+    if not invoice or not invoice.s3_key:
+        raise HTTPException(status_code=404, detail="Invoice not found")
+
+    try:
+        url = s3_service.generate_presigned_url(invoice.s3_key)
+    except s3_service.S3StorageError:
+        raise HTTPException(status_code=502, detail="Could not generate a download link. Please try again.")
+
+    return {"url": url}
 
 
 @app.put("/invoice/{invoice_id}")
@@ -1103,6 +1152,8 @@ def add_manual_expense(
     payment_terms=(data.payment_terms or "").strip() or None,
 
     description=(data.description or "").strip() or None,
+
+    s3_key=data.s3_key,
 
 )
 

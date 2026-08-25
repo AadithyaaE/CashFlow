@@ -52,6 +52,8 @@ class Invoice(Base):
 
     paid_at = Column(String, nullable=True)
 
+    s3_key = Column(String, nullable=True)
+
 class ManualExpenseRequest(
     BaseModel
 ):
@@ -75,6 +77,8 @@ class ManualExpenseRequest(
     payment_terms: str | None = None
 
     description: str | None = None
+
+    s3_key: str | None = None
 
 
 class InvoiceUpdateRequest(BaseModel):

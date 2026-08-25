@@ -250,6 +250,8 @@ const CashPilot = {
         return this.hydrateUserChrome();
     },
 
+    // Removes the Lovable editor's floating page-switcher widget, if present
+    // (some pages call this directly; see login.html/signup.html etc.).
     stripDevWidget() {
         document.querySelectorAll("[data-page-switcher]").forEach((el) => el.remove());
     },

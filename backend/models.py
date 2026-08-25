@@ -107,23 +107,6 @@ class VendorNegotiationRequest(BaseModel):
     goal: str = "extension"
 
 
-class ScenarioRequest(BaseModel):
-
-    current_balance: float
-
-    scenario_cost: float
-
-    projected_balance: float
-
-    projected_runway: int
-
-    total_payables: float
-
-
-class ChatRequest(BaseModel):
-    question: str
-
-
 class User(Base):
 
     __tablename__ = "users"

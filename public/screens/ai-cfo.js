@@ -9,13 +9,6 @@ let lastOverview = null;
 let lastDashboardData = null;
 let forecastChartInstance = null;
 
-const PRIORITY_COLOR = {
-    Critical: "text-red-600",
-    High: "text-orange-600",
-    Medium: "text-yellow-600",
-    Low: "text-green-600",
-};
-
 const PRIORITY_BADGE = {
     Critical: "bg-red-100 text-red-700",
     High: "bg-orange-100 text-orange-700",

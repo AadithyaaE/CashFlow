@@ -46,20 +46,6 @@ EXCHANGE_RATES_TO_INR = {
     "GBP": 116,
 }
 
-REQUIRED_FIELDS = [
-    "vendor_name",
-    "invoice_number",
-    "invoice_date",
-    "due_date",
-    "total_amount",
-    "currency",
-    "gst",
-    "category",
-    "payment_terms",
-    "description",
-]
-
-
 class ExtractionError(Exception):
     """Raised when the document can't be turned into any usable text at all."""
 

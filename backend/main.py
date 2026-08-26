@@ -253,13 +253,27 @@ _default_dev_origins = [
     "http://127.0.0.1:8085",
 ]
 
+# Always-allowed production frontend(s), independent of whatever CORS_ORIGINS
+# happens to be set to on the server. render.yaml's own CORS_ORIGINS value
+# can drift out of sync with the real Vercel deployment URL (exactly what
+# broke signup/register in production); listing the known-current frontend
+# here means a code deploy alone fixes it, without depending on someone also
+# updating the Render dashboard's environment variables.
+_default_prod_origins = [
+    "https://cash-flow-frd2.vercel.app",
+]
+
 # CORS_ORIGINS (comma-separated) drives which origins may call this API.
 # Previously this env var was parsed but never actually used, so every
 # deployment silently fell back to the localhost dev list — the browser
 # would block every request from a real frontend domain. Set CORS_ORIGINS
 # in production (e.g. to the Vercel deployment URL); the localhost entries
 # stay allowed too so local frontend dev keeps working against a deployed API.
-CORS_ORIGINS = _env_origins + _default_dev_origins if _env_origins else _default_dev_origins
+CORS_ORIGINS = (
+    _env_origins + _default_dev_origins + _default_prod_origins
+    if _env_origins
+    else _default_dev_origins + _default_prod_origins
+)
 
 app.add_middleware(
     CORSMiddleware,

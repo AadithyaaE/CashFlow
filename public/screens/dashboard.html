@@ -491,15 +491,15 @@
         setText("overviewBalance", fmt(data.current_balance));
         setText("totalPayables", fmt(data.total_payables));
         setText("totalReceivables", fmt(data.total_receivables || 0));
-        setText("cashRunway", `${data.cash_runway} Days`);
+        setText("cashRunway", `${CashPilot.formatRunwayDays(data.cash_runway)} Days`);
         setText("upcomingBills", fmt(data.upcoming_bills || 0));
         setText("sidebarBalance", fmt(data.current_balance));
-        setText("sidebarRunway", `${Math.ceil(data.cash_runway)} days runway`);
+        setText("sidebarRunway", `${CashPilot.formatRunwayDays(data.cash_runway)} days runway`);
 
         const balanceFooter = document.getElementById("balanceFooter");
         if (balanceFooter) {
             balanceFooter.innerHTML =
-                `<span class="material-symbols-outlined text-sm">schedule</span><span class="ml-1">${data.cash_runway} day cash runway</span>`;
+                `<span class="material-symbols-outlined text-sm">schedule</span><span class="ml-1">${CashPilot.formatRunwayDays(data.cash_runway)} day cash runway</span>`;
         }
 
         const payablesFooter = document.getElementById("payablesFooter");
@@ -551,12 +551,24 @@
 
     }
 
+    // "Upcoming Obligations" means unpaid payables specifically — money
+    // still owed. Status classification (Overdue/Due Soon/Pending) comes
+    // from the shared CashPilot.computeInvoiceStatus (see api.js) instead
+    // of a local copy, so this can't drift from Invoice Hub/Analytics again.
+    const OBLIGATIONS_STATUS_CLASS = {
+        overdue: "bg-error-container text-on-error-container",
+        due_soon: "bg-secondary-container text-on-secondary-container",
+        pending: "bg-tertiary-container text-on-tertiary-container",
+    };
+
     function renderObligationsTable(invoices) {
 
         const table = document.getElementById("invoiceTable");
         if (!table) return;
 
-        if (!invoices.length) {
+        const obligations = invoices.filter((i) => i.transaction_type === "payable" && !i.is_paid);
+
+        if (!obligations.length) {
             table.innerHTML = `
                 <tr>
                     <td colspan="5" class="px-lg py-xl text-center text-on-surface-variant">
@@ -567,25 +579,10 @@
             return;
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        table.innerHTML = obligations.map((invoice) => {
 
-        table.innerHTML = invoices.map((invoice) => {
-
-            const dueDate = CashPilot.parseBackendDate(invoice.due_date);
-            let status = "Pending";
-            let statusClass = "bg-tertiary-container text-on-tertiary-container";
-
-            if (dueDate) {
-                const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-                if (diffDays < 0) {
-                    status = "Overdue";
-                    statusClass = "bg-error-container text-on-error-container";
-                } else if (diffDays <= 3) {
-                    status = "Due Soon";
-                    statusClass = "bg-secondary-container text-on-secondary-container";
-                }
-            }
+            const { key, label } = CashPilot.computeInvoiceStatus(invoice);
+            const statusClass = OBLIGATIONS_STATUS_CLASS[key] || OBLIGATIONS_STATUS_CLASS.pending;
 
             const vendor = CashPilot.escapeHtml(invoice.vendor || "");
             const initial = CashPilot.escapeHtml(invoice.vendor ? invoice.vendor.charAt(0) : "V");
@@ -607,7 +604,7 @@
                     </td>
                     <td class="px-lg py-md text-center">
                         <span class="${statusClass} px-sm py-xs rounded-full text-xs font-bold">
-                            ${status}
+                            ${label}
                         </span>
                     </td>
                 </tr>

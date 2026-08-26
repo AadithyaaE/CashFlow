@@ -265,7 +265,7 @@
         try {
             const data = await CashPilot.apiJson("/dashboard");
             document.getElementById("sidebarBalance").textContent = CashPilot.formatCurrency(data.current_balance);
-            document.getElementById("sidebarRunway").textContent = `${Math.ceil(data.cash_runway)} days runway`;
+            document.getElementById("sidebarRunway").textContent = `${CashPilot.formatRunwayDays(data.cash_runway)} days runway`;
         } catch (_) {}
     }
 

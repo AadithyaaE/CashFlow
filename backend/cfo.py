@@ -16,6 +16,7 @@ from dataclasses import dataclass, replace
 from datetime import datetime, timedelta
 
 from scoring import priority_score
+from categories import normalize_category
 
 DATE_FMT = "%d-%m-%Y"
 
@@ -31,6 +32,7 @@ class SimpleInvoice:
     category: str | None
     transaction_type: str
     is_paid: bool
+    invoice_date: str | None = None
 
 
 def to_simple(invoice) -> SimpleInvoice:
@@ -44,6 +46,7 @@ def to_simple(invoice) -> SimpleInvoice:
         category=invoice.category,
         transaction_type=invoice.transaction_type,
         is_paid=bool(invoice.is_paid),
+        invoice_date=invoice.invoice_date,
     )
 
 
@@ -67,15 +70,88 @@ def _outstanding(invoices, transaction_type):
     ]
 
 
-def compute_runway_days(invoices, balance, today=None) -> int:
-    """Days of runway at the current unpaid-payables burn, same (balance /
-    burn) * 30 convention /dashboard uses — but scoped to *outstanding*
-    (unpaid) payables specifically, since this module's "burn" needs to mean
-    money still owed, not money already paid."""
-    monthly_burn = sum(i.amount for i in _outstanding(invoices, "payable"))
+HISTORY_MONTHS = 3  # how many complete calendar months back to look for a burn average
+
+
+def _add_months(year: int, month: int, delta: int) -> tuple[int, int]:
+    total = (year * 12 + (month - 1)) + delta
+    return total // 12, total % 12 + 1
+
+
+def compute_monthly_burn(invoices, today=None) -> dict:
+    """Best available signal for "typical monthly payable burn".
+
+    Primary: average payable spend per calendar month, over the last
+    HISTORY_MONTHS *complete* months (the current, still-in-progress month
+    is excluded so a partial month never skews the average). Grouped by
+    invoice_date — the date the expense was actually issued/incurred — not
+    due_date, which only says when it's scheduled to be *paid* and can put a
+    months-old expense in a future bucket (or vice versa). Both paid and
+    unpaid payables count, as long as their invoice_date falls in the
+    window; invoices with no invoice_date at all (common for manually-added
+    expenses — only the OCR upload/review flow captures this field) simply
+    can't be placed on the timeline and are excluded, not guessed at.
+    Averages only over the months that actually have data, so 1 or 2
+    populated months still produce a real average instead of forcing a full
+    3-month requirement.
+
+    Fallback: if none of the last HISTORY_MONTHS months have any dated
+    payable history, the current outstanding (unpaid) payables total is
+    used instead — the same figure this calculation used before.
+
+    Returns {"monthly_burn": float, "method": "historical_average" | "current_payables_fallback"}.
+    """
+    today = today or datetime.today().date()
+
+    window_keys = set()
+    key = (today.year, today.month)
+    for _ in range(HISTORY_MONTHS):
+        key = _add_months(key[0], key[1], -1)
+        window_keys.add(key)
+
+    monthly_totals: dict[tuple[int, int], float] = {}
+    for inv in invoices:
+        if inv.transaction_type != "payable":
+            continue
+        due = parse_due_date(inv.invoice_date)  # same DD-MM-YYYY parser, applied to invoice_date
+        if due is None:
+            continue
+        month_key = (due.year, due.month)
+        if month_key not in window_keys:
+            continue
+        monthly_totals[month_key] = monthly_totals.get(month_key, 0) + inv.amount
+
+    if monthly_totals:
+        monthly_burn = sum(monthly_totals.values()) / len(monthly_totals)
+        return {"monthly_burn": round(monthly_burn, 2), "method": "historical_average"}
+
+    current_payables = sum(i.amount for i in _outstanding(invoices, "payable"))
+    return {"monthly_burn": round(current_payables, 2), "method": "current_payables_fallback"}
+
+
+def compute_runway(invoices, balance, today=None) -> dict:
+    """Single source of truth for cash runway — used by /dashboard, the AI
+    CFO health score (and everything derived from it), and the scenario
+    simulator, so the figure can't drift between screens again.
+
+    (balance / monthly_burn) * 30 is unchanged; only how monthly_burn itself
+    is determined has improved — see compute_monthly_burn. Returns 365 (the
+    existing display-layer "365+" cap) whenever there's no burn signal at
+    all, exactly as before.
+    """
+    burn = compute_monthly_burn(invoices, today=today)
+    monthly_burn = burn["monthly_burn"]
+
     if monthly_burn > 0:
-        return round((balance / monthly_burn) * 30)
-    return 365
+        runway_days = round((balance / monthly_burn) * 30)
+    else:
+        runway_days = 365
+
+    return {
+        "runway_days": runway_days,
+        "monthly_burn": monthly_burn,
+        "runway_method": burn["method"] if monthly_burn > 0 else "no_burn_cap",
+    }
 
 
 def category_breakdown(invoices) -> list[dict]:
@@ -83,7 +159,7 @@ def category_breakdown(invoices) -> list[dict]:
     answer "what's my biggest expense" from real totals, not a guess."""
     totals: dict[str, float] = {}
     for i in invoices:
-        category = i.category or "Uncategorized"
+        category = normalize_category(i.category) if i.category else "Uncategorized"
         totals[category] = totals.get(category, 0) + i.amount
     return [
         {"category": category, "amount": round(amount, 2)}
@@ -217,7 +293,8 @@ def compute_financial_health(invoices, balance, forecast=None) -> dict:
     # in the next 30 days, reusing the forecast instead of re-scanning.
     upcoming_30d = sum(b["outgoing"] for b in forecast if b["days"] <= 30)
 
-    runway_days = compute_runway_days(invoices, balance)
+    runway = compute_runway(invoices, balance)
+    runway_days = runway["runway_days"]
 
     vendor_totals: dict[str, float] = {}
     for i in payables:
@@ -308,6 +385,8 @@ def compute_financial_health(invoices, balance, forecast=None) -> dict:
         "explanation": explanation,
         "metrics": {
             "runway_days": runway_days,
+            "monthly_burn": runway["monthly_burn"],
+            "runway_method": runway["runway_method"],
             "total_outstanding_payables": round(total_payables, 2),
             "total_outstanding_receivables": round(total_receivables, 2),
             "overdue_payables_count": len(overdue),

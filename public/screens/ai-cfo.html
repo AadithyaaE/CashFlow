@@ -394,16 +394,17 @@
 
         <!-- Scenario Simulator -->
         <div id="scenario-simulator" class="bg-surface-container-lowest border border-outline-variant p-lg rounded-xl shadow-sm">
-            <div class="flex items-center gap-sm mb-lg">
+            <div class="flex items-center gap-sm mb-xs">
                 <span class="material-symbols-outlined text-secondary" style="font-variation-settings:'FILL' 1;">science</span>
                 <h3 class="font-headline-md text-on-surface">Scenario Simulator</h3>
             </div>
+            <p class="text-xs text-on-surface-variant mb-lg">Model a hypothetical change and see how it would move your Health Score, Runway, and Risk Level — no changes are saved.</p>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-lg items-start">
                 <form id="scenarioForm" class="space-y-md">
                     <div>
                         <label class="font-label-md text-on-surface-variant block mb-xs">What if…</label>
-                        <select id="scenarioType" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest">
+                        <select id="scenarioType" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors">
                             <option value="delay_payable">I delay a payable by N days</option>
                             <option value="accelerate_receivable">A customer pays a receivable N days early</option>
                             <option value="expense_increase">My expenses increase by X%</option>
@@ -412,23 +413,24 @@
 
                     <div id="scenarioInvoiceField">
                         <label class="font-label-md text-on-surface-variant block mb-xs">Invoice</label>
-                        <select id="scenarioInvoiceId" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest">
+                        <select id="scenarioInvoiceId" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors">
                             <option value="">Loading invoices…</option>
                         </select>
                     </div>
 
                     <div id="scenarioDaysField">
                         <label class="font-label-md text-on-surface-variant block mb-xs">Days</label>
-                        <input id="scenarioDays" type="number" min="1" value="10" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest" />
+                        <input id="scenarioDays" type="number" min="1" value="10" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors" />
                     </div>
 
                     <div id="scenarioPercentField" class="hidden">
                         <label class="font-label-md text-on-surface-variant block mb-xs">Percent increase</label>
-                        <input id="scenarioPercent" type="number" min="1" value="20" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest" />
+                        <input id="scenarioPercent" type="number" min="1" value="20" class="w-full px-md py-sm border border-outline-variant rounded-lg bg-surface-container-lowest focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-colors" />
                     </div>
 
-                    <button type="submit" id="scenarioSubmitBtn" class="w-full px-md py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm hover:bg-primary-container transition-all">
-                        Run Scenario
+                    <button type="submit" id="scenarioSubmitBtn" class="w-full px-md py-sm bg-primary text-on-primary rounded-lg font-label-md shadow-sm hover:bg-primary-container transition-all disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-xs">
+                        <span id="scenarioSubmitIcon" class="material-symbols-outlined text-base hidden animate-spin">progress_activity</span>
+                        <span id="scenarioSubmitLabel">Run Scenario</span>
                     </button>
                 </form>
 
@@ -437,7 +439,7 @@
                         <span class="material-symbols-outlined text-on-surface-variant text-2xl">science</span>
                     </div>
                     <p class="font-bold text-on-surface text-sm">Run a scenario to see the impact</p>
-                    <p class="text-xs text-on-surface-variant max-w-[240px]">Projected Health Score, Cash Balance, Runway, and Risk Level will appear here.</p>
+                    <p class="text-xs text-on-surface-variant max-w-[240px]">Choose a scenario on the left — Health Score, Runway, Cash Balance, and Risk Level will update here.</p>
                 </div>
             </div>
         </div>

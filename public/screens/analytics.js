@@ -14,22 +14,12 @@ let currentRange = { key: '30', from: null, to: null };
 let charts = { trend: null, category: null, bar: null, status: null };
 
 // ==========================================
-// STATUS (mirrors public/screens/invoices.html's computeStatus for
-// consistent Paid/Overdue/Due Soon/Pending semantics across the app)
+// STATUS — shared with Invoice Hub and the Dashboard via
+// CashPilot.computeInvoiceStatus (see api.js) so this can't silently drift
+// between pages again.
 // ==========================================
 function computeStatus(invoice) {
-    if (invoice.is_paid) {
-        return { key: "paid", label: "Paid" };
-    }
-    const due = CashPilot.parseBackendDate(invoice.due_date);
-    if (due) {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-        if (diffDays < 0) return { key: "overdue", label: "Overdue" };
-        if (diffDays <= 3) return { key: "due_soon", label: "Due Soon" };
-    }
-    return { key: "pending", label: "Pending" };
+    return CashPilot.computeInvoiceStatus(invoice);
 }
 
 // ==========================================
@@ -122,7 +112,7 @@ async function loadAll(manual) {
         document.getElementById('analyticsErrorBanner').classList.add('hidden');
 
         setText('sidebarBalance', CashPilot.formatCurrency(dashboardData.current_balance));
-        setText('sidebarRunway', `${Math.ceil(dashboardData.cash_runway)} days runway`);
+        setText('sidebarRunway', `${CashPilot.formatRunwayDays(dashboardData.cash_runway)} days runway`);
 
         renderAll();
 

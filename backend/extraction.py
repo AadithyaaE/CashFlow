@@ -22,6 +22,7 @@ import fitz
 from langchain_core.messages import HumanMessage
 
 import ai_errors
+from categories import normalize_category
 
 
 # A digital PDF page with real invoice content typically yields well over a
@@ -262,7 +263,7 @@ def extract_invoice_fields(llm, text: str) -> dict:
     due_date = normalize_date(raw_fields.get("due_date")) or "Unknown"
     invoice_date = normalize_date(raw_fields.get("invoice_date"))
 
-    category = (raw_fields.get("category") or "").strip() or "General"
+    category = normalize_category(raw_fields.get("category"))
 
     def clean_str(key):
         value = raw_fields.get(key)

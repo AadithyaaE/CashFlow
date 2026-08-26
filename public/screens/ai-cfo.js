@@ -47,7 +47,7 @@ async function loadSidebar() {
         const data = await CashPilot.apiJson("/dashboard");
         lastDashboardData = data;
         setText("sidebarBalance", CashPilot.formatCurrency(data.current_balance));
-        setText("sidebarRunway", `${Math.ceil(data.cash_runway)} days runway`);
+        setText("sidebarRunway", `${CashPilot.formatRunwayDays(data.cash_runway)} days runway`);
         renderFinancialOverviewStats();
     } catch (_) {
         // Non-critical widget — the rest of the page still works without it.
@@ -64,7 +64,7 @@ function renderFinancialOverviewStats() {
     const criticalTotal = criticalPayables.reduce((sum, r) => sum + r.amount, 0);
 
     setText("overviewCurrentBalance", CashPilot.formatCurrency(lastDashboardData.current_balance));
-    setText("overviewRunway", `${metrics.runway_days} days`);
+    setText("overviewRunway", `${CashPilot.formatRunwayDays(metrics.runway_days)} days`);
     setText("overviewPayables", CashPilot.formatCurrency(metrics.total_outstanding_payables));
     setText("overviewReceivables", CashPilot.formatCurrency(metrics.total_outstanding_receivables));
     setText(
@@ -446,9 +446,15 @@ function updateScenarioFieldVisibility() {
 
 document.getElementById("scenarioType").addEventListener("change", updateScenarioFieldVisibility);
 
-document.getElementById("scenarioForm").addEventListener("submit", async (e) => {
+document.getElementById("scenarioForm").addEventListener("submit", (e) => {
     e.preventDefault();
+    runScenario();
+});
 
+// Shared by the form submit and the error panel's "Try Again" button, so
+// there's exactly one place that builds the request and handles the result —
+// same /cfo/scenario call and payload shape either way.
+async function runScenario() {
     const type = document.getElementById("scenarioType").value;
     const body = { scenario_type: type };
 
@@ -465,8 +471,12 @@ document.getElementById("scenarioForm").addEventListener("submit", async (e) => 
     }
 
     const submitBtn = document.getElementById("scenarioSubmitBtn");
+    const submitIcon = document.getElementById("scenarioSubmitIcon");
+    const submitLabel = document.getElementById("scenarioSubmitLabel");
     submitBtn.disabled = true;
-    submitBtn.textContent = "Running…";
+    submitIcon.classList.remove("hidden");
+    submitLabel.textContent = "Running…";
+    renderScenarioSkeleton();
 
     try {
         const result = await CashPilot.apiJson("/cfo/scenario", {
@@ -475,62 +485,147 @@ document.getElementById("scenarioForm").addEventListener("submit", async (e) => 
         });
         renderScenarioResult(result);
     } catch (err) {
-        CashPilot.toast(err.message || "Could not run this scenario.", "error");
+        renderScenarioError(err.message || "Could not run this scenario.");
     } finally {
         submitBtn.disabled = false;
-        submitBtn.textContent = "Run Scenario";
+        submitIcon.classList.add("hidden");
+        submitLabel.textContent = "Run Scenario";
     }
-});
+}
+
+// Risk levels are already ordered Low < Medium < High < Critical throughout
+// the app (see cfo.py's risk_level_from_score) — reused here only to label a
+// direction (Improved/Worsened/No change), not to compute a new value.
+const RISK_RANK = { Low: 0, Medium: 1, High: 2, Critical: 3 };
+
+function riskDeltaPill(before, after) {
+    const a = RISK_RANK[before];
+    const b = RISK_RANK[after];
+    if (a === undefined || b === undefined || a === b) {
+        return `<span class="text-[10px] font-semibold text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded-full">No change</span>`;
+    }
+    const improved = b < a;
+    const cls = improved ? "text-emerald-700 bg-emerald-50" : "text-red-700 bg-red-50";
+    return `<span class="text-[10px] font-semibold ${cls} px-1.5 py-0.5 rounded-full">${improved ? "Improved" : "Worsened"}</span>`;
+}
+
+function numericDeltaPill(value, higherIsBetter = true) {
+    if (value === 0) {
+        return `<span class="text-[10px] font-semibold text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded-full">No change</span>`;
+    }
+    const good = higherIsBetter ? value > 0 : value < 0;
+    const arrow = value > 0 ? "▲" : "▼";
+    const cls = good ? "text-emerald-700 bg-emerald-50" : "text-red-700 bg-red-50";
+    return `<span class="text-[10px] font-semibold ${cls} px-1.5 py-0.5 rounded-full">${arrow} ${Math.abs(value)}</span>`;
+}
+
+const SCENARIO_RISK_COLOR = {
+    Low: "text-emerald-600",
+    Medium: "text-secondary",
+    High: "text-orange-600",
+    Critical: "text-error",
+};
+
+// One compact card per metric: icon + label (RESULT CARD DESIGN), the
+// simulated value as the large primary figure, and a "Current → Simulated"
+// line with a delta pill (CURRENT VS SIMULATED COMPARISON) — folded into the
+// same card instead of a second, redundant section, since every value here
+// already comes straight from result.baseline/result.projected.
+function scenarioMetricCard({ icon, label, current, simulated, deltaHtml }) {
+    return `
+        <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant hover:border-primary/40 transition-colors">
+            <div class="flex items-center gap-xs mb-xs">
+                <span class="material-symbols-outlined text-primary text-base">${icon}</span>
+                <p class="text-xs text-on-surface-variant font-label-md">${label}</p>
+            </div>
+            <p class="text-2xl font-bold text-on-surface leading-tight">${simulated.value}${simulated.suffix ? `<span class="text-xs font-normal text-on-surface-variant ml-1">${simulated.suffix}</span>` : ""}</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Current: ${current} &rarr; Simulated: ${simulated.value}${simulated.suffix ? ` ${simulated.suffix}` : ""}</p>
+            <div class="mt-xs">${deltaHtml}</div>
+        </div>
+    `;
+}
 
 function renderScenarioResult(result) {
     const { baseline, projected, description } = result;
-
     const delta = (a, b) => Math.round(b - a);
-    const deltaPill = (value, higherIsBetter = true) => {
-        if (value === 0) {
-            return `<span class="text-[10px] font-semibold text-on-surface-variant bg-surface-container px-1.5 py-0.5 rounded-full">No change</span>`;
-        }
-        const good = higherIsBetter ? value > 0 : value < 0;
-        const arrow = value > 0 ? "▲" : "▼";
-        const cls = good ? "text-emerald-700 bg-emerald-50" : "text-red-700 bg-red-50";
-        return `<span class="text-[10px] font-semibold ${cls} px-1.5 py-0.5 rounded-full">${arrow} ${Math.abs(value)}</span>`;
-    };
-    const riskColor = {
-        Low: "text-emerald-600",
-        Medium: "text-secondary",
-        High: "text-orange-600",
-        Critical: "text-error",
-    };
+
+    const cards = [
+        scenarioMetricCard({
+            icon: "insights",
+            label: "Health Score",
+            current: baseline.health_score,
+            simulated: { value: projected.health_score, suffix: "/100" },
+            deltaHtml: numericDeltaPill(delta(baseline.health_score, projected.health_score), true),
+        }),
+        scenarioMetricCard({
+            icon: "schedule",
+            label: "Cash Runway",
+            current: `${CashPilot.formatRunwayDays(baseline.runway_days)} days`,
+            simulated: { value: CashPilot.formatRunwayDays(projected.runway_days), suffix: "days" },
+            deltaHtml: numericDeltaPill(delta(baseline.runway_days, projected.runway_days), true),
+        }),
+        scenarioMetricCard({
+            icon: "account_balance_wallet",
+            label: "Cash Balance",
+            current: CashPilot.formatCurrency(baseline.balance),
+            simulated: { value: CashPilot.formatCurrency(projected.balance), suffix: "" },
+            deltaHtml: numericDeltaPill(delta(baseline.balance, projected.balance), true),
+        }),
+        `
+        <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant hover:border-primary/40 transition-colors">
+            <div class="flex items-center gap-xs mb-xs">
+                <span class="material-symbols-outlined text-primary text-base">warning</span>
+                <p class="text-xs text-on-surface-variant font-label-md">Risk Level</p>
+            </div>
+            <p class="text-2xl font-bold leading-tight ${SCENARIO_RISK_COLOR[projected.risk_level] || "text-on-surface"}">${CashPilot.escapeHtml(projected.risk_level)}</p>
+            <p class="text-[11px] text-on-surface-variant mt-1">Current: ${CashPilot.escapeHtml(baseline.risk_level)} &rarr; Simulated: ${CashPilot.escapeHtml(projected.risk_level)}</p>
+            <div class="mt-xs">${riskDeltaPill(baseline.risk_level, projected.risk_level)}</div>
+        </div>
+        `,
+    ];
 
     const resultEl = document.getElementById("scenarioResult");
     // Swap out of the dashed empty-state look now that there's a real result.
     resultEl.className = "p-lg rounded-xl border border-outline-variant bg-primary-fixed/10";
     resultEl.innerHTML = `
-        <div class="flex items-center gap-sm mb-lg pb-md border-b border-outline-variant/60">
-            <span class="material-symbols-outlined text-primary">auto_awesome</span>
-            <p class="font-semibold text-on-surface text-sm">${CashPilot.escapeHtml(description)}</p>
-        </div>
-        <div class="grid grid-cols-2 gap-md">
-            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant mb-xs">Cash Runway</p>
-                <p class="text-2xl font-bold text-on-surface">${projected.runway_days}<span class="text-xs font-normal text-on-surface-variant ml-1">days</span></p>
-                <div class="mt-xs">${deltaPill(delta(baseline.runway_days, projected.runway_days), true)}</div>
-            </div>
-            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant mb-xs">Health Score</p>
-                <p class="text-2xl font-bold text-on-surface">${projected.health_score}<span class="text-xs font-normal text-on-surface-variant ml-1">/100</span></p>
-                <div class="mt-xs">${deltaPill(delta(baseline.health_score, projected.health_score), true)}</div>
-            </div>
-            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant mb-xs">Cash Balance</p>
-                <p class="text-2xl font-bold text-on-surface">${CashPilot.formatCurrency(projected.balance)}</p>
-            </div>
-            <div class="p-md rounded-lg bg-surface-container-lowest border border-outline-variant">
-                <p class="text-xs text-on-surface-variant mb-xs">Risk Level</p>
-                <p class="text-2xl font-bold ${riskColor[projected.risk_level] || ""}">${projected.risk_level}</p>
+        <div class="mb-lg pb-md border-b border-outline-variant/60">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-primary mb-xs">Scenario Result</p>
+            <div class="flex items-start gap-sm">
+                <span class="material-symbols-outlined text-primary">auto_awesome</span>
+                <p class="font-semibold text-on-surface text-sm">${CashPilot.escapeHtml(description)}</p>
             </div>
         </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">${cards.join("")}</div>
     `;
+}
+
+// Subtle placeholder shown only while the request is in flight — matches the
+// real result's layout so the panel doesn't jump size when data arrives.
+function renderScenarioSkeleton() {
+    const resultEl = document.getElementById("scenarioResult");
+    resultEl.className = "p-lg rounded-xl border border-outline-variant bg-surface-container-low/50";
+    const card = `<div class="h-[86px] rounded-lg bg-surface-container animate-pulse"></div>`;
+    resultEl.innerHTML = `
+        <div class="mb-lg pb-md border-b border-outline-variant/60">
+            <div class="h-3 w-24 rounded bg-surface-container animate-pulse mb-sm"></div>
+            <div class="h-4 w-3/4 rounded bg-surface-container animate-pulse"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-md">${card}${card}${card}${card}</div>
+    `;
+}
+
+function renderScenarioError(message) {
+    const resultEl = document.getElementById("scenarioResult");
+    resultEl.className = "p-lg rounded-xl border border-error bg-error-container/20 flex flex-col items-center justify-center text-center gap-sm min-h-[220px]";
+    resultEl.innerHTML = `
+        <div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center">
+            <span class="material-symbols-outlined text-error text-2xl">error</span>
+        </div>
+        <p class="font-bold text-on-surface text-sm">Couldn't run this scenario</p>
+        <p class="text-xs text-on-surface-variant max-w-[260px]">${CashPilot.escapeHtml(message)}</p>
+        <button type="button" id="scenarioRetryBtn" class="mt-xs px-md py-xs rounded-lg bg-error text-on-error font-label-md text-xs font-bold hover:opacity-90 transition-opacity">Try Again</button>
+    `;
+    document.getElementById("scenarioRetryBtn").addEventListener("click", runScenario);
 }
 
 // ---------------------------------------------------------------------------

@@ -205,7 +205,7 @@
                 <div class="mt-sm grid grid-cols-2 gap-sm">
                     <div class="p-sm rounded-lg bg-surface-container-low border border-outline-variant">
                         <p class="text-[10px] text-on-surface-variant">Runway</p>
-                        <p class="text-sm font-bold">${data.projected.runway_days}d <span class="text-[10px] font-normal text-on-surface-variant">(${delta(data.baseline.runway_days, data.projected.runway_days)}d)</span></p>
+                        <p class="text-sm font-bold">${CashPilot.formatRunwayDays(data.projected.runway_days)}d <span class="text-[10px] font-normal text-on-surface-variant">(${delta(data.baseline.runway_days, data.projected.runway_days)}d)</span></p>
                     </div>
                     <div class="p-sm rounded-lg bg-surface-container-low border border-outline-variant">
                         <p class="text-[10px] text-on-surface-variant">Health Score</p>

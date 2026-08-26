@@ -274,6 +274,19 @@ const CashPilot = {
 
     },
 
+    // The backend caps cash_runway/runway_days at 365 whenever monthly burn
+    // is 0 (see backend/main.py and cfo.py) — that's a fallback meaning
+    // "unknown/unbounded", not a precise 365-day calculation. Callers keep
+    // their own unit text ("days", "days runway", "d", etc.); this only
+    // formats the number itself.
+    formatRunwayDays(days) {
+
+        const n = Math.round(Number(days) || 0);
+
+        return n >= 365 ? "365+" : String(n);
+
+    },
+
     // Backend dates come back as "DD-MM-YYYY" strings that the native Date
     // constructor cannot parse reliably. Returns a Date or null.
     parseBackendDate(value) {
@@ -289,6 +302,38 @@ const CashPilot = {
         const date = new Date(Number(year), Number(month) - 1, Number(day));
 
         return isNaN(date.getTime()) ? null : date;
+
+    },
+
+    // Single definition of invoice status (Paid / Overdue / Due Soon /
+    // Pending), used consistently by Invoice Hub, Analytics, and the
+    // Dashboard's obligations table — previously three separate copies of
+    // this same logic that could silently drift apart. "Due Soon" is a
+    // 3-day window (0-3 days out, inclusive); there's no separate "Due
+    // Today" status — a same-day due date falls under "Due Soon". An
+    // unparseable/missing due_date falls under "Pending", same as anything
+    // due more than 3 days out.
+    computeInvoiceStatus(invoice) {
+
+        if (invoice.is_paid) {
+            return { key: "paid", label: "Paid", className: "bg-green-100 text-green-700" };
+        }
+
+        const due = this.parseBackendDate(invoice.due_date);
+        if (due) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const diffDays = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                return { key: "overdue", label: "Overdue", className: "bg-red-100 text-red-700" };
+            }
+            if (diffDays <= 3) {
+                return { key: "due_soon", label: "Due Soon", className: "bg-amber-100 text-amber-700" };
+            }
+        }
+
+        return { key: "pending", label: "Pending", className: "bg-blue-100 text-blue-700" };
 
     },
 

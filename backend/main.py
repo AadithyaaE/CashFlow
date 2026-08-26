@@ -18,6 +18,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from models import UpdateBalanceRequest
 from extraction import get_document_text, extract_invoice_fields, ExtractionError
 from scoring import priority_score, is_valid_due_date
+from categories import normalize_category
 import cfo
 import ai_errors
 import storage.s3_service as s3_service
@@ -384,6 +385,14 @@ def dashboard(
 ).all()
     for invoice in invoices:
 
+        # "Upcoming Bills" means unpaid payables specifically — matches the
+        # AI CFO's upcoming_30d_obligations (compute_cash_flow_forecast),
+        # which already excludes paid invoices and receivables. Without
+        # these two filters this figure could count money coming IN
+        # (receivables) or bills already paid as if still owed.
+        if invoice.transaction_type != "payable" or invoice.is_paid:
+            continue
+
         try:
 
             due = datetime.strptime(
@@ -416,26 +425,11 @@ def dashboard(
         if invoice.transaction_type == "receivable"
     )
 
-    # Runway burn must reflect money still owed, not money already paid —
-    # matches cfo.py's compute_runway_days (used by the AI CFO page), which
-    # scopes to unpaid payables only. total_payables above is intentionally
-    # left as the sum of all payables — it feeds the separate "Total
-    # Payables" stat tile, not runway.
-    monthly_burn = sum(
-        invoice.amount
-        for invoice in invoices
-        if invoice.transaction_type == "payable" and not invoice.is_paid
-    )
-
-    if monthly_burn > 0:
-
-        runway_days = round(
-            (current_balance / monthly_burn) * 30
-        )
-
-    else:
-
-        runway_days = 365
+    # Cash runway is computed by the one shared cfo.compute_runway() function
+    # — same calculation the AI CFO page uses — so this can't drift from it
+    # again. total_payables above is intentionally left as the sum of all
+    # payables; it feeds the separate "Total Payables" stat tile, not runway.
+    runway = cfo.compute_runway(invoices, current_balance)
 
     db.close()
 
@@ -444,7 +438,9 @@ def dashboard(
         "total_payables": total_payables,
         "upcoming_bills":upcoming_bills,
         "total_receivables": total_receivables,
-        "cash_runway": runway_days,
+        "cash_runway": runway["runway_days"],
+        "monthly_burn": runway["monthly_burn"],
+        "runway_method": runway["runway_method"],
         "invoice_count": len(invoices),
 
  }
@@ -569,7 +565,7 @@ def analytics(
 
     for invoice in invoices:
 
-        category = invoice.category
+        category = normalize_category(invoice.category)
 
         if category not in categories:
 
@@ -704,7 +700,7 @@ def update_invoice(
         update_data["vendor"] = update_data["vendor"].strip()
 
     if "category" in update_data and update_data["category"] is not None:
-        update_data["category"] = update_data["category"].strip()
+        update_data["category"] = normalize_category(update_data["category"])
 
     # Track when an invoice was marked paid so payment-delay analytics can
     # compare paid_at against due_date. Only stamp it on the transition to
@@ -770,7 +766,7 @@ def add_manual_expense(
 
     amount=data.amount,
 
-    category=data.category.strip(),
+    category=normalize_category(data.category),
 
     due_date=data.due_date,
 
@@ -829,6 +825,7 @@ def payment_plan(
         Invoice
     ).filter(
         Invoice.transaction_type == "payable",
+        Invoice.is_paid == False,
         Invoice.user_id == current_user.id
     ).all()
 

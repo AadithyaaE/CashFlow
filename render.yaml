@@ -34,7 +34,7 @@ services:
         value: https://cash-flow-frd2.vercel.app
       # Used to build the password-reset link sent to users.
       - key: FRONTEND_URL
-        value: https://cashpilot-ai.vercel.app
+        value: https://cash-flow-frd2.vercel.app
       # Your Neon Postgres connection string, e.g.:
       #   postgresql://<user>:<password>@<host>/<db>?sslmode=require
       # Set this in the Render dashboard — it's a secret and intentionally
